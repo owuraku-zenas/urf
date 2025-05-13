@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  events             Event[]
+  markedAttendances  Attendance[] @relation("MarkedBy")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model Member {
+  id          String   @id @default(cuid())
+  name        String
+  email       String?  @unique
+  phone       String
+  dateOfBirth DateTime?
+  university  String?
+  program     String?
+  startYear   String?
+  hostel      String?
+  roomNumber  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  cellGroup   CellGroup? @relation(fields: [cellGroupId], references: [id])
+  cellGroupId String?
+
+  invitedBy   Member?  @relation("MemberInvites", fields: [invitedById], references: [id])
+  invitedById String?
+  invitees    Member[] @relation("MemberInvites")
+
+  departments MemberDepartment[]
+  attendances Attendance[]
+}
+
+model Department {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     MemberDepartment[]
+}
+
+model CellGroup {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     Member[]
+}
+
+model MemberDepartment {
+  member      Member     @relation(fields: [memberId], references: [id])
+  memberId    String
+  department  Department @relation(fields: [departmentId], references: [id])
+  departmentId String
+  createdAt   DateTime   @default(now())
+
+  @@id([memberId, departmentId])
+}
+
+model Event {
+  id          String     @id @default(cuid())
+  name        String
+  type        EventType
+  date        DateTime
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  createdBy   User       @relation(fields: [createdById], references: [id])
+  createdById String
+
+  attendances Attendance[]
+}
+
+enum EventType {
+  MIDWEEK
+  SUNDAY
+  PRAYER
+  SPECIAL
+}
+
+model Attendance {
+  id        String         @id @default(cuid())
+  status    AttendanceStatus
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  event     Event          @relation(fields: [eventId], references: [id])
+  eventId   String
+  member    Member         @relation(fields: [memberId], references: [id])
+  memberId  String
+  markedBy  User           @relation("MarkedBy", fields: [markedById], references: [id])
+  markedById String
+
+  @@unique([eventId, memberId])
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+}
