@@ -5,29 +5,60 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, Download } from "lucide-react"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { exportToCSV } from "@/lib/utils"
+
+interface GrowthData {
+  month: string
+  newMembers: number
+  totalMembers: number
+  growthRate: number
+}
+
+interface ReportData {
+  growthData: GrowthData[]
+  totalMembers: number
+  newThisMonth: number
+  averageGrowthRate: number
+}
 
 export default function MemberGrowthReportPage() {
   const [isLoading, setIsLoading] = useState(true)
-  const [reportData, setReportData] = useState<any>(null)
+  const [reportData, setReportData] = useState<ReportData | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      // Mock data for the report
-      setReportData({
-        growthData: [
-          { month: "2024-01", newMembers: 5, totalMembers: 5 },
-          { month: "2024-02", newMembers: 8, totalMembers: 13 },
-          { month: "2024-03", newMembers: 12, totalMembers: 25 },
-          { month: "2024-04", newMembers: 7, totalMembers: 32 },
-        ],
-        totalMembers: 32,
-      })
-      setIsLoading(false)
-    }, 1000)
+    const fetchReportData = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch('/api/reports/member-growth')
+        if (!response.ok) {
+          throw new Error('Failed to fetch report data')
+        }
+        const data = await response.json()
+        setReportData(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred')
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-    return () => clearTimeout(timer)
+    fetchReportData()
   }, [])
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-10">
+        <Card className="border-red-200 bg-red-50">
+          <CardHeader>
+            <CardTitle className="text-red-800">Error</CardTitle>
+            <CardDescription className="text-red-600">{error}</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto py-10">
@@ -42,7 +73,27 @@ export default function MemberGrowthReportPage() {
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Member Growth Report</h1>
-        <Button>
+        <Button 
+          onClick={() => {
+            if (!reportData?.growthData?.length) {
+              alert('No data available to export')
+              return
+            }
+            try {
+              const exportData = reportData.growthData.map(month => ({
+                Month: formatMonth(month.month),
+                'New Members': month.newMembers,
+                'Total Members': month.totalMembers,
+                'Growth Rate': `${month.growthRate}%`
+              }))
+              exportToCSV(exportData, 'member-growth-report')
+            } catch (error) {
+              console.error('Export failed:', error)
+              alert('Failed to export report. Please try again.')
+            }
+          }}
+          disabled={isLoading || !reportData?.growthData?.length}
+        >
           <Download className="mr-2 h-4 w-4" />
           Export Report
         </Button>
@@ -62,11 +113,11 @@ export default function MemberGrowthReportPage() {
         <Card>
           <CardHeader>
             <CardTitle>New This Month</CardTitle>
-            <CardDescription>Members added in April</CardDescription>
+            <CardDescription>Members added this month</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold">
-              {isLoading ? "..." : reportData?.growthData[reportData.growthData.length - 1].newMembers}
+              {isLoading ? "..." : reportData?.newThisMonth}
             </div>
           </CardContent>
         </Card>
@@ -77,7 +128,9 @@ export default function MemberGrowthReportPage() {
             <CardDescription>Monthly average</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold">{isLoading ? "..." : "28%"}</div>
+            <div className="text-4xl font-bold">
+              {isLoading ? "..." : `${reportData?.averageGrowthRate}%`}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -93,8 +146,54 @@ export default function MemberGrowthReportPage() {
               <p>Loading chart data...</p>
             </div>
           ) : (
-            <div className="h-80 flex items-center justify-center bg-muted/20 rounded-md">
-              <p className="text-muted-foreground">[Chart visualization would appear here]</p>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={reportData?.growthData}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="month" 
+                    tickFormatter={(value) => formatMonth(value)}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis 
+                    yAxisId="left"
+                    label={{ value: 'Total Members', angle: -90, position: 'insideLeft' }}
+                  />
+                  <YAxis 
+                    yAxisId="right" 
+                    orientation="right"
+                    label={{ value: 'New Members', angle: 90, position: 'insideRight' }}
+                  />
+                  <Tooltip 
+                    formatter={(value: number, name: string) => [value, name === 'totalMembers' ? 'Total Members' : 'New Members']}
+                    labelFormatter={(label) => formatMonth(label)}
+                  />
+                  <Line
+                    yAxisId="left"
+                    type="monotone"
+                    dataKey="totalMembers"
+                    stroke="#2563eb"
+                    name="Total Members"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="newMembers"
+                    stroke="#16a34a"
+                    name="New Members"
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           )}
         </CardContent>
@@ -124,19 +223,14 @@ export default function MemberGrowthReportPage() {
                     </td>
                   </tr>
                 ) : (
-                  reportData.growthData.map((item: any, index: number) => {
-                    const prevTotal = index > 0 ? reportData.growthData[index - 1].totalMembers : 0
-                    const growthRate = prevTotal === 0 ? "N/A" : `${Math.round((item.newMembers / prevTotal) * 100)}%`
-
-                    return (
-                      <tr key={item.month} className="border-b">
-                        <td className="py-3 px-4">{formatMonth(item.month)}</td>
-                        <td className="py-3 px-4">{item.newMembers}</td>
-                        <td className="py-3 px-4">{item.totalMembers}</td>
-                        <td className="py-3 px-4">{growthRate}</td>
-                      </tr>
-                    )
-                  })
+                  reportData?.growthData.map((item) => (
+                    <tr key={item.month} className="border-b">
+                      <td className="py-3 px-4">{formatMonth(item.month)}</td>
+                      <td className="py-3 px-4">{item.newMembers}</td>
+                      <td className="py-3 px-4">{item.totalMembers}</td>
+                      <td className="py-3 px-4">{item.growthRate}%</td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>

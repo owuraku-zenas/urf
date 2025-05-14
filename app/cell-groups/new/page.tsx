@@ -31,8 +31,21 @@ export default function NewCellGroupPage() {
     setIsSubmitting(true)
 
     try {
-      // For demo purposes, we'll just simulate a successful submission
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await fetch("/api/cell-groups", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Failed to create cell group")
+      }
+
+      const data = await response.json()
+      console.log("Created cell group:", data)
 
       toast({
         title: "Success",
@@ -44,7 +57,7 @@ export default function NewCellGroupPage() {
       console.error("Error creating cell group:", error)
       toast({
         title: "Error",
-        description: "Failed to create cell group. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to create cell group. Please try again.",
         variant: "destructive",
       })
     } finally {

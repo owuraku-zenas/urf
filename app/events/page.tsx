@@ -1,70 +1,51 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, Filter, Plus } from "lucide-react"
+import { Search, Filter, Plus, Eye } from "lucide-react"
+
+interface Event {
+  id: string
+  name: string
+  type: 'MIDWEEK' | 'SUNDAY' | 'PRAYER' | 'SPECIAL'
+  date: string
+  description: string | null
+  attendances: {
+    id: string
+    member: {
+      id: string
+      name: string
+    }
+  }[]
+}
 
 export default function EventsPage() {
   const [isLoading, setIsLoading] = useState(true)
-  const [events, setEvents] = useState<any[]>([])
+  const [events, setEvents] = useState<Event[]>([])
   const [searchTerm, setSearchTerm] = useState("")
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      // Mock event data
-      setEvents([
-        {
-          id: "1",
-          name: "Sunday Service",
-          type: "SUNDAY",
-          date: new Date("2024-04-21T09:00:00Z"),
-          createdBy: { name: "Admin User" },
-          _count: { attendances: 30 },
-        },
-        {
-          id: "2",
-          name: "Midweek Service",
-          type: "MIDWEEK",
-          date: new Date("2024-04-17T18:00:00Z"),
-          createdBy: { name: "Admin User" },
-          _count: { attendances: 20 },
-        },
-        {
-          id: "3",
-          name: "Prayer Meeting",
-          type: "PRAYER",
-          date: new Date("2024-04-12T19:00:00Z"),
-          createdBy: { name: "Admin User" },
-          _count: { attendances: 15 },
-        },
-        {
-          id: "4",
-          name: "Sunday Service",
-          type: "SUNDAY",
-          date: new Date("2024-04-14T09:00:00Z"),
-          createdBy: { name: "Admin User" },
-          _count: { attendances: 28 },
-        },
-        {
-          id: "5",
-          name: "Midweek Service",
-          type: "MIDWEEK",
-          date: new Date("2024-04-10T18:00:00Z"),
-          createdBy: { name: "Admin User" },
-          _count: { attendances: 18 },
-        },
-      ])
-      setIsLoading(false)
-    }, 1000)
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('/api/events')
+        if (!response.ok) {
+          throw new Error('Failed to fetch events')
+        }
+        const data = await response.json()
+        setEvents(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred')
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-    return () => clearTimeout(timer)
+    fetchEvents()
   }, [])
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,6 +57,19 @@ export default function EventsPage() {
       event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       formatEventType(event.type).toLowerCase().includes(searchTerm.toLowerCase()),
   )
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-10">
+        <Card className="border-red-200 bg-red-50">
+          <CardHeader>
+            <CardTitle className="text-red-800">Error</CardTitle>
+            <CardDescription className="text-red-600">{error}</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto py-10">
@@ -126,7 +120,6 @@ export default function EventsPage() {
                 <TableHead>Event Name</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Date</TableHead>
-                <TableHead>Created By</TableHead>
                 <TableHead>Attendance</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -134,14 +127,15 @@ export default function EventsPage() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center">
+                  <TableCell colSpan={5} className="text-center">
                     Loading events...
                   </TableCell>
                 </TableRow>
               ) : filteredEvents.length === 0 ? (
                 <TableRow>
-                  <TableCell className="font-medium">No events found</TableCell>
-                  <TableCell colSpan={5}></TableCell>
+                  <TableCell colSpan={5} className="text-center">
+                    No events found
+                  </TableCell>
                 </TableRow>
               ) : (
                 filteredEvents.map((event) => (
@@ -149,11 +143,13 @@ export default function EventsPage() {
                     <TableCell className="font-medium">{event.name}</TableCell>
                     <TableCell>{formatEventType(event.type)}</TableCell>
                     <TableCell>{new Date(event.date).toLocaleDateString()}</TableCell>
-                    <TableCell>{event.createdBy.name}</TableCell>
-                    <TableCell>{event._count.attendances}</TableCell>
+                    <TableCell>{event.attendances.length}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/attendance/${event.id}`}>Mark Attendance</Link>
+                        <Link href={`/events/${event.id}`}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Event
+                        </Link>
                       </Button>
                     </TableCell>
                   </TableRow>

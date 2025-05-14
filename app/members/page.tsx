@@ -1,89 +1,53 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import Link from "next/link"
 
+interface Member {
+  id: string
+  name: string
+  email: string | null
+  phone: string
+  dateOfBirth: string | null
+  university: string | null
+  program: string | null
+  startYear: string | null
+  hostel: string | null
+  roomNumber: string | null
+  cellGroup: {
+    id: string
+    name: string
+  } | null
+  invitedBy: {
+    id: string
+    name: string
+  } | null
+}
+
 export default function MembersPage() {
   const [isLoading, setIsLoading] = useState(true)
-  const [members, setMembers] = useState<any[]>([])
+  const [members, setMembers] = useState<Member[]>([])
   const [searchTerm, setSearchTerm] = useState("")
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      // Mock member data
-      setMembers([
-        {
-          id: "1",
-          name: "John Doe",
-          phone: "0123456789",
-          cellGroup: { name: "Campus Fellowship" },
-          university: "University of Ghana",
-          invitedBy: { name: "Admin User" },
-        },
-        {
-          id: "2",
-          name: "Jane Smith",
-          phone: "0123456788",
-          cellGroup: { name: "Graduate Group" },
-          university: "University of Ghana",
-          invitedBy: null,
-        },
-        {
-          id: "3",
-          name: "Michael Johnson",
-          phone: "0123456787",
-          cellGroup: { name: "Campus Fellowship" },
-          university: "KNUST",
-          invitedBy: { name: "John Doe" },
-        },
-        {
-          id: "4",
-          name: "Sarah Williams",
-          phone: "0123456786",
-          cellGroup: { name: "Freshers Group" },
-          university: "University of Ghana",
-          invitedBy: { name: "Jane Smith" },
-        },
-        {
-          id: "5",
-          name: "David Brown",
-          phone: "0123456785",
-          cellGroup: { name: "Graduate Group" },
-          university: "KNUST",
-          invitedBy: null,
-        },
-        {
-          id: "6",
-          name: "Emily Davis",
-          phone: "0123456784",
-          cellGroup: { name: "Campus Fellowship" },
-          university: "University of Ghana",
-          invitedBy: { name: "Michael Johnson" },
-        },
-        {
-          id: "7",
-          name: "Robert Wilson",
-          phone: "0123456783",
-          cellGroup: { name: "Freshers Group" },
-          university: "Central University",
-          invitedBy: { name: "Sarah Williams" },
-        },
-        {
-          id: "8",
-          name: "Jennifer Taylor",
-          phone: "0123456782",
-          cellGroup: { name: "Graduate Group" },
-          university: "University of Ghana",
-          invitedBy: { name: "David Brown" },
-        },
-      ])
-      setIsLoading(false)
-    }, 1000)
+    const fetchMembers = async () => {
+      try {
+        const response = await fetch('/api/members')
+        if (!response.ok) {
+          throw new Error('Failed to fetch members')
+        }
+        const data = await response.json()
+        setMembers(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred')
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-    return () => clearTimeout(timer)
+    fetchMembers()
   }, [])
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,6 +61,17 @@ export default function MembersPage() {
       (member.university && member.university.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (member.cellGroup && member.cellGroup.name.toLowerCase().includes(searchTerm.toLowerCase())),
   )
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-10 px-4">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <h3 className="text-lg font-medium text-red-800">Error</h3>
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -202,21 +177,26 @@ export default function MembersPage() {
                   </tr>
                 ) : filteredMembers.length === 0 ? (
                   <tr>
-                    <td className="py-4 px-4 font-medium">No members found</td>
-                    <td colSpan={5}></td>
+                    <td colSpan={6} className="text-center py-4">
+                      No members found
+                    </td>
                   </tr>
                 ) : (
                   filteredMembers.map((member) => (
-                    <tr key={member.id} className="border-b">
-                      <td className="py-4 px-4 font-medium">{member.name}</td>
-                      <td className="py-4 px-4">{member.phone}</td>
-                      <td className="py-4 px-4">{member.cellGroup?.name || "None"}</td>
-                      <td className="py-4 px-4">{member.university || "N/A"}</td>
-                      <td className="py-4 px-4">{member.invitedBy?.name || "N/A"}</td>
-                      <td className="py-4 px-4 text-right">
+                    <tr key={member.id} className="border-b hover:bg-gray-50">
+                      <td className="py-3 px-4">
+                        <Link href={`/members/${member.id}`} className="text-blue-600 hover:text-blue-800">
+                          {member.name}
+                        </Link>
+                      </td>
+                      <td className="py-3 px-4">{member.phone}</td>
+                      <td className="py-3 px-4">{member.cellGroup?.name || '-'}</td>
+                      <td className="py-3 px-4">{member.university || '-'}</td>
+                      <td className="py-3 px-4">{member.invitedBy?.name || '-'}</td>
+                      <td className="py-3 px-4 text-right">
                         <Link
                           href={`/members/${member.id}`}
-                          className="inline-flex items-center rounded-md text-sm font-medium text-blue-600 hover:text-blue-800"
+                          className="inline-flex items-center rounded-md bg-white px-2.5 py-1.5 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                         >
                           View
                         </Link>

@@ -3,30 +3,49 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 
+interface Stats {
+  memberCount: number
+  eventCount: number
+  cellGroupCount: number
+  attendanceRate: number
+}
+
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [stats, setStats] = useState({
+  const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState<Stats>({
     memberCount: 0,
     eventCount: 0,
     cellGroupCount: 0,
     attendanceRate: 0,
   })
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      // Mock stats data
-      setStats({
-        memberCount: 32,
-        eventCount: 6,
-        cellGroupCount: 3,
-        attendanceRate: 71,
-      })
-      setIsLoading(false)
-    }, 1000)
+    const fetchStats = async () => {
+      try {
+        const response = await fetch("/api/stats")
+        if (!response.ok) {
+          throw new Error("Failed to fetch stats")
+        }
+        const data = await response.json()
+        setStats(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to fetch stats")
+      } finally {
+        setLoading(false)
+      }
+    }
 
-    return () => clearTimeout(timer)
+    fetchStats()
   }, [])
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-red-500">Error: {error}</div>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -59,7 +78,7 @@ export default function Home() {
             </svg>
           </div>
           <div className="p-6 pt-0">
-            <div className="text-3xl font-bold">{isLoading ? "..." : stats.memberCount}</div>
+            <div className="text-3xl font-bold">{loading ? "..." : stats.memberCount}</div>
             <p className="text-xs text-gray-500">Total registered members</p>
             <Link
               href="/members"
@@ -93,7 +112,7 @@ export default function Home() {
             </svg>
           </div>
           <div className="p-6 pt-0">
-            <div className="text-3xl font-bold">{isLoading ? "..." : stats.eventCount}</div>
+            <div className="text-3xl font-bold">{loading ? "..." : stats.eventCount}</div>
             <p className="text-xs text-gray-500">Total events created</p>
             <Link
               href="/events"
@@ -126,7 +145,7 @@ export default function Home() {
             </svg>
           </div>
           <div className="p-6 pt-0">
-            <div className="text-3xl font-bold">{isLoading ? "..." : `${stats.attendanceRate}%`}</div>
+            <div className="text-3xl font-bold">{loading ? "..." : `${stats.attendanceRate}%`}</div>
             <p className="text-xs text-gray-500">Average attendance rate</p>
             <Link
               href="/attendance"
@@ -160,7 +179,7 @@ export default function Home() {
             </svg>
           </div>
           <div className="p-6 pt-0">
-            <div className="text-3xl font-bold">{isLoading ? "..." : stats.cellGroupCount}</div>
+            <div className="text-3xl font-bold">{loading ? "..." : stats.cellGroupCount}</div>
             <p className="text-xs text-gray-500">Active cell groups</p>
             <Link
               href="/cell-groups"

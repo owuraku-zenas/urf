@@ -1,89 +1,60 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { PrismaClient } from "@prisma/client"
 
-export async function GET(request: Request) {
+const prisma = new PrismaClient()
+
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url)
-    const eventId = searchParams.get("eventId")
-
-    if (!eventId) {
-      return NextResponse.json({ error: "Event ID is required" }, { status: 400 })
-    }
-
     const attendances = await prisma.attendance.findMany({
-      where: {
-        eventId,
-      },
       include: {
+        event: true,
         member: true,
-        markedBy: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
       },
     })
-
     return NextResponse.json(attendances)
   } catch (error) {
-    console.error("Error fetching attendance:", error)
-    return NextResponse.json({ error: "Failed to fetch attendance" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to fetch attendance records" }, { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
+    const { eventId, memberId, status } = body
 
-    const { eventId, memberId, status, markedById } = body
-
-    // Check if attendance record already exists
-    const existingAttendance = await prisma.attendance.findUnique({
+    // Check if attendance record exists
+    const existingAttendance = await prisma.attendance.findFirst({
       where: {
-        eventId_memberId: {
-          eventId,
-          memberId,
-        },
+        eventId,
+        memberId,
       },
     })
 
+    let attendance
     if (existingAttendance) {
-      // Update existing record
-      const attendance = await prisma.attendance.update({
+      // Update existing attendance
+      attendance = await prisma.attendance.update({
         where: {
           id: existingAttendance.id,
         },
         data: {
           status,
-          markedById,
-        },
-        include: {
-          member: true,
-          event: true,
         },
       })
-
-      return NextResponse.json(attendance)
     } else {
-      // Create new record
-      const attendance = await prisma.attendance.create({
+      // Create new attendance
+      attendance = await prisma.attendance.create({
         data: {
           eventId,
           memberId,
           status,
-          markedById,
-        },
-        include: {
-          member: true,
-          event: true,
         },
       })
-
-      return NextResponse.json(attendance, { status: 201 })
     }
+
+    return NextResponse.json(attendance)
   } catch (error) {
-    console.error("Error recording attendance:", error)
-    return NextResponse.json({ error: "Failed to record attendance" }, { status: 500 })
+    console.error("Error updating attendance:", error)
+    return NextResponse.json({ error: "Failed to update attendance" }, { status: 500 })
   }
 }

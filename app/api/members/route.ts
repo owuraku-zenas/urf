@@ -1,90 +1,110 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { prisma } from "@/lib/prisma"
+import { Prisma } from "@prisma/client"
 
 export async function GET() {
   try {
+    console.log("Fetching all members...")
     const members = await prisma.member.findMany({
-      include: {
-        cellGroup: true,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        dateOfBirth: true,
+        university: true,
+        program: true,
+        startYear: true,
+        hostel: true,
+        roomNumber: true,
+        createdAt: true,
+        updatedAt: true,
+        cellGroup: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
         invitedBy: {
           select: {
             id: true,
             name: true,
           },
         },
-        departments: {
-          include: {
-            department: true,
+        invitees: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            university: true,
+            program: true,
+            createdAt: true,
           },
         },
       },
     })
-
+    console.log(`Found ${members.length} members:`, members)
     return NextResponse.json(members)
   } catch (error) {
     console.error("Error fetching members:", error)
-    return NextResponse.json({ error: "Failed to fetch members" }, { status: 500 })
+    return NextResponse.json(
+      { error: "Failed to fetch members" },
+      { status: 500 }
+    )
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
+    const data = await request.json()
+    console.log("Creating new member with data:", data)
 
-    const {
-      name,
-      email,
-      phone,
-      dateOfBirth,
-      university,
-      program,
-      startYear,
-      hostel,
-      roomNumber,
-      cellGroupId,
-      invitedById,
-      departmentIds = [],
-    } = body
+    if (!data.cellGroupId) {
+      return NextResponse.json(
+        { error: "Cell group is required" },
+        { status: 400 }
+      )
+    }
 
-    // Create the member
+    // Extract IDs and remove them from the data object
+    const { cellGroupId, invitedById, ...restData } = data
+
     const member = await prisma.member.create({
       data: {
-        name,
-        email,
-        phone,
-        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
-        university,
-        program,
-        startYear,
-        hostel,
-        roomNumber,
-        cellGroupId: cellGroupId || null,
-        invitedById: invitedById || null,
-        // Create department connections
-        departments: {
-          create: departmentIds.map((departmentId: string) => ({
-            department: {
-              connect: {
-                id: departmentId,
-              },
-            },
-          })),
+        ...restData,
+        dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+        cellGroup: {
+          connect: { id: cellGroupId }
         },
+        invitedBy: invitedById ? {
+          connect: { id: invitedById }
+        } : undefined
       },
       include: {
         cellGroup: true,
-        invitedBy: true,
-        departments: {
-          include: {
-            department: true,
-          },
-        },
-      },
+        invitedBy: true
+      }
     })
 
-    return NextResponse.json(member, { status: 201 })
+    console.log("Created new member:", member)
+    return NextResponse.json(member)
   } catch (error) {
     console.error("Error creating member:", error)
-    return NextResponse.json({ error: "Failed to create member" }, { status: 500 })
+    
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        const field = (error.meta?.target as string[])?.[0] ?? 'field'
+        return NextResponse.json(
+          { error: `A member with this ${field} already exists` },
+          { status: 400 }
+        )
+      }
+    }
+
+    return NextResponse.json(
+      { error: "Failed to create member" },
+      { status: 500 }
+    )
   }
 }

@@ -6,86 +6,72 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, Download } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { exportToCSV } from "@/lib/utils"
+
+interface EventStats {
+  id: string
+  name: string
+  type: string
+  date: string
+  attendanceCount: number
+  attendancePercentage: number
+}
+
+interface ReportData {
+  events: EventStats[]
+  totalMembers: number
+  averageAttendance: {
+    overall: number
+    sunday: number
+    midweek: number
+    prayer: number
+  }
+}
 
 export default function AttendanceTrendsReportPage() {
   const [isLoading, setIsLoading] = useState(true)
-  const [reportData, setReportData] = useState<any>(null)
+  const [reportData, setReportData] = useState<ReportData | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState("all")
 
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      // Mock data for the report
-      setReportData({
-        events: [
-          {
-            id: "1",
-            name: "Sunday Service",
-            type: "SUNDAY",
-            date: "2024-04-07T09:00:00Z",
-            attendanceCount: 25,
-            attendancePercentage: 78,
-          },
-          {
-            id: "2",
-            name: "Midweek Service",
-            type: "MIDWEEK",
-            date: "2024-04-10T18:00:00Z",
-            attendanceCount: 18,
-            attendancePercentage: 56,
-          },
-          {
-            id: "3",
-            name: "Prayer Meeting",
-            type: "PRAYER",
-            date: "2024-04-12T19:00:00Z",
-            attendanceCount: 15,
-            attendancePercentage: 47,
-          },
-          {
-            id: "4",
-            name: "Sunday Service",
-            type: "SUNDAY",
-            date: "2024-04-14T09:00:00Z",
-            attendanceCount: 28,
-            attendancePercentage: 88,
-          },
-          {
-            id: "5",
-            name: "Midweek Service",
-            type: "MIDWEEK",
-            date: "2024-04-17T18:00:00Z",
-            attendanceCount: 20,
-            attendancePercentage: 63,
-          },
-          {
-            id: "6",
-            name: "Sunday Service",
-            type: "SUNDAY",
-            date: "2024-04-21T09:00:00Z",
-            attendanceCount: 30,
-            attendancePercentage: 94,
-          },
-        ],
-        totalMembers: 32,
-        averageAttendance: {
-          overall: 71,
-          sunday: 87,
-          midweek: 60,
-          prayer: 47,
-        },
-      })
-      setIsLoading(false)
-    }, 1000)
+    const fetchReportData = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch('/api/reports/attendance-trends')
+        if (!response.ok) {
+          throw new Error('Failed to fetch report data')
+        }
+        const data = await response.json()
+        setReportData(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred')
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-    return () => clearTimeout(timer)
+    fetchReportData()
   }, [])
 
-  const filteredEvents =
-    reportData?.events.filter((event: any) => {
-      if (filter === "all") return true
-      return event.type === filter
-    }) || []
+  const filteredEvents = reportData?.events.filter((event) => {
+    if (filter === "all") return true
+    return event.type === filter
+  }) || []
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-10">
+        <Card className="border-red-200 bg-red-50">
+          <CardHeader>
+            <CardTitle className="text-red-800">Error</CardTitle>
+            <CardDescription className="text-red-600">{error}</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto py-10">
@@ -100,7 +86,29 @@ export default function AttendanceTrendsReportPage() {
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Attendance Trends Report</h1>
-        <Button>
+        <Button 
+          onClick={() => {
+            if (!reportData?.events?.length) {
+              alert('No data available to export')
+              return
+            }
+            try {
+              const exportData = reportData.events.map(event => ({
+                Date: new Date(event.date).toLocaleDateString(),
+                Event: event.name,
+                Type: formatEventType(event.type),
+                'Attendance Count': event.attendanceCount,
+                'Total Members': reportData.totalMembers,
+                'Attendance Percentage': `${event.attendancePercentage}%`
+              }))
+              exportToCSV(exportData, 'attendance-trends-report')
+            } catch (error) {
+              console.error('Export failed:', error)
+              alert('Failed to export report. Please try again.')
+            }
+          }}
+          disabled={isLoading || !reportData?.events?.length}
+        >
           <Download className="mr-2 h-4 w-4" />
           Export Report
         </Button>
@@ -159,8 +167,43 @@ export default function AttendanceTrendsReportPage() {
               <p>Loading chart data...</p>
             </div>
           ) : (
-            <div className="h-80 flex items-center justify-center bg-muted/20 rounded-md">
-              <p className="text-muted-foreground">[Chart visualization would appear here]</p>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={reportData?.events}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="date" 
+                    tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis 
+                    label={{ value: 'Attendance %', angle: -90, position: 'insideLeft' }}
+                    domain={[0, 100]}
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => [`${value}%`, 'Attendance']}
+                    labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                  />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="attendancePercentage"
+                    stroke="#2563eb"
+                    name="Attendance"
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           )}
         </CardContent>
@@ -211,13 +254,13 @@ export default function AttendanceTrendsReportPage() {
                     </td>
                   </tr>
                 ) : (
-                  filteredEvents.map((event: any) => (
+                  filteredEvents.map((event) => (
                     <tr key={event.id} className="border-b">
                       <td className="py-3 px-4">{new Date(event.date).toLocaleDateString()}</td>
                       <td className="py-3 px-4">{event.name}</td>
                       <td className="py-3 px-4">{formatEventType(event.type)}</td>
                       <td className="py-3 px-4">
-                        {event.attendanceCount} / {reportData.totalMembers}
+                        {event.attendanceCount} / {reportData?.totalMembers}
                       </td>
                       <td className="py-3 px-4">{event.attendancePercentage}%</td>
                     </tr>

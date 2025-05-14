@@ -16,51 +16,41 @@ import { toast } from "@/components/ui/use-toast"
 
 export default function NewEventPage() {
   const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
+  const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
-    type: "",
+    type: "MIDWEEK",
     date: "",
-    time: "",
     description: "",
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
+    setIsLoading(true)
 
     try {
-      // In a real app, you would get the current user's ID
-      const createdById = "usr1" // Using the admin user we created
+      // Format the date to ISO string
+      const formattedData = {
+        ...formData,
+        date: new Date(formData.date).toISOString(),
+      }
 
       const response = await fetch("/api/events", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...formData,
-          createdById,
-        }),
+        body: JSON.stringify(formattedData),
       })
 
       if (!response.ok) {
-        throw new Error("Failed to create event")
+        const error = await response.json()
+        throw new Error(error.error || "Failed to create event")
       }
 
       toast({
         title: "Success",
-        description: "Event has been created successfully",
+        description: "Event created successfully",
       })
 
       router.push("/events")
@@ -68,85 +58,101 @@ export default function NewEventPage() {
       console.error("Error creating event:", error)
       toast({
         title: "Error",
-        description: "Failed to create event. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to create event. Please try again.",
         variant: "destructive",
       })
     } finally {
-      setIsSubmitting(false)
+      setIsLoading(false)
     }
   }
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
   return (
-    <div className="container mx-auto py-10">
-      <div className="mb-6">
-        <Button variant="outline" asChild>
-          <Link href="/events">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Events
-          </Link>
-        </Button>
-      </div>
+    <div className="container mx-auto py-10 px-4">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6">Create New Event</h1>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              Event Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              required
+            />
+          </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Create New Event</CardTitle>
-          <CardDescription>Enter the details of the new church event</CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="name">Event Name</Label>
-                <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
-              </div>
+          <div>
+            <label htmlFor="type" className="block text-sm font-medium text-gray-700">
+              Event Type
+            </label>
+            <select
+              id="type"
+              name="type"
+              value={formData.type}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              required
+            >
+              <option value="MIDWEEK">Midweek Service</option>
+              <option value="SUNDAY">Sunday Service</option>
+              <option value="PRAYER">Prayer Service</option>
+              <option value="SPECIAL">Special Program</option>
+            </select>
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="type">Event Type</Label>
-                <Select onValueChange={(value) => handleSelectChange("type", value)} required>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select event type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="MIDWEEK">Midweek Service</SelectItem>
-                    <SelectItem value="SUNDAY">Sunday Service</SelectItem>
-                    <SelectItem value="PRAYER">Prayer Service</SelectItem>
-                    <SelectItem value="SPECIAL">Special Program</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          <div>
+            <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+              Date and Time
+            </label>
+            <input
+              type="datetime-local"
+              id="date"
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              required
+            />
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="date">Event Date</Label>
-                <Input id="date" name="date" type="date" value={formData.date} onChange={handleChange} required />
-              </div>
+          <div>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+              Description
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              rows={4}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="time">Event Time</Label>
-                <Input id="time" name="time" type="time" value={formData.time} onChange={handleChange} required />
-              </div>
-
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="description">Event Description</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  className="min-h-[100px]"
-                />
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline" type="button" asChild>
-              <Link href="/events">Cancel</Link>
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create Event"}
-            </Button>
-          </CardFooter>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+            >
+              {isLoading ? "Creating..." : "Create Event"}
+            </button>
+          </div>
         </form>
-      </Card>
+      </div>
     </div>
   )
 }

@@ -66,7 +66,6 @@ export type Attendance = {
   eventId: string
   memberId: string
   status: "present" | "absent"
-  markedById: string // References User
   createdAt: Date
   updatedAt: Date
 }

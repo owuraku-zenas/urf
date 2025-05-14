@@ -3,10 +3,13 @@ import "@/app/globals.css"
 import { Inter } from "next/font/google"
 import { MainNav } from "@/components/main-nav"
 import { UserNav } from "@/components/user-nav"
+import { Toaster } from "@/components/ui/toaster"
+import type { Metadata } from "next"
+import { Toaster as SonnerToaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Church Membership Management",
   description: "Manage church members, events, and attendance",
     generator: 'v0.dev'
@@ -31,6 +34,8 @@ export default function RootLayout({
           </header>
           <main className="flex-1">{children}</main>
         </div>
+        <Toaster />
+        <SonnerToaster />
       </body>
     </html>
   )

@@ -1,19 +1,22 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { PrismaClient, Prisma } from "@prisma/client"
+
+const prisma = new PrismaClient()
 
 export async function GET() {
   try {
     const events = await prisma.event.findMany({
       include: {
-        createdBy: {
+        attendances: {
           select: {
             id: true,
-            name: true,
-          },
-        },
-        _count: {
-          select: {
-            attendances: true,
+            memberId: true,
+            member: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
       },
@@ -32,34 +35,41 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
+    console.log("Creating event with data:", body)
 
-    const { name, type, date, time, description, createdById } = body
-
-    // Combine date and time
-    const dateTime = new Date(`${date}T${time}`)
+    // Validate required fields
+    if (!body.name || !body.type || !body.date) {
+      return NextResponse.json(
+        { error: "Name, type, and date are required" },
+        { status: 400 }
+      )
+    }
 
     // Create the event
     const event = await prisma.event.create({
       data: {
-        name,
-        type,
-        date: dateTime,
-        description,
-        createdById,
-      },
-      include: {
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+        name: body.name,
+        type: body.type,
+        date: new Date(body.date),
+        description: body.description || null,
       },
     })
 
-    return NextResponse.json(event, { status: 201 })
+    console.log("Event created successfully:", event)
+    return NextResponse.json(event)
   } catch (error) {
     console.error("Error creating event:", error)
-    return NextResponse.json({ error: "Failed to create event" }, { status: 500 })
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2003") {
+        return NextResponse.json(
+          { error: "Invalid data provided" },
+          { status: 400 }
+        )
+      }
+    }
+    return NextResponse.json(
+      { error: "Failed to create event" },
+      { status: 500 }
+    )
   }
 }
