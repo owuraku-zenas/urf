@@ -61,6 +61,7 @@ export async function POST(request: Request) {
       data: {
         ...restData,
         dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+        joinDate: data.joinDate ? new Date(data.joinDate) : new Date(),
         cellGroup: {
           connect: { id: cellGroupId }
         },
