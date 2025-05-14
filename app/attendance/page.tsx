@@ -136,7 +136,7 @@ export default function AttendancePage() {
 
   if (error) {
     return (
-      <div className="container mx-auto py-10">
+      <div className="py-10">
         <Card className="border-red-200 bg-red-50">
           <CardHeader>
             <CardTitle className="text-red-800">Error</CardTitle>
@@ -148,7 +148,7 @@ export default function AttendancePage() {
   }
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="py-10">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Attendance Tracking</h1>
       </div>
@@ -201,9 +201,9 @@ export default function AttendancePage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col gap-4 mb-4 md:flex-row">
+            <div className="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0 mb-4">
               <Input
-                placeholder="Search by name or phone number..."
+                placeholder="Search by name or phone..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="max-w-sm"
@@ -222,13 +222,14 @@ export default function AttendancePage() {
                 </SelectContent>
               </Select>
             </div>
+
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
-                  <TableHead>Phone Number</TableHead>
+                  <TableHead>Phone</TableHead>
                   <TableHead>Cell Group</TableHead>
-                  <TableHead>Marked At</TableHead>
+                  <TableHead>Time Marked</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -241,20 +242,16 @@ export default function AttendancePage() {
                 ) : filteredRecords.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center">
-                      No present members found
+                      No attendance records found
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredRecords.map((record) => (
                     <TableRow key={record.id}>
-                      <TableCell className="font-medium">
-                        {record.member?.name || 'Unknown'}
-                      </TableCell>
-                      <TableCell>{record.member?.phone || 'N/A'}</TableCell>
-                      <TableCell>{record.member?.cellGroup?.name || 'No Cell Group'}</TableCell>
-                      <TableCell>
-                        {new Date(record.createdAt).toLocaleString()}
-                      </TableCell>
+                      <TableCell className="font-medium">{record.member.name}</TableCell>
+                      <TableCell>{record.member.phone}</TableCell>
+                      <TableCell>{record.member.cellGroup?.name || 'No Cell Group'}</TableCell>
+                      <TableCell>{new Date(record.createdAt).toLocaleTimeString()}</TableCell>
                     </TableRow>
                   ))
                 )}

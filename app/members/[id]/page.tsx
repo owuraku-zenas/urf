@@ -213,7 +213,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-10 px-4">
+      <div className="py-10">
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
         </div>
@@ -226,7 +226,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
   }
 
   return (
-    <div className="container mx-auto py-10 px-4">
+    <div className="py-10">
       <div className="mb-6 flex justify-between items-center">
         <Link
           href="/members"

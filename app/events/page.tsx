@@ -63,7 +63,7 @@ export default function EventsPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto py-10">
+      <div className="py-10">
         <Card className="border-red-200 bg-red-50">
           <CardHeader>
             <CardTitle className="text-red-800">Error</CardTitle>
@@ -75,7 +75,7 @@ export default function EventsPage() {
   }
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="py-10">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Church Events</h1>
         <Button asChild>

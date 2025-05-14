@@ -32,14 +32,18 @@ export default function RootLayout({
         >
           <div className="flex min-h-screen flex-col">
             <header className="border-b">
-              <div className="container flex h-16 items-center px-4">
+              <div className="max-w-7xl mx-auto px-5 w-full flex h-16 items-center">
                 <MainNav />
                 <div className="ml-auto flex items-center space-x-4">
                   <UserNav />
                 </div>
               </div>
             </header>
-            <main className="flex-1">{children}</main>
+            <main className="flex-1">
+              <div className="max-w-7xl mx-auto px-5 w-full">
+                {children}
+              </div>
+            </main>
           </div>
           <Toaster />
           <SonnerToaster />

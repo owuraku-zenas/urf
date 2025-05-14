@@ -48,7 +48,7 @@ export default function Home() {
   }
 
   return (
-    <div className="container mx-auto py-10 px-4">
+    <div className="py-10">
       <div className="mb-8 space-y-4">
         <h1 className="text-4xl font-bold">Church Membership Management</h1>
         <p className="text-xl text-gray-500">Manage members, events, and attendance in one place</p>

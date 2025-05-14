@@ -82,7 +82,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-10">
+      <div className="py-10">
         <Card>
           <CardHeader>
             <CardTitle>Loading...</CardTitle>
@@ -95,7 +95,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
   if (error) {
     return (
-      <div className="container mx-auto py-10">
+      <div className="py-10">
         <Card className="border-red-200 bg-red-50">
           <CardHeader>
             <CardTitle className="text-red-800">Error</CardTitle>
@@ -108,7 +108,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
   if (!event) {
     return (
-      <div className="container mx-auto py-10">
+      <div className="py-10">
         <Card className="border-yellow-200 bg-yellow-50">
           <CardHeader>
             <CardTitle className="text-yellow-800">Event Not Found</CardTitle>
@@ -122,7 +122,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
   }
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="py-10">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">{event.name}</h1>
         <div className="flex gap-2">
