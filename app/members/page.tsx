@@ -107,15 +107,15 @@ export default function MembersPage() {
 
   return (
     <div className="py-10">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h1 className="text-3xl font-bold">Members</h1>
-        <div className="flex gap-2">
-          <Button onClick={handleExportPDF}>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button onClick={handleExportPDF} className="w-full sm:w-auto">
             <Download className="mr-2 h-4 w-4" />
             Export PDF
           </Button>
-          <Link href="/members/new">
-            <Button>
+          <Link href="/members/new" className="w-full sm:w-auto">
+            <Button className="w-full sm:w-auto">
               <Plus className="mr-2 h-4 w-4" />
               Add Member
             </Button>
@@ -131,18 +131,18 @@ export default function MembersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row gap-4 mb-4">
             <Input
               placeholder="Search by name, phone, or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="max-w-sm"
+              className="w-full sm:max-w-sm"
             />
             <Select
               value={selectedCellGroup}
               onValueChange={setSelectedCellGroup}
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Select cell group" />
               </SelectTrigger>
               <SelectContent>
@@ -156,47 +156,50 @@ export default function MembersPage() {
             </Select>
           </div>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Cell Group</TableHead>
-                <TableHead>Invited By</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredMembers.length === 0 ? (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center">
-                    No members found
-                  </TableCell>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Cell Group</TableHead>
+                  <TableHead>Invited By</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ) : (
-                filteredMembers.map((member) => (
-                  <TableRow key={member.id}>
-                    <TableCell className="font-medium">
-                      {member.name}
-                    </TableCell>
-                    <TableCell>{member.phone}</TableCell>
-                    <TableCell>{member.email || 'N/A'}</TableCell>
-                    <TableCell>{member.cellGroup?.name || 'No Cell Group'}</TableCell>
-                    <TableCell>{member.invitedBy?.name || 'Not invited by anyone'}</TableCell>
-                    <TableCell>
-                      <Link href={`/members/${member.id}`}>
-                        <Button variant="outline" size="sm">
-                          <Eye className="mr-2 h-4 w-4" />
-                          View Details
-                        </Button>
-                      </Link>
+              </TableHeader>
+              <TableBody>
+                {filteredMembers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center">
+                      No members found
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  filteredMembers.map((member) => (
+                    <TableRow key={member.id}>
+                      <TableCell className="font-medium">
+                        {member.name}
+                      </TableCell>
+                      <TableCell>{member.phone}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{member.email || 'N/A'}</TableCell>
+                      <TableCell>{member.cellGroup?.name || 'No Cell Group'}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{member.invitedBy?.name || 'Not invited by anyone'}</TableCell>
+                      <TableCell className="text-right">
+                        <Link href={`/members/${member.id}`}>
+                          <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                            <Eye className="mr-2 h-4 w-4" />
+                            <span className="hidden sm:inline">View Details</span>
+                            <span className="sm:hidden">View</span>
+                          </Button>
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -31,16 +31,14 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div className="flex min-h-screen flex-col">
-            <header className="border-b">
-              <div className="max-w-7xl mx-auto px-5 w-full flex h-16 items-center">
+            <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+              <div className="w-full max-w-7xl mx-auto px-5 flex h-16 items-center justify-between">
                 <MainNav />
-                <div className="ml-auto flex items-center space-x-4">
-                  <UserNav />
-                </div>
+                <UserNav />
               </div>
             </header>
             <main className="flex-1">
-              <div className="max-w-7xl mx-auto px-5 w-full">
+              <div className="w-full max-w-7xl mx-auto px-5 py-10">
                 {children}
               </div>
             </main>

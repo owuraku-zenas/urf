@@ -136,131 +136,137 @@ export default function AttendancePage() {
 
   if (error) {
     return (
-      <div className="py-10">
-        <Card className="border-red-200 bg-red-50">
-          <CardHeader>
-            <CardTitle className="text-red-800">Error</CardTitle>
-            <CardDescription className="text-red-600">{error}</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
+      <main className="flex-1">
+        <div className="w-full max-w-7xl mx-auto px-5 py-10">
+          <Card className="border-red-200 bg-red-50">
+            <CardHeader>
+              <CardTitle className="text-red-800">Error</CardTitle>
+              <CardDescription className="text-red-600">{error}</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </main>
     )
   }
 
   return (
-    <div className="py-10">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Attendance Tracking</h1>
-      </div>
+    <main className="flex-1">
+      <div className="w-full max-w-7xl mx-auto px-5 py-10">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold">Attendance Tracking</h1>
+        </div>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Select Event</CardTitle>
-          <CardDescription>Choose an event to view attendance records</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
-            <Select value={selectedEventId} onValueChange={handleSelectEvent}>
-              <SelectTrigger className="w-full md:w-[300px]">
-                <SelectValue placeholder="Select an event" />
-              </SelectTrigger>
-              <SelectContent>
-                {isLoading ? (
-                  <SelectItem value="loading" disabled>
-                    Loading events...
-                  </SelectItem>
-                ) : events.length === 0 ? (
-                  <SelectItem value="none" disabled>
-                    No events available
-                  </SelectItem>
-                ) : (
-                  events.map((event) => (
-                    <SelectItem key={event.id} value={event.id}>
-                      {event.name} - {new Date(event.date).toLocaleDateString()}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-            <Button disabled={!selectedEventId} asChild>
-              <Link href={selectedEventId ? `/attendance/${selectedEventId}` : "#"}>
-                <ClipboardList className="mr-2 h-4 w-4" />
-                Mark Attendance
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {selectedEventId && selectedEvent && (
-        <Card>
+        <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Present Members</CardTitle>
-            <CardDescription>
-              {selectedEvent.name} - {new Date(selectedEvent.date).toLocaleDateString()}
-            </CardDescription>
+            <CardTitle>Select Event</CardTitle>
+            <CardDescription>Choose an event to view attendance records</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0 mb-4">
-              <Input
-                placeholder="Search by name or phone..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-sm"
-              />
-              <Select value={selectedCellGroup} onValueChange={setSelectedCellGroup}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by cell group" />
+            <div className="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
+              <Select value={selectedEventId} onValueChange={handleSelectEvent}>
+                <SelectTrigger className="w-full md:w-[300px]">
+                  <SelectValue placeholder="Select an event" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Cell Groups</SelectItem>
-                  {cellGroups.map((group) => (
-                    <SelectItem key={group.id} value={group.id}>
-                      {group.name}
+                  {isLoading ? (
+                    <SelectItem value="loading" disabled>
+                      Loading events...
                     </SelectItem>
-                  ))}
+                  ) : events.length === 0 ? (
+                    <SelectItem value="none" disabled>
+                      No events available
+                    </SelectItem>
+                  ) : (
+                    events.map((event) => (
+                      <SelectItem key={event.id} value={event.id}>
+                        {event.name} - {new Date(event.date).toLocaleDateString()}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
+              <Button disabled={!selectedEventId} asChild className="w-full md:w-auto">
+                <Link href={selectedEventId ? `/attendance/${selectedEventId}` : "#"}>
+                  <ClipboardList className="mr-2 h-4 w-4" />
+                  Mark Attendance
+                </Link>
+              </Button>
             </div>
-
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Cell Group</TableHead>
-                  <TableHead>Time Marked</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center">
-                      Loading attendance records...
-                    </TableCell>
-                  </TableRow>
-                ) : filteredRecords.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center">
-                      No attendance records found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredRecords.map((record) => (
-                    <TableRow key={record.id}>
-                      <TableCell className="font-medium">{record.member.name}</TableCell>
-                      <TableCell>{record.member.phone}</TableCell>
-                      <TableCell>{record.member.cellGroup?.name || 'No Cell Group'}</TableCell>
-                      <TableCell>{new Date(record.createdAt).toLocaleTimeString()}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
           </CardContent>
         </Card>
-      )}
-    </div>
+
+        {selectedEventId && selectedEvent && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Present Members</CardTitle>
+              <CardDescription>
+                {selectedEvent.name} - {new Date(selectedEvent.date).toLocaleDateString()}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0 mb-4">
+                <Input
+                  placeholder="Search by name or phone..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full md:max-w-sm"
+                />
+                <Select value={selectedCellGroup} onValueChange={setSelectedCellGroup}>
+                  <SelectTrigger className="w-full md:w-[180px]">
+                    <SelectValue placeholder="Filter by cell group" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Cell Groups</SelectItem>
+                    {cellGroups.map((group) => (
+                      <SelectItem key={group.id} value={group.id}>
+                        {group.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Phone</TableHead>
+                      <TableHead className="hidden sm:table-cell">Cell Group</TableHead>
+                      <TableHead className="hidden sm:table-cell">Time Marked</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {isLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center">
+                          Loading attendance records...
+                        </TableCell>
+                      </TableRow>
+                    ) : filteredRecords.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center">
+                          No attendance records found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredRecords.map((record) => (
+                        <TableRow key={record.id}>
+                          <TableCell className="font-medium">{record.member.name}</TableCell>
+                          <TableCell>{record.member.phone}</TableCell>
+                          <TableCell className="hidden sm:table-cell">{record.member.cellGroup?.name || 'No Cell Group'}</TableCell>
+                          <TableCell className="hidden sm:table-cell">{new Date(record.createdAt).toLocaleTimeString()}</TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </main>
   )
 }
 

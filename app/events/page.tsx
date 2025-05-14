@@ -63,114 +63,121 @@ export default function EventsPage() {
 
   if (error) {
     return (
-      <div className="py-10">
-        <Card className="border-red-200 bg-red-50">
-          <CardHeader>
-            <CardTitle className="text-red-800">Error</CardTitle>
-            <CardDescription className="text-red-600">{error}</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
+      <main className="flex-1">
+        <div className="w-full max-w-7xl mx-auto px-5 py-10">
+          <Card className="border-red-200 bg-red-50">
+            <CardHeader>
+              <CardTitle className="text-red-800">Error</CardTitle>
+              <CardDescription className="text-red-600">{error}</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </main>
     )
   }
 
   return (
-    <div className="py-10">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Church Events</h1>
-        <Button asChild>
-          <Link href="/events/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Create New Event
-          </Link>
-        </Button>
-      </div>
+    <main className="flex-1">
+      <div className="w-full max-w-7xl mx-auto px-5 py-10">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold">Church Events</h1>
+          <Button asChild className="w-full sm:w-auto">
+            <Link href="/events/new">
+              <Plus className="mr-2 h-4 w-4" />
+              Create New Event
+            </Link>
+          </Button>
+        </div>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Event Search</CardTitle>
-          <CardDescription>Search for events by name, type, or date</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search events..."
-                className="pl-8"
-                value={searchTerm}
-                onChange={handleSearch}
-              />
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Event Search</CardTitle>
+            <CardDescription>Search for events by name, type, or date</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
+              <div className="relative flex-1">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search events..."
+                  className="pl-8"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                />
+              </div>
+              <Select value={selectedType} onValueChange={setSelectedType}>
+                <SelectTrigger className="w-full md:w-[180px]">
+                  <SelectValue placeholder="Filter by type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="MIDWEEK">Midweek Service</SelectItem>
+                  <SelectItem value="SUNDAY">Sunday Service</SelectItem>
+                  <SelectItem value="PRAYER">Prayer Service</SelectItem>
+                  <SelectItem value="SPECIAL">Special Program</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="MIDWEEK">Midweek Service</SelectItem>
-                <SelectItem value="SUNDAY">Sunday Service</SelectItem>
-                <SelectItem value="PRAYER">Prayer Service</SelectItem>
-                <SelectItem value="SPECIAL">Special Program</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>All Events</CardTitle>
-          <CardDescription>Showing {filteredEvents.length} church events</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Event Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Attendance</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center">
-                    Loading events...
-                  </TableCell>
-                </TableRow>
-              ) : filteredEvents.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center">
-                    No events found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredEvents.map((event) => (
-                  <TableRow key={event.id}>
-                    <TableCell className="font-medium">{event.name}</TableCell>
-                    <TableCell>{formatEventType(event.type)}</TableCell>
-                    <TableCell>{new Date(event.date).toLocaleDateString()}</TableCell>
-                    <TableCell>{event.attendances.length}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/events/${event.id}`}>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View Event
-                        </Link>
-                      </Button>
-                    </TableCell>
+        <Card>
+          <CardHeader>
+            <CardTitle>All Events</CardTitle>
+            <CardDescription>Showing {filteredEvents.length} church events</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Event Name</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead className="hidden sm:table-cell">Date</TableHead>
+                    <TableHead>Attendance</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center">
+                        Loading events...
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredEvents.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center">
+                        No events found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredEvents.map((event) => (
+                      <TableRow key={event.id}>
+                        <TableCell className="font-medium">{event.name}</TableCell>
+                        <TableCell>{formatEventType(event.type)}</TableCell>
+                        <TableCell className="hidden sm:table-cell">{new Date(event.date).toLocaleDateString()}</TableCell>
+                        <TableCell>{event.attendances.length}</TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="sm" asChild className="w-full sm:w-auto">
+                            <Link href={`/events/${event.id}`}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              <span className="hidden sm:inline">View Event</span>
+                              <span className="sm:hidden">View</span>
+                            </Link>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
   )
 }
 
