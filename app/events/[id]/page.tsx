@@ -24,8 +24,8 @@ interface Event {
   })[]
 }
 
-export default function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+export default function EventDetailsPage({ params }: { params: { id: string } }) {
+  const { id } = params
   const router = useRouter()
   const [event, setEvent] = useState<Event | null>(null)
   const [error, setError] = useState<string | null>(null)
