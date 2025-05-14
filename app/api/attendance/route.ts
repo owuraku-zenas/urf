@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
-
-const prisma = new PrismaClient()
+import { prisma } from "@/lib/prisma"
 
 export async function GET() {
   try {
@@ -20,41 +18,66 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { eventId, memberId, status } = body
+    const { eventId, memberId } = body
 
-    // Check if attendance record exists
-    const existingAttendance = await prisma.attendance.findFirst({
-      where: {
+    if (!eventId || !memberId) {
+      return NextResponse.json(
+        { error: "Event ID and member ID are required" },
+        { status: 400 }
+      )
+    }
+
+    const attendance = await prisma.attendance.create({
+      data: {
         eventId,
         memberId,
       },
+      include: {
+        event: true,
+        member: true,
+      },
     })
-
-    let attendance
-    if (existingAttendance) {
-      // Update existing attendance
-      attendance = await prisma.attendance.update({
-        where: {
-          id: existingAttendance.id,
-        },
-        data: {
-          status,
-        },
-      })
-    } else {
-      // Create new attendance
-      attendance = await prisma.attendance.create({
-        data: {
-          eventId,
-          memberId,
-          status,
-        },
-      })
-    }
 
     return NextResponse.json(attendance)
   } catch (error) {
-    console.error("Error updating attendance:", error)
-    return NextResponse.json({ error: "Failed to update attendance" }, { status: 500 })
+    console.error("Error creating attendance record:", error)
+    return NextResponse.json(
+      { error: "Failed to create attendance record" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json()
+    const { id, eventId, memberId } = body
+
+    if (!id || !eventId || !memberId) {
+      return NextResponse.json(
+        { error: "ID, event ID, and member ID are required" },
+        { status: 400 }
+      )
+    }
+
+    const attendance = await prisma.attendance.update({
+      where: { id },
+      data: {
+        eventId,
+        memberId,
+      },
+      include: {
+        event: true,
+        member: true,
+      },
+    })
+
+    return NextResponse.json(attendance)
+  } catch (error) {
+    console.error("Error updating attendance record:", error)
+    return NextResponse.json(
+      { error: "Failed to update attendance record" },
+      { status: 500 }
+    )
   }
 }

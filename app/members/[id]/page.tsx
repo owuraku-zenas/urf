@@ -1,10 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { toast } from "@/components/ui/use-toast"
-import { use } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { format } from "date-fns"
+import { ArrowLeft } from "lucide-react"
 
 interface Member {
   id: string
@@ -17,22 +23,26 @@ interface Member {
   startYear: string | null
   hostel: string | null
   roomNumber: string | null
-  cellGroup: {
+  cellGroup?: {
     id: string
     name: string
-  } | null
-  invitedBy: {
+  }
+  invitedBy?: {
     id: string
     name: string
-  } | null
-  invitees: {
+  }
+  invitees: Array<{
     id: string
     name: string
     phone: string
-    university: string | null
-    program: string | null
+    university: string
+    program: string
+    cellGroup?: {
+      id: string
+      name: string
+    }
     createdAt: string
-  }[]
+  }>
   attendances: {
     id: string
     event: {
@@ -49,6 +59,7 @@ interface CellGroup {
 }
 
 export default function MemberDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const [isLoading, setIsLoading] = useState(true)
   const [member, setMember] = useState<Member | null>(null)
   const [isEditing, setIsEditing] = useState(false)
@@ -72,14 +83,14 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
     totalEvents: 0,
     attendanceRate: 0,
   })
-
-  const resolvedParams = use(params)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedCellGroup, setSelectedCellGroup] = useState("all")
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [memberResponse, cellGroupsResponse, membersResponse] = await Promise.all([
-          fetch(`/api/members/${resolvedParams.id}`),
+          fetch(`/api/members/${id}`),
           fetch("/api/cell-groups"),
           fetch("/api/members"),
         ])
@@ -135,7 +146,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
     }
 
     fetchData()
-  }, [resolvedParams.id])
+  }, [id])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -155,7 +166,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
         invitedById: formData.invitedById || null,
       }
 
-      const response = await fetch(`/api/members/${resolvedParams.id}`, {
+      const response = await fetch(`/api/members/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -191,6 +202,14 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
       [name]: value,
     }))
   }
+
+  const filteredInvitees = member?.invitees.filter(invitee => {
+    const matchesSearch = invitee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         invitee.phone.includes(searchQuery) ||
+                         invitee.university?.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCellGroup = selectedCellGroup === "all" || invitee.cellGroup?.id === selectedCellGroup
+    return matchesSearch && matchesCellGroup
+  }) || []
 
   if (isLoading) {
     return (
@@ -238,7 +257,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
         </button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-3 mb-8">
         <div className="md:col-span-2">
           {isEditing ? (
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -255,21 +274,8 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       required
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -282,8 +288,21 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       required
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -296,7 +315,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                       name="dateOfBirth"
                       value={formData.dateOfBirth}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -309,7 +328,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                       name="university"
                       value={formData.university}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -322,7 +341,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                       name="program"
                       value={formData.program}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -335,7 +354,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                       name="startYear"
                       value={formData.startYear}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -348,7 +367,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                       name="hostel"
                       value={formData.hostel}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -361,7 +380,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                       name="roomNumber"
                       value={formData.roomNumber}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -373,7 +392,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                       name="cellGroupId"
                       value={formData.cellGroupId}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     >
                       <option value="">Select a cell group</option>
                       {cellGroups.map((group) => (
@@ -392,11 +411,11 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                       name="invitedById"
                       value={formData.invitedById}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     >
                       <option value="">Select a member</option>
                       {members
-                        .filter(m => m.id !== resolvedParams.id)
+                        .filter((m) => m.id !== id)
                         .map((member) => (
                           <option key={member.id} value={member.id}>
                             {member.name}
@@ -405,10 +424,10 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                     </select>
                   </div>
                 </div>
-                <div className="mt-6 flex justify-end">
+                <div className="mt-6">
                   <button
                     type="submit"
-                    className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   >
                     Save Changes
                   </button>
@@ -416,249 +435,186 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
               </div>
             </form>
           ) : (
-            <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
-              <div className="p-6">
-                <h2 className="text-2xl font-bold mb-1">{member.name}</h2>
-                <p className="text-sm text-gray-500 mb-6">Member Profile</p>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="flex items-center gap-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-4 w-4 text-gray-500"
-                    >
-                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                    </svg>
-                    <span>{member.phone}</span>
-                  </div>
-                  {member.email && (
-                    <div className="flex items-center gap-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4 text-gray-500"
-                      >
-                        <rect width="20" height="16" x="2" y="4" rx="2"></rect>
-                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-                      </svg>
-                      <span>{member.email}</span>
-                    </div>
-                  )}
-                  {member.university && (
-                    <div className="flex items-center gap-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4 text-gray-500"
-                      >
-                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
-                        <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
-                      </svg>
-                      <span>
-                        {member.university} {member.program ? `- ${member.program}` : ""}
-                      </span>
-                    </div>
-                  )}
-                  {(member.hostel || member.roomNumber) && (
-                    <div className="flex items-center gap-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4 text-gray-500"
-                      >
-                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                      </svg>
-                      <span>
-                        {member.hostel} {member.roomNumber ? `Room ${member.roomNumber}` : ""}
-                      </span>
-                    </div>
-                  )}
-                  {member.cellGroup && (
-                    <div className="flex items-center gap-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4 text-gray-500"
-                      >
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                      </svg>
-                      <span>Cell Group: {member.cellGroup.name}</span>
-                    </div>
-                  )}
-                  {member.invitedBy && (
-                    <div className="flex items-center gap-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4 text-gray-500"
-                      >
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                      </svg>
-                      <span>Invited by: {member.invitedBy.name}</span>
-                    </div>
-                  )}
+            <div className="rounded-lg border border-gray-200 bg-white shadow-sm p-6">
+              <h2 className="text-2xl font-bold mb-6">Member Details</h2>
+              <dl className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Name</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{member.name}</dd>
                 </div>
-              </div>
-            </div>
-          )}
-
-          {member.invitees.length > 0 && (
-            <div className="mt-6 rounded-lg border border-gray-200 bg-white shadow-sm">
-              <div className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Invited Members</h3>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Name
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Phone
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          University
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Program
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Joined
-                        </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {member.invitees.map((invitedMember) => (
-                        <tr key={invitedMember.id}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {invitedMember.name}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {invitedMember.phone}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {invitedMember.university || "-"}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {invitedMember.program || "-"}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {new Date(invitedMember.createdAt).toLocaleDateString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <Link
-                              href={`/members/${invitedMember.id}`}
-                              className="text-blue-600 hover:text-blue-900"
-                            >
-                              View
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Phone</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{member.phone}</dd>
                 </div>
-              </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Email</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{member.email || "N/A"}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Date of Birth</dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {member.dateOfBirth ? new Date(member.dateOfBirth).toLocaleDateString() : "N/A"}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">University</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{member.university || "N/A"}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Program</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{member.program || "N/A"}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Start Year</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{member.startYear || "N/A"}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Hostel</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{member.hostel || "N/A"}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Room Number</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{member.roomNumber || "N/A"}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Cell Group</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{member.cellGroup?.name || "N/A"}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Invited By</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{member.invitedBy?.name || "N/A"}</dd>
+                </div>
+              </dl>
             </div>
           )}
         </div>
 
-        <div>
-          <div className="rounded-lg border border-gray-200 bg-white shadow-sm mb-6">
-            <div className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Attendance Statistics</h3>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{attendanceStats.attendanceCount}</div>
-                  <div className="text-sm text-gray-500">Attended</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{attendanceStats.totalEvents}</div>
-                  <div className="text-sm text-gray-500">Total Events</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{attendanceStats.attendanceRate}%</div>
-                  <div className="text-sm text-gray-500">Rate</div>
-                </div>
+        <div className="space-y-6">
+          <div className="rounded-lg border border-gray-200 bg-white shadow-sm p-6">
+            <h3 className="text-lg font-medium mb-4">Attendance Statistics</h3>
+            <dl className="grid grid-cols-1 gap-4">
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Total Events Attended</dt>
+                <dd className="mt-1 text-2xl font-semibold text-gray-900">
+                  {attendanceStats.attendanceCount}
+                </dd>
               </div>
-            </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Attendance Rate</dt>
+                <dd className="mt-1 text-2xl font-semibold text-gray-900">
+                  {attendanceStats.attendanceRate}%
+                </dd>
+              </div>
+            </dl>
           </div>
 
-          <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
-            <div className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Recent Attendance</h3>
-              {member.attendances.length === 0 ? (
-                <p className="text-gray-500">No attendance records yet.</p>
-              ) : (
-                <div className="space-y-4">
-                  {member.attendances.map((attendance) => (
-                    <div key={attendance.id} className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium">{attendance.event.name}</div>
-                        <div className="text-sm text-gray-500">
-                          {new Date(attendance.event.date).toLocaleDateString()}
-                        </div>
-                      </div>
+          <div className="rounded-lg border border-gray-200 bg-white shadow-sm p-6">
+            <h3 className="text-lg font-medium mb-4">Recent Attendance</h3>
+            {member.attendances.length === 0 ? (
+              <p className="text-sm text-gray-500">No attendance records yet</p>
+            ) : (
+              <ul className="space-y-4">
+                {member.attendances.map((attendance) => (
+                  <li key={attendance.id} className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{attendance.event.name}</p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(attendance.event.date).toLocaleDateString()}
+                      </p>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    <Link
+                      href={`/events/${attendance.event.id}`}
+                      className="text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      View
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Invited Members</CardTitle>
+          <CardDescription>
+            {member.invitees.length} total invited members
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-4 mb-4">
+            <Input
+              placeholder="Search by name, phone, or university..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-sm"
+            />
+            <Select
+              value={selectedCellGroup}
+              onValueChange={setSelectedCellGroup}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select cell group" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Cell Groups</SelectItem>
+                {cellGroups.map((group) => (
+                  <SelectItem key={group.id} value={group.id}>
+                    {group.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>University</TableHead>
+                <TableHead>Program</TableHead>
+                <TableHead>Cell Group</TableHead>
+                <TableHead>Join Date</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredInvitees.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center">
+                    No invited members found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredInvitees.map((invitee) => (
+                  <TableRow key={invitee.id}>
+                    <TableCell className="font-medium">
+                      {invitee.name}
+                    </TableCell>
+                    <TableCell>{invitee.phone}</TableCell>
+                    <TableCell>{invitee.university}</TableCell>
+                    <TableCell>{invitee.program}</TableCell>
+                    <TableCell>{invitee.cellGroup?.name || 'No Cell Group'}</TableCell>
+                    <TableCell>
+                      {format(new Date(invitee.createdAt), 'PPP')}
+                    </TableCell>
+                    <TableCell>
+                      <Link href={`/members/${invitee.id}`}>
+                        <Button variant="outline" size="sm">
+                          View Details
+                        </Button>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   )
 }

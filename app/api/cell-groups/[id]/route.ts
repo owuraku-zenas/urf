@@ -21,8 +21,16 @@ export async function GET(
             id: true,
             name: true,
             phone: true,
+            email: true,
             university: true,
             program: true,
+            createdAt: true,
+            invitedBy: {
+              select: {
+                id: true,
+                name: true
+              }
+            }
           },
         },
       },

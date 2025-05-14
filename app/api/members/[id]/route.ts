@@ -1,15 +1,12 @@
 import { NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
-
-const prisma = new PrismaClient()
+import { prisma } from "@/lib/prisma"
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const resolvedParams = await params
-    const { id } = resolvedParams
+    const { id } = params
     console.log("Fetching member:", id)
     
     const member = await prisma.member.findUnique({
@@ -37,12 +34,17 @@ export async function GET(
             university: true,
             program: true,
             createdAt: true,
+            cellGroup: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
         attendances: {
           select: {
             id: true,
-            status: true,
             event: {
               select: {
                 id: true,
@@ -70,10 +72,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const resolvedParams = await params
+    const { id } = params
     const body = await request.json()
 
     // Validate required fields
@@ -87,7 +89,7 @@ export async function PUT(
     // Update member
     const member = await prisma.member.update({
       where: {
-        id: resolvedParams.id,
+        id,
       },
       data: {
         name: body.name,
@@ -123,12 +125,17 @@ export async function PUT(
             university: true,
             program: true,
             createdAt: true,
+            cellGroup: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
         attendances: {
           select: {
             id: true,
-            status: true,
             event: {
               select: {
                 id: true,
@@ -153,13 +160,13 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const resolvedParams = await params
+    const { id } = params
     await prisma.member.delete({
       where: {
-        id: resolvedParams.id,
+        id,
       },
     })
     return new NextResponse(null, { status: 204 })

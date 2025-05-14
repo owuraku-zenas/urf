@@ -17,11 +17,18 @@ export async function GET(
           select: {
             id: true,
             memberId: true,
+            createdAt: true,
             member: {
               select: {
                 id: true,
                 name: true,
-                phone: true
+                phone: true,
+                cellGroup: {
+                  select: {
+                    id: true,
+                    name: true
+                  }
+                }
               }
             }
           }

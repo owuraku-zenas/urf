@@ -6,45 +6,32 @@ export async function GET() {
   try {
     console.log("Fetching all members...")
     const members = await prisma.member.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        dateOfBirth: true,
-        university: true,
-        program: true,
-        startYear: true,
-        hostel: true,
-        roomNumber: true,
-        createdAt: true,
-        updatedAt: true,
+      include: {
         cellGroup: {
           select: {
             id: true,
             name: true,
-            description: true,
-          },
+            description: true
+          }
         },
         invitedBy: {
           select: {
             id: true,
-            name: true,
-          },
+            name: true
+          }
         },
         invitees: {
           select: {
             id: true,
-            name: true,
-            phone: true,
-            university: true,
-            program: true,
-            createdAt: true,
-          },
-        },
+            name: true
+          }
+        }
       },
+      orderBy: {
+        createdAt: 'desc'
+      }
     })
-    console.log(`Found ${members.length} members:`, members)
+    console.log(`Found ${members.length} members:`, JSON.stringify(members, null, 2))
     return NextResponse.json(members)
   } catch (error) {
     console.error("Error fetching members:", error)

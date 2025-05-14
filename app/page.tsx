@@ -212,8 +212,8 @@ export default function Home() {
             </svg>
           </div>
           <div className="p-6 pt-0">
-            <div className="text-3xl font-bold">3</div>
-            <p className="text-xs text-gray-500">Available reports</p>
+            <div className="text-3xl font-bold">Analytics</div>
+            <p className="text-xs text-gray-500">View detailed analytics and insights</p>
             <Link
               href="/reports"
               className="mt-4 block w-full rounded-md bg-blue-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-blue-700"
