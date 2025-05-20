@@ -8,7 +8,13 @@ import { Toaster as SonnerToaster } from "sonner"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  preload: true,
+  fallback: ["system-ui", "arial"],
+  adjustFontFallback: true,
+})
 
 export const metadata: Metadata = {
   title: "URF - University Revival Fellowship",
