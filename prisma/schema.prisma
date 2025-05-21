@@ -93,18 +93,25 @@ model Event {
   description String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  attendances Attendance[]
+  attendance  Attendance[]
+
+  @@index([date])
 }
 
 model Attendance {
-  id        String   @id @default(uuid())
-  event     Event    @relation(fields: [eventId], references: [id])
-  eventId   String
-  member    Member   @relation(fields: [memberId], references: [id])
+  id        String   @id @default(cuid())
   memberId  String
+  eventId   String
+  date      DateTime
+  status    String   // 'PRESENT' or 'ABSENT'
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@unique([eventId, memberId])
+  member    Member   @relation(fields: [memberId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id])
+
+  @@index([memberId])
+  @@index([eventId])
 }
 
 enum Role {

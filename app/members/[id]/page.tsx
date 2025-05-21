@@ -8,11 +8,24 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input"
 import { Member, CellGroup } from "@prisma/client"
 import { use } from "react"
+import { ArrowLeft, Edit, Mail, Phone, Users } from "lucide-react"
+import Link from "next/link"
+import { toast } from "sonner"
+import { z } from "zod"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts'
 
 interface MemberWithRelations extends Member {
   cellGroup: CellGroup
   invitedBy: Member | null
   invitees: Member[]
+}
+
+interface Attendance {
+  id: string
+  eventId: string
+  eventName: string
+  date: string
+  status: 'PRESENT' | 'ABSENT'
 }
 
 export default function MemberDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -23,6 +36,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
   const [isLoading, setIsLoading] = useState(true)
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
+  const [attendance, setAttendance] = useState<Attendance[]>([])
 
   useEffect(() => {
     const fetchMember = async () => {
@@ -40,7 +54,22 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
       }
     }
 
+    const fetchAttendance = async () => {
+      try {
+        const response = await fetch(`/api/members/${id}/attendance`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch attendance')
+        }
+        const data = await response.json()
+        setAttendance(data)
+      } catch (error) {
+        console.error('Error fetching attendance:', error)
+        toast.error('Failed to load attendance data')
+      }
+    }
+
     fetchMember()
+    fetchAttendance()
   }, [id])
 
   const filteredInvitees = member?.invitees.filter(invitee => {
@@ -48,6 +77,39 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
     return (!startDate || inviteeDate >= new Date(startDate)) &&
       (!endDate || inviteeDate <= new Date(endDate + 'T23:59:59'))
   }) || []
+
+  const filteredAttendance = attendance.filter(record => {
+    const recordDate = new Date(record.date)
+    return (!startDate || recordDate >= new Date(startDate)) &&
+      (!endDate || recordDate <= new Date(endDate + 'T23:59:59'))
+  })
+
+  // Prepare data for charts
+  const attendanceByStatus = filteredAttendance.reduce((acc, record) => {
+    acc[record.status] = (acc[record.status] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+
+  const pieChartData = Object.entries(attendanceByStatus).map(([status, count]) => ({
+    name: status,
+    value: count
+  }))
+
+  const monthlyAttendance = filteredAttendance.reduce((acc, record) => {
+    const month = new Date(record.date).toLocaleString('default', { month: 'short' })
+    if (!acc[month]) {
+      acc[month] = { present: 0, absent: 0 }
+    }
+    acc[month][record.status.toLowerCase() as 'present' | 'absent']++
+    return acc
+  }, {} as Record<string, { present: number; absent: number }>)
+
+  const barChartData = Object.entries(monthlyAttendance).map(([month, data]) => ({
+    month,
+    ...data
+  }))
+
+  const COLORS = ['#4CAF50', '#F44336']
 
   if (isLoading) {
     return (
@@ -91,144 +153,209 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
   }
 
   return (
-    <div className="py-10">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">{member.name}</h1>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => router.push('/members')}>
-            Back to Members
-          </Button>
-          <Button onClick={() => router.push(`/members/${id}/edit`)}>
-            Edit Member
-          </Button>
-        </div>
+    <div className="container mx-auto py-8 space-y-8">
+      <div>
+        <Button
+          variant="outline"
+          onClick={() => router.push('/members')}
+          className="mb-4"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Members
+        </Button>
       </div>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Member Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <dt className="text-sm font-medium text-gray-500">Email</dt>
-              <dd className="mt-1 text-sm text-gray-900">{member.email}</dd>
+              <CardTitle className="text-2xl">{member.name}</CardTitle>
+              <CardDescription>Member Details</CardDescription>
             </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Phone</dt>
-              <dd className="mt-1 text-sm text-gray-900">{member.phone}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Date of Birth</dt>
-              <dd className="mt-1 text-sm text-gray-900">
-                {member.dateOfBirth ? new Date(member.dateOfBirth).toLocaleDateString() : 'N/A'}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Join Date</dt>
-              <dd className="mt-1 text-sm text-gray-900">
-                {member.joinDate ? new Date(member.joinDate).toLocaleDateString() : 'N/A'}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">University</dt>
-              <dd className="mt-1 text-sm text-gray-900">{member.university || 'N/A'}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Program</dt>
-              <dd className="mt-1 text-sm text-gray-900">{member.program || 'N/A'}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Start Year</dt>
-              <dd className="mt-1 text-sm text-gray-900">{member.startYear || 'N/A'}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Hostel</dt>
-              <dd className="mt-1 text-sm text-gray-900">{member.hostel || 'N/A'}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Room Number</dt>
-              <dd className="mt-1 text-sm text-gray-900">{member.roomNumber || 'N/A'}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Cell Group</dt>
-              <dd className="mt-1 text-sm text-gray-900">{member.cellGroup?.name || 'No Cell Group'}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Invited By</dt>
-              <dd className="mt-1 text-sm text-gray-900">{member.invitedBy?.name || 'N/A'}</dd>
-            </div>
-          </dl>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Invitees</CardTitle>
-          <CardDescription>
-            Members invited by {member.name}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4 mb-4">
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-full sm:w-[180px]"
-                placeholder="Start date"
-              />
-              <Input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="w-full sm:w-[180px]"
-                placeholder="End date"
-              />
+            <div className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={() => {
-                  setStartDate("")
-                  setEndDate("")
-                }}
-                className="w-full sm:w-auto"
+                onClick={() => router.push(`/members/${member.id}/edit`)}
               >
-                Clear Dates
+                <Edit className="mr-2 h-4 w-4" />
+                Edit Member
               </Button>
             </div>
-          </div>
-
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Join Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredInvitees.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center">
-                    No invitees found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredInvitees.map((invitee) => (
-                  <TableRow key={invitee.id}>
-                    <TableCell className="font-medium">{invitee.name}</TableCell>
-                    <TableCell>{invitee.email || 'N/A'}</TableCell>
-                    <TableCell>{invitee.phone}</TableCell>
-                    <TableCell>{new Date(invitee.createdAt).toLocaleDateString()}</TableCell>
-                  </TableRow>
-                ))
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4">
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-gray-500" />
+                <span>{member.email || 'No email provided'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-gray-500" />
+                <span>{member.phone || 'No phone provided'}</span>
+              </div>
+              {member.cellGroup && (
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-gray-500" />
+                  <Link
+                    href={`/cell-groups/${member.cellGroup.id}`}
+                    className="text-blue-600 hover:underline"
+                  >
+                    {member.cellGroup.name}
+                  </Link>
+                </div>
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Attendance Analytics Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Attendance Analytics</CardTitle>
+            <CardDescription>Member attendance statistics and trends</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              {/* Date Range Filter */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <Input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full sm:w-[180px]"
+                    placeholder="Start date"
+                  />
+                  <Input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full sm:w-[180px]"
+                    placeholder="End date"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setStartDate("")
+                      setEndDate("")
+                    }}
+                    className="w-full sm:w-auto"
+                  >
+                    Clear Dates
+                  </Button>
+                </div>
+              </div>
+
+              {/* Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-2xl font-bold">{attendanceByStatus['PRESENT'] || 0}</div>
+                    <p className="text-sm text-gray-500">Present</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-2xl font-bold">{attendanceByStatus['ABSENT'] || 0}</div>
+                    <p className="text-sm text-gray-500">Absent</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Charts */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Attendance Distribution */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Attendance Distribution</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={pieChartData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {pieChartData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Monthly Attendance Trend */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Monthly Attendance Trend</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={barChartData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="month" />
+                          <YAxis />
+                          <Tooltip />
+                          <Bar dataKey="present" name="Present" fill="#4CAF50" />
+                          <Bar dataKey="absent" name="Absent" fill="#F44336" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Invitees</CardTitle>
+            <CardDescription>Members invited by {member.name}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {member.invitees.length === 0 ? (
+              <p>No invitees yet</p>
+            ) : (
+              <div className="grid gap-4">
+                {member.invitees.map((invitee) => (
+                  <Card key={invitee.id}>
+                    <CardContent className="pt-6">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold">{invitee.name}</h3>
+                          <p className="text-sm text-gray-500">
+                            {invitee.email || 'No email provided'}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {invitee.phone || 'No phone provided'}
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          onClick={() => router.push(`/members/${invitee.id}`)}
+                        >
+                          View Details
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
