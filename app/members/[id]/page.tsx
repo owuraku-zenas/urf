@@ -15,9 +15,35 @@ import { z } from "zod"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts'
 
 interface MemberWithRelations extends Member {
-  cellGroup: CellGroup
-  invitedBy: Member | null
-  invitees: Member[]
+  cellGroup: {
+    id: string
+    name: string
+  } | null
+  invitedBy: {
+    id: string
+    name: string
+  } | null
+  invitees: Array<{
+    id: string
+    name: string
+    email: string | null
+    phone: string
+    university: string | null
+    program: string | null
+    createdAt: Date
+    cellGroup: {
+      id: string
+      name: string
+    } | null
+  }>
+  attendances: Array<{
+    id: string
+    event: {
+      id: string
+      name: string
+      date: Date
+    }
+  }>
 }
 
 interface Attendance {
@@ -207,6 +233,53 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
           </CardContent>
         </Card>
 
+        {/* Invitees Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Invitees</CardTitle>
+            <CardDescription>Members invited by {member.name}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {member.invitees.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Cell Group</TableHead>
+                    <TableHead>Join Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {member.invitees.map((invitee) => (
+                    <TableRow key={invitee.id}>
+                      <TableCell>
+                        <Link
+                          href={`/members/${invitee.id}`}
+                          className="text-blue-600 hover:underline"
+                        >
+                          {invitee.name}
+                        </Link>
+                      </TableCell>
+                      <TableCell>{invitee.phone}</TableCell>
+                      <TableCell>{invitee.email || 'N/A'}</TableCell>
+                      <TableCell>
+                        {invitee.cellGroup?.name || 'N/A'}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(invitee.createdAt).toLocaleDateString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-gray-500">No invitees yet.</p>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Attendance Analytics Section */}
         <Card>
           <CardHeader>
@@ -315,44 +388,6 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                 </Card>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Invitees</CardTitle>
-            <CardDescription>Members invited by {member.name}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {member.invitees.length === 0 ? (
-              <p>No invitees yet</p>
-            ) : (
-              <div className="grid gap-4">
-                {member.invitees.map((invitee) => (
-                  <Card key={invitee.id}>
-                    <CardContent className="pt-6">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold">{invitee.name}</h3>
-                          <p className="text-sm text-gray-500">
-                            {invitee.email || 'No email provided'}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {invitee.phone || 'No phone provided'}
-                          </p>
-                        </div>
-                        <Button
-                          variant="outline"
-                          onClick={() => router.push(`/members/${invitee.id}`)}
-                        >
-                          View Details
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
           </CardContent>
         </Card>
       </div>
