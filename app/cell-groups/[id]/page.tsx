@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,7 +20,8 @@ interface CellGroupWithMembers extends CellGroup {
   members: MemberWithInviter[]
 }
 
-export default function CellGroupDetailsPage({ params }: { params: { id: string } }) {
+export default function CellGroupDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const router = useRouter()
   const [cellGroup, setCellGroup] = useState<CellGroupWithMembers | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -29,7 +30,7 @@ export default function CellGroupDetailsPage({ params }: { params: { id: string 
   useEffect(() => {
     const fetchCellGroup = async () => {
       try {
-        const response = await fetch(`/api/cell-groups/${params.id}`)
+        const response = await fetch(`/api/cell-groups/${id}`)
         if (!response.ok) {
           throw new Error('Failed to fetch cell group')
         }
@@ -43,7 +44,7 @@ export default function CellGroupDetailsPage({ params }: { params: { id: string 
     }
 
     fetchCellGroup()
-  }, [params.id])
+  }, [id])
 
   const handleExportMembers = () => {
     if (!cellGroup) return
@@ -98,12 +99,42 @@ export default function CellGroupDetailsPage({ params }: { params: { id: string 
 
   return (
     <div className="container mx-auto py-10">
+      <div className="mb-6">
+        <Button
+          variant="outline"
+          onClick={() => router.push('/cell-groups')}
+          className="inline-flex items-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="mr-2 h-4 w-4"
+          >
+            <path d="m12 19-7-7 7-7"></path>
+            <path d="M19 12H5"></path>
+          </svg>
+          Back to Cell Groups
+        </Button>
+      </div>
+
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">{cellGroup.name}</h1>
-        <Button onClick={handleExportMembers}>
-          <Download className="mr-2 h-4 w-4" />
-          Export Members (PDF)
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => router.push(`/cell-groups/${id}/edit`)}>
+            Edit Cell Group
+          </Button>
+          <Button onClick={handleExportMembers}>
+            <Download className="mr-2 h-4 w-4" />
+            Export Members (PDF)
+          </Button>
+        </div>
       </div>
 
       <Card className="mb-6">
