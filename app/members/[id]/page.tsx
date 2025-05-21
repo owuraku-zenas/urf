@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Member, CellGroup } from "@prisma/client"
+import { use } from "react"
 
 interface MemberWithRelations extends Member {
   cellGroup: CellGroup
@@ -13,8 +14,8 @@ interface MemberWithRelations extends Member {
   invitees: Member[]
 }
 
-export default function MemberDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params
+export default function MemberDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const router = useRouter()
   const [member, setMember] = useState<MemberWithRelations | null>(null)
   const [error, setError] = useState<string | null>(null)
