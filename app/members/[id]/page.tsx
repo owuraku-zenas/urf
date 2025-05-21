@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input"
 import { Member, CellGroup } from "@prisma/client"
 import { use } from "react"
-import { ArrowLeft, Edit, Mail, Phone, Users } from "lucide-react"
+import { ArrowLeft, Edit, Mail, Phone, Users, Calendar, GraduationCap, BookOpen, Home, DoorOpen } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -210,23 +210,78 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
           </CardHeader>
           <CardContent>
             <div className="grid gap-4">
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-gray-500" />
-                <span>{member.email || 'No email provided'}</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-gray-500" />
+                    <span>{member.email || 'No email provided'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-gray-500" />
+                    <span>{member.phone || 'No phone provided'}</span>
+                  </div>
+                  {member.dateOfBirth && (
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-gray-500" />
+                      <span>Date of Birth: {new Date(member.dateOfBirth).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                  {member.joinDate && (
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-gray-500" />
+                      <span>Join Date: {new Date(member.joinDate).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-4">
+                  {member.university && (
+                    <div className="flex items-center gap-2">
+                      <GraduationCap className="h-4 w-4 text-gray-500" />
+                      <span>University: {member.university}</span>
+                    </div>
+                  )}
+                  {member.program && (
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-gray-500" />
+                      <span>Program: {member.program}</span>
+                    </div>
+                  )}
+                  {member.startYear && (
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-gray-500" />
+                      <span>Start Year: {member.startYear}</span>
+                    </div>
+                  )}
+                  {member.cellGroup && (
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-gray-500" />
+                      <Link
+                        href={`/cell-groups/${member.cellGroup.id}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        Cell Group: {member.cellGroup.name}
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-gray-500" />
-                <span>{member.phone || 'No phone provided'}</span>
-              </div>
-              {member.cellGroup && (
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-gray-500" />
-                  <Link
-                    href={`/cell-groups/${member.cellGroup.id}`}
-                    className="text-blue-600 hover:underline"
-                  >
-                    {member.cellGroup.name}
-                  </Link>
+              {(member.hostel || member.roomNumber) && (
+                <div className="border-t pt-4">
+                  <h3 className="font-medium mb-2">Accommodation Details</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {member.hostel && (
+                      <div className="flex items-center gap-2">
+                        <Home className="h-4 w-4 text-gray-500" />
+                        <span>Hostel: {member.hostel}</span>
+                      </div>
+                    )}
+                    {member.roomNumber && (
+                      <div className="flex items-center gap-2">
+                        <DoorOpen className="h-4 w-4 text-gray-500" />
+                        <span>Room Number: {member.roomNumber}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
