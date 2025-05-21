@@ -16,7 +16,7 @@ export async function GET() {
       prisma.attendance.count(),
       prisma.event.count({
         where: {
-          attendances: {
+          attendance: {
             some: {},
           },
         },

@@ -38,8 +38,8 @@ interface AttendanceWithMember extends Attendance {
   member: MemberWithCellGroup
 }
 
-interface EventWithAttendances extends Event {
-  attendances: AttendanceWithMember[]
+interface EventWithAttendance extends Event {
+  attendance: AttendanceWithMember[]
 }
 
 export const generateMemberListPDF = (
@@ -111,7 +111,7 @@ export const generateCellGroupMembersPDF = (
 }
 
 export const generateEventAttendancePDF = (
-  event: EventWithAttendances,
+  event: EventWithAttendance,
   options: ExportOptions
 ) => {
   const doc = new jsPDF()
@@ -129,13 +129,13 @@ export const generateEventAttendancePDF = (
   doc.text(`Event: ${event.name}`, 14, options.subtitle ? 40 : 30)
   doc.text(`Date: ${new Date(event.date).toLocaleDateString()}`, 14, options.subtitle ? 50 : 40)
   doc.text(`Type: ${event.type}`, 14, options.subtitle ? 60 : 50)
-  doc.text(`Total Attendance: ${event.attendances.length}`, 14, options.subtitle ? 70 : 60)
+  doc.text(`Total Attendance: ${event.attendance.length}`, 14, options.subtitle ? 70 : 60)
 
   // Add table
   autoTable(doc, {
     startY: options.subtitle ? 80 : 70,
     head: [['Name', 'Phone', 'Cell Group', 'Marked At']],
-    body: event.attendances.map(attendance => [
+    body: event.attendance.map(attendance => [
       attendance.member.name,
       attendance.member.phone,
       attendance.member.cellGroup?.name || 'N/A',
@@ -149,7 +149,7 @@ export const generateEventAttendancePDF = (
 }
 
 export const generateAttendanceTrendsPDF = (
-  events: EventWithAttendances[],
+  events: EventWithAttendance[],
   cellGroups: CellGroupWithMembers[],
   options: ExportOptions
 ) => {
@@ -178,8 +178,8 @@ export const generateAttendanceTrendsPDF = (
       event.name,
       new Date(event.date).toLocaleDateString(),
       event.type,
-      event.attendances.length.toString(),
-      `${Math.round((event.attendances.length / cellGroups.reduce((sum, group) => sum + group.members.length, 0)) * 100)}%`
+      event.attendance.length.toString(),
+      `${Math.round((event.attendance.length / cellGroups.reduce((sum, group) => sum + group.members.length, 0)) * 100)}%`
     ]),
     theme: 'grid',
     headStyles: { fillColor: [41, 128, 185] }
@@ -198,7 +198,7 @@ export const generateAttendanceTrendsPDF = (
     head: [['Cell Group', 'Total Members', 'Average Attendance', 'Attendance Rate']],
     body: cellGroups.map(group => {
       const totalAttendance = events.reduce((sum, event) => 
-        sum + event.attendances.filter(a => a.member.cellGroupId === group.id).length, 0)
+        sum + event.attendance.filter(a => a.member.cellGroupId === group.id).length, 0)
       const avgAttendance = totalAttendance / events.length
       const attendanceRate = (avgAttendance / group.members.length) * 100
 

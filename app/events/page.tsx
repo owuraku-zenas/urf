@@ -15,7 +15,7 @@ interface Event {
   type: 'MIDWEEK' | 'SUNDAY' | 'PRAYER' | 'SPECIAL'
   date: string
   description: string | null
-  attendances: {
+  attendance: {
     id: string
     member: {
       id: string
@@ -158,7 +158,7 @@ export default function EventsPage() {
                         <TableCell className="font-medium">{event.name}</TableCell>
                         <TableCell>{formatEventType(event.type)}</TableCell>
                         <TableCell className="hidden sm:table-cell">{new Date(event.date).toLocaleDateString()}</TableCell>
-                        <TableCell>{event.attendances.length}</TableCell>
+                        <TableCell>{event.attendance.length}</TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="sm" asChild className="w-full sm:w-auto">
                             <Link href={`/events/${event.id}`}>

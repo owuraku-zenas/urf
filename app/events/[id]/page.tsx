@@ -17,7 +17,7 @@ interface Event {
   description: string | null
   createdAt: Date
   updatedAt: Date
-  attendances: (Attendance & {
+  attendance: (Attendance & {
     member: Member & {
       cellGroup: CellGroup
     }
@@ -56,7 +56,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     // Map attendances to ensure all member fields are strings
     const mappedEvent = {
       ...event,
-      attendances: event.attendances.map(attendance => ({
+      attendance: event.attendance.map(attendance => ({
         ...attendance,
         member: {
           ...attendance.member,
@@ -196,7 +196,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         <CardHeader>
           <CardTitle>Attendance Records</CardTitle>
           <CardDescription>
-            {event.attendances.length} members present
+            {event.attendance.length} members present
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -204,34 +204,18 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Phone</TableHead>
                 <TableHead>Cell Group</TableHead>
-                <TableHead>Marked At</TableHead>
+                <TableHead>Phone</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {event.attendances.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center">
-                    No attendance records yet
-                  </TableCell>
+              {event.attendance.map((record) => (
+                <TableRow key={record.id}>
+                  <TableCell>{record.member.name}</TableCell>
+                  <TableCell>{record.member.cellGroup?.name || 'N/A'}</TableCell>
+                  <TableCell>{record.member.phone}</TableCell>
                 </TableRow>
-              ) : (
-                event.attendances.map((attendance) => (
-                  <TableRow key={attendance.id}>
-                    <TableCell className="font-medium">
-                      {attendance.member?.name || 'N/A'}
-                    </TableCell>
-                    <TableCell>{attendance.member?.phone || 'N/A'}</TableCell>
-                    <TableCell>
-                      {attendance.member?.cellGroup?.name || 'No Cell Group'}
-                    </TableCell>
-                    <TableCell>
-                      {attendance.createdAt ? new Date(attendance.createdAt).toLocaleString() : 'N/A'}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
+              ))}
             </TableBody>
           </Table>
         </CardContent>

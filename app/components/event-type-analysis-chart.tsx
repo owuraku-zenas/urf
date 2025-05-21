@@ -7,12 +7,16 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 interface Event {
   id: string
   name: string
-  type: string
+  type: 'MIDWEEK' | 'SUNDAY' | 'PRAYER' | 'SPECIAL'
   date: string
-  attendances: Array<{
+  description: string | null
+  attendance: {
     id: string
-    memberId: string
-  }>
+    member: {
+      id: string
+      name: string
+    }
+  }[]
 }
 
 export default function EventTypeAnalysisChart() {
@@ -41,7 +45,7 @@ export default function EventTypeAnalysisChart() {
   // Group events by type and calculate attendance metrics
   const chartData = events.reduce((acc: any[], event) => {
     const existingType = acc.find(item => item.type === event.type)
-    const attendanceCount = event.attendances.length
+    const attendanceCount = event.attendance.length
 
     if (existingType) {
       existingType.totalEvents++

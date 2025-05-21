@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const events = await prisma.event.findMany({
       include: {
-        attendances: {
+        attendance: {
           select: {
             id: true,
             memberId: true,

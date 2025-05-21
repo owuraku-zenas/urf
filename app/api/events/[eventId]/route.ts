@@ -13,7 +13,7 @@ export async function GET(
         id: eventId,
       },
       include: {
-        attendances: {
+        attendance: {
           select: {
             id: true,
             memberId: true,

@@ -3,75 +3,64 @@ import { prisma } from "@/lib/prisma"
 
 export async function GET() {
   try {
-    // Get total number of members
-    const totalMembers = await prisma.member.count()
-
-    // Get all events with their attendance counts
-    const events = await prisma.event.findMany({
-      include: {
-        _count: {
-          select: {
-            attendances: true
+    const [events, members] = await Promise.all([
+      prisma.event.findMany({
+        include: {
+          _count: {
+            select: {
+              attendance: true
+            }
           }
+        },
+        orderBy: {
+          date: 'desc'
         }
-      },
-      orderBy: {
-        date: 'desc'
-      }
-    })
+      }),
+      prisma.member.findMany()
+    ])
 
-    // Calculate attendance statistics
+    const totalMembers = members.length
+
     const eventStats = events.map(event => ({
       id: event.id,
       name: event.name,
-      type: event.type,
       date: event.date,
-      attendanceCount: event._count.attendances,
-      attendancePercentage: Math.round((event._count.attendances / totalMembers) * 100)
+      type: event.type,
+      attendanceCount: event._count.attendance,
+      attendancePercentage: Math.round((event._count.attendance / totalMembers) * 100)
     }))
 
-    // Calculate average attendance by event type
     const typeStats = events.reduce((acc, event) => {
-      const type = event.type
-      if (!acc[type]) {
-        acc[type] = {
+      if (!acc[event.type]) {
+        acc[event.type] = {
           total: 0,
           count: 0
         }
       }
-      acc[type].total += event._count.attendances
-      acc[type].count += 1
+      acc[event.type].total += event._count.attendance
+      acc[event.type].count++
       return acc
     }, {} as Record<string, { total: number; count: number }>)
 
-    const averageAttendance = {
-      overall: Math.round(
-        (events.reduce((sum, event) => sum + event._count.attendances, 0) / 
-        (events.length * totalMembers)) * 100
-      ),
-      sunday: Math.round(
-        (typeStats.SUNDAY?.total || 0) / 
-        ((typeStats.SUNDAY?.count || 1) * totalMembers) * 100
-      ),
-      midweek: Math.round(
-        (typeStats.MIDWEEK?.total || 0) / 
-        ((typeStats.MIDWEEK?.count || 1) * totalMembers) * 100
-      ),
-      prayer: Math.round(
-        (typeStats.PRAYER?.total || 0) / 
-        ((typeStats.PRAYER?.count || 1) * totalMembers) * 100
-      )
-    }
+    const typeAverages = Object.entries(typeStats).map(([type, stats]) => ({
+      type,
+      averageAttendance: Math.round(stats.total / stats.count)
+    }))
+
+    const overallAverage = Math.round(
+      (events.reduce((sum, event) => sum + event._count.attendance, 0) /
+        events.length) || 0
+    )
 
     return NextResponse.json({
-      events: eventStats,
-      totalMembers,
-      averageAttendance
+      eventStats,
+      typeAverages,
+      overallAverage
     })
   } catch (error) {
-    console.error("Error generating attendance trends report:", error)
+    console.error("Error generating attendance trends:", error)
     return NextResponse.json(
-      { error: "Failed to generate report" },
+      { error: "Failed to generate attendance trends" },
       { status: 500 }
     )
   }

@@ -9,11 +9,9 @@ interface Event {
   name: string
   type: string
   date: string
-  attendances: Array<{
-    id: string
-    memberId: string
+  attendance: Array<{
     member: {
-      cellGroupId: string
+      cellGroupId: string | null
     }
   }>
 }
@@ -71,8 +69,8 @@ export default function CellGroupAttendanceChart() {
     }
 
     cellGroups.forEach(group => {
-      const attendanceCount = event.attendances.filter(
-        attendance => attendance.member?.cellGroupId === group.id
+      const attendanceCount = event.attendance.filter(
+        (a) => a.member.cellGroupId === group.id
       ).length
       const totalMembers = group._count.members
       dataPoint[group.name] = totalMembers > 0 ? (attendanceCount / totalMembers) * 100 : 0

@@ -33,9 +33,10 @@ interface Event {
   name: string
   type: string
   date: string
-  attendances: Array<{
-    id: string
-    memberId: string
+  attendance: Array<{
+    member: {
+      cellGroupId: string | null
+    }
   }>
 }
 
@@ -106,7 +107,7 @@ export default function Dashboard() {
 
   const attendanceData = events?.map(event => ({
     name: event.name,
-    attendance: event.attendances?.length || 0
+    attendance: event.attendance?.length || 0
   })) || []
 
   const invitationData = members

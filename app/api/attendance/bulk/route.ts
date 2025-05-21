@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { AttendanceStatus } from "@prisma/client"
 
 export async function POST(request: Request) {
   try {
@@ -13,21 +14,36 @@ export async function POST(request: Request) {
       )
     }
 
-    // Map attendance records to the correct format
-    const attendanceRecords = attendances.map(attendance => ({
-      eventId,
-      memberId: attendance.memberId
-    }))
+    // Get the event to verify it exists
+    const event = await prisma.event.findUnique({
+      where: { id: eventId }
+    })
+
+    if (!event) {
+      return NextResponse.json(
+        { error: "Event not found" },
+        { status: 404 }
+      )
+    }
 
     // Delete existing attendance records for this event
     await prisma.attendance.deleteMany({
       where: { eventId }
     })
 
-    // Create new attendance records
-    const createdAttendances = await prisma.attendance.createMany({
-      data: attendanceRecords
-    })
+    // Create new attendance records one by one
+    const createdAttendances = await Promise.all(
+      attendances.map(attendance => 
+        prisma.attendance.create({
+          data: {
+            member: { connect: { id: attendance.memberId } },
+            event: { connect: { id: eventId } },
+            date: event.date,
+            status: attendance.status === 'ABSENT' ? AttendanceStatus.ABSENT : AttendanceStatus.PRESENT
+          }
+        })
+      )
+    )
 
     return NextResponse.json(createdAttendances)
   } catch (error) {
