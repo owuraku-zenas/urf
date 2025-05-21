@@ -49,6 +49,8 @@ export default function MembersPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCellGroup, setSelectedCellGroup] = useState("all")
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,7 +86,13 @@ export default function MembersPage() {
       member.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.email.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCellGroup = selectedCellGroup === 'all' || member.cellGroupId === selectedCellGroup
-    return matchesSearch && matchesCellGroup
+    
+    // Date range filtering
+    const memberDate = new Date(member.createdAt)
+    const matchesDateRange = (!startDate || memberDate >= new Date(startDate)) &&
+      (!endDate || memberDate <= new Date(endDate + 'T23:59:59'))
+
+    return matchesSearch && matchesCellGroup && matchesDateRange
   })
 
   const handleExportPDF = () => {
@@ -154,6 +162,32 @@ export default function MembersPage() {
                 ))}
               </SelectContent>
             </Select>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full sm:w-[180px]"
+                placeholder="Start date"
+              />
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full sm:w-[180px]"
+                placeholder="End date"
+              />
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setStartDate("")
+                  setEndDate("")
+                }}
+                className="w-full sm:w-auto"
+              >
+                Clear Dates
+              </Button>
+            </div>
           </div>
 
           <div className="overflow-x-auto">

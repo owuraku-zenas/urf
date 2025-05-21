@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Input } from "@/components/ui/input"
 import { Member, CellGroup } from "@prisma/client"
 import { use } from "react"
 
@@ -20,6 +21,8 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
   const [member, setMember] = useState<MemberWithRelations | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
 
   useEffect(() => {
     const fetchMember = async () => {
@@ -39,6 +42,12 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
 
     fetchMember()
   }, [id])
+
+  const filteredInvitees = member?.invitees.filter(invitee => {
+    const inviteeDate = new Date(invitee.createdAt)
+    return (!startDate || inviteeDate >= new Date(startDate)) &&
+      (!endDate || inviteeDate <= new Date(endDate + 'T23:59:59'))
+  }) || []
 
   if (isLoading) {
     return (
@@ -161,27 +170,58 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4 mb-4">
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full sm:w-[180px]"
+                placeholder="Start date"
+              />
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full sm:w-[180px]"
+                placeholder="End date"
+              />
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setStartDate("")
+                  setEndDate("")
+                }}
+                className="w-full sm:w-auto"
+              >
+                Clear Dates
+              </Button>
+            </div>
+          </div>
+
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Phone</TableHead>
+                <TableHead>Join Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {member.invitees.length === 0 ? (
+              {filteredInvitees.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center">
-                    No invitees yet
+                  <TableCell colSpan={4} className="text-center">
+                    No invitees found
                   </TableCell>
                 </TableRow>
               ) : (
-                member.invitees.map((invitee) => (
+                filteredInvitees.map((invitee) => (
                   <TableRow key={invitee.id}>
                     <TableCell className="font-medium">{invitee.name}</TableCell>
-                    <TableCell>{invitee.email}</TableCell>
+                    <TableCell>{invitee.email || 'N/A'}</TableCell>
                     <TableCell>{invitee.phone}</TableCell>
+                    <TableCell>{new Date(invitee.createdAt).toLocaleDateString()}</TableCell>
                   </TableRow>
                 ))
               )}

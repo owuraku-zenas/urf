@@ -30,6 +30,7 @@ export async function GET(
           select: {
             id: true,
             name: true,
+            email: true,
             phone: true,
             university: true,
             program: true,
@@ -121,6 +122,7 @@ export async function PUT(
           select: {
             id: true,
             name: true,
+            email: true,
             phone: true,
             university: true,
             program: true,
