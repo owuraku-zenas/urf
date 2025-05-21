@@ -85,9 +85,14 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
     <div className="py-10">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">{member.name}</h1>
-        <Button onClick={() => router.push('/members')}>
-          Back to Members
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => router.push('/members')}>
+            Back to Members
+          </Button>
+          <Button onClick={() => router.push(`/members/${id}/edit`)}>
+            Edit Member
+          </Button>
+        </div>
       </div>
 
       <Card className="mb-6">
