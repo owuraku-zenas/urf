@@ -225,7 +225,7 @@ export default function NewMemberPage() {
                   id="email"
                   name="email"
                   type="email"
-                  value={formData.email}
+                  value={formData.email ?? ""}
                   onChange={handleChange}
                   className={`w-full rounded-md border ${errors.email ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                 />
@@ -277,7 +277,7 @@ export default function NewMemberPage() {
                   id="dateOfBirth"
                   name="dateOfBirth"
                   type="date"
-                  value={formData.dateOfBirth}
+                  value={formData.dateOfBirth ?? ""}
                   onChange={handleChange}
                   className={`w-full rounded-md border ${errors.dateOfBirth ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                 />
@@ -293,7 +293,7 @@ export default function NewMemberPage() {
                 <input
                   id="university"
                   name="university"
-                  value={formData.university}
+                  value={formData.university ?? ""}
                   onChange={handleChange}
                   className={`w-full rounded-md border ${errors.university ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                 />
@@ -309,7 +309,7 @@ export default function NewMemberPage() {
                 <input
                   id="program"
                   name="program"
-                  value={formData.program}
+                  value={formData.program ?? ""}
                   onChange={handleChange}
                   className={`w-full rounded-md border ${errors.program ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                 />
@@ -325,7 +325,7 @@ export default function NewMemberPage() {
                 <input
                   id="startYear"
                   name="startYear"
-                  value={formData.startYear}
+                  value={formData.startYear ?? ""}
                   onChange={handleChange}
                   placeholder="YYYY"
                   className={`w-full rounded-md border ${errors.startYear ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
@@ -342,7 +342,7 @@ export default function NewMemberPage() {
                 <input
                   id="hostel"
                   name="hostel"
-                  value={formData.hostel}
+                  value={formData.hostel ?? ""}
                   onChange={handleChange}
                   className={`w-full rounded-md border ${errors.hostel ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                 />
@@ -358,7 +358,7 @@ export default function NewMemberPage() {
                 <input
                   id="roomNumber"
                   name="roomNumber"
-                  value={formData.roomNumber}
+                  value={formData.roomNumber ?? ""}
                   onChange={handleChange}
                   className={`w-full rounded-md border ${errors.roomNumber ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                 />
@@ -398,7 +398,7 @@ export default function NewMemberPage() {
                 <select
                   id="invitedById"
                   name="invitedById"
-                  value={formData.invitedById}
+                  value={formData.invitedById ?? ""}
                   onChange={handleChange}
                   className={`w-full rounded-md border ${errors.invitedById ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                 >
