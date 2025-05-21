@@ -4,8 +4,9 @@ import type { NextRequest } from "next/server"
 
 export default auth((req) => {
   const isLoggedIn = !!req.auth
-  const isOnLoginPage = req.nextUrl.pathname.startsWith("/login")
+  const isOnLoginPage = req.nextUrl.pathname === "/login"
 
+  // Allow access to login page
   if (isOnLoginPage) {
     if (isLoggedIn) {
       return NextResponse.redirect(new URL("/", req.nextUrl))
@@ -13,6 +14,7 @@ export default auth((req) => {
     return NextResponse.next()
   }
 
+  // Protect all other routes
   if (!isLoggedIn) {
     let from = req.nextUrl.pathname
     if (req.nextUrl.search) {
@@ -27,7 +29,17 @@ export default auth((req) => {
   return NextResponse.next()
 })
 
-// Optionally, don't invoke Middleware on some paths
+// Don't invoke Middleware on these paths
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico|public).*)",
+  ],
 } 
