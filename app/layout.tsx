@@ -9,13 +9,7 @@ import { cn } from "@/lib/utils"
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { Header } from "@/components/header"
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  preload: true,
-  fallback: ["system-ui", "arial"],
-  adjustFontFallback: true,
-})
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "URF - Universal Radiant Family",
@@ -29,14 +23,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(inter.className, "min-h-screen bg-background")} suppressHydrationWarning>
-        <AuthProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            forcedTheme="light"
-            disableTransitionOnChange
-          >
+      <body className={inter.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
             <div className="flex min-h-screen flex-col">
               <Header />
               <main className="flex-1 relative">
@@ -47,8 +41,8 @@ export default function RootLayout({
             </div>
             <Toaster />
             <SonnerToaster />
-          </ThemeProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
