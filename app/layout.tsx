@@ -4,7 +4,6 @@ import { Inter } from "next/font/google"
 import { Toaster } from "@/components/ui/toaster"
 import type { Metadata } from "next"
 import { Toaster as SonnerToaster } from "sonner"
-import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { Header } from "@/components/header"
@@ -22,27 +21,20 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AuthProvider>
-            <div className="flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1 relative">
-                <div className="w-full max-w-7xl mx-auto px-5 py-5">
-                  {children}
-                </div>
-              </main>
-            </div>
-            <Toaster />
-            <SonnerToaster />
-          </AuthProvider>
-        </ThemeProvider>
+        <AuthProvider>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1 relative">
+              <div className="w-full max-w-7xl mx-auto px-5 py-5">
+                {children}
+              </div>
+            </main>
+          </div>
+          <Toaster />
+          <SonnerToaster />
+        </AuthProvider>
       </body>
     </html>
   )
