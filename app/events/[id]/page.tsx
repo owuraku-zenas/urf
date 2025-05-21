@@ -24,8 +24,8 @@ interface Event {
   })[]
 }
 
-export default function EventDetailsPage({ params }: { params: { id: string } }) {
-  const { id } = params
+export default function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const router = useRouter()
   const [event, setEvent] = useState<Event | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -126,6 +126,9 @@ export default function EventDetailsPage({ params }: { params: { id: string } })
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">{event.name}</h1>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={() => router.push(`/events/${event.id}/edit`)}>
+            Edit Event
+          </Button>
           <Button onClick={() => router.push(`/attendance/${event.id}`)}>
             Mark Attendance
           </Button>
