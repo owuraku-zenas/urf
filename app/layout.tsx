@@ -18,8 +18,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "URF - University Revival Fellowship",
-  description: "University Revival Fellowship Management System",
+  title: "URF - Universal Radiant Family",
+  description: "Universal Radiant Family - Raising Leaders, Mentors and Icons",
 }
 
 export default function RootLayout({

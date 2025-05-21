@@ -11,7 +11,7 @@ export default function LoginPage() {
           <div className="max-w-md space-y-6">
             <h2 className="text-4xl font-bold tracking-tight">Welcome to URF</h2>
             <p className="text-lg text-blue-100">
-              University Revival Fellowship - Empowering students through faith and fellowship
+              Universal Radiant Family - Raising Leaders, Mentors and Icons
             </p>
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
@@ -20,7 +20,7 @@ export default function LoginPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <span>Connect with fellow believers</span>
+                <span>Develop your leadership potential</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
@@ -28,7 +28,7 @@ export default function LoginPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <span>Grow in your faith journey</span>
+                <span>Become a mentor to others</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
@@ -36,7 +36,7 @@ export default function LoginPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <span>Join our vibrant community</span>
+                <span>Grow into an influential icon</span>
               </div>
             </div>
           </div>
