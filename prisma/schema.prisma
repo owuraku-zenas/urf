@@ -52,6 +52,9 @@ model User {
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
+  inviteToken        String?   @unique
+  inviteTokenExpires DateTime?
+  status             String?
 }
 
 model Member {

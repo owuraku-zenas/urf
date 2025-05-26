@@ -3,3 +3,6 @@ onlyBuiltDependencies:
   - '@prisma/engines'
   - esbuild
   - prisma
+
+ignoredBuiltDependencies:
+  - bcrypt
