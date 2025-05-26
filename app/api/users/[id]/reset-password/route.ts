@@ -40,7 +40,7 @@ export async function POST(req: NextRequest, context: { params: { id: string } }
         pass: process.env.EMAIL_SERVER_PASSWORD,
       },
     });
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
     const setPasswordUrl = `${baseUrl}/set-password?token=${token}`;
     await transporter.sendMail({
       from: process.env.EMAIL_FROM,
