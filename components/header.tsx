@@ -46,10 +46,14 @@ export function Header() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer">
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
+              <Link href="/users/profile" passHref legacyBehavior>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <a>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </a>
+                </DropdownMenuItem>
+              </Link>
               {isAdmin && (
                 <Link href="/users" passHref legacyBehavior>
                   <DropdownMenuItem asChild className="cursor-pointer">
