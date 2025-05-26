@@ -10,45 +10,91 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Eye, Download } from "lucide-react";
 import Link from "next/link";
 import { useSession } from 'next-auth/react';
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 export default function ManageUsers() {
   const [users, setUsers] = useState([]);
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const [deleteUserId, setDeleteUserId] = useState(null);
+  const [resetLoadingId, setResetLoadingId] = useState(null);
+
+  useEffect(() => {
+    if (status === "authenticated" && session.user.role !== "ADMIN") {
+      router.push("/");
+    }
+  }, [session, status, router]);
 
   useEffect(() => {
     const fetchUsers = async () => {
       const response = await fetch('/api/users');
       const data = await response.json();
-      setUsers(data);
+      if (Array.isArray(data)) {
+        setUsers(data);
+      } else {
+        setUsers([]); // Optionally, handle error here
+      }
     };
     fetchUsers();
   }, []);
 
-  const handleEdit = (id) => {
-    router.push(`/users/${id}`);
+  const handleResetPassword = async (id) => {
+    setResetLoadingId(id);
+    try {
+      const res = await fetch(`/api/users/${id}/reset-password`, { method: "POST" });
+      if (res.ok) {
+        toast.success("Reset email sent successfully.");
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Failed to send reset email.");
+      }
+    } catch (err) {
+      toast.error("Failed to send reset email.");
+    }
+    setResetLoadingId(null);
   };
 
   const handleDelete = async (id) => {
-    if (confirm('Are you sure you want to delete this user?')) {
-      await fetch(`/api/users/${id}`, { method: 'DELETE' });
-      setUsers(users.filter(user => user.id !== id));
-    }
+    await fetch(`/api/users/${id}`, { method: 'DELETE' });
+    setUsers(users.filter(user => user.id !== id));
+    setDeleteUserId(null);
   };
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRole = selectedRole === 'all' || user.role === selectedRole;
-    return matchesSearch && matchesRole;
+    const isNotCurrentUser = session?.user?.id !== user.id;
+    return matchesSearch && matchesRole && isNotCurrentUser;
   });
+
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
+
+  if (status === "authenticated" && session.user.role !== "ADMIN") {
+    return null;
+  }
 
   return (
     <div className="py-10">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h1 className="text-3xl font-bold">Users</h1>
+        <Link href="/users" className="text-3xl font-bold hover:underline focus:underline">
+          Users
+        </Link>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Link href="/users/new" className="w-full sm:w-auto">
             <Button className="w-full sm:w-auto">
@@ -107,20 +153,43 @@ export default function ManageUsers() {
                     <TableCell>{user.role}</TableCell>
                     <TableCell>
                       <Button
-                        onClick={() => handleEdit(user.id)}
+                        onClick={() => handleResetPassword(user.id)}
                         variant="outline"
                         className="mr-2"
-                        disabled={user.id === session?.user?.id}
+                        disabled={user.id === session?.user?.id || resetLoadingId === user.id}
                       >
-                        Edit
+                        {resetLoadingId === user.id ? "Resetting..." : "Reset Password"}
                       </Button>
-                      <Button
-                        onClick={() => handleDelete(user.id)}
-                        variant="destructive"
-                        disabled={user.id === session?.user?.id}
-                      >
-                        Delete
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            disabled={user.id === session?.user?.id}
+                            onClick={() => setDeleteUserId(user.id)}
+                          >
+                            Delete
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete User</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete this user? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => setDeleteUserId(null)}>
+                              Cancel
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(user.id)}
+                              disabled={user.id !== deleteUserId}
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </TableCell>
                   </TableRow>
                 ))}

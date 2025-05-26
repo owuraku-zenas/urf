@@ -4,10 +4,11 @@ import { NextResponse } from "next/server"
 export default auth((req) => {
   const isLoggedIn = !!req.auth
   const isOnLoginPage = req.nextUrl.pathname === "/login"
+  const isOnSetPasswordPage = req.nextUrl.pathname === "/set-password"
 
-  // Allow access to login page
-  if (isOnLoginPage) {
-    if (isLoggedIn) {
+  // Allow access to login page and set-password page
+  if (isOnLoginPage || isOnSetPasswordPage) {
+    if (isLoggedIn && isOnLoginPage) {
       return NextResponse.redirect(new URL("/", req.nextUrl))
     }
     return NextResponse.next()

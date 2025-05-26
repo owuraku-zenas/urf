@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { User, LogOut, Users } from "lucide-react"
+import Link from "next/link"
 
 export function Header() {
   const pathname = usePathname()
@@ -50,10 +51,14 @@ export function Header() {
                 <span>Profile</span>
               </DropdownMenuItem>
               {isAdmin && (
-                <DropdownMenuItem className="cursor-pointer">
-                  <Users className="mr-2 h-4 w-4" />
-                  <span>Manage Users</span>
-                </DropdownMenuItem>
+                <Link href="/users" passHref legacyBehavior>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <a>
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>Manage Users</span>
+                    </a>
+                  </DropdownMenuItem>
+                </Link>
               )}
               <DropdownMenuItem 
                 className="cursor-pointer text-red-600 focus:text-red-600"
