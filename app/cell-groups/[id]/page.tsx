@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Download, Eye } from "lucide-react"
 import { generateCellGroupMembersPDF } from "@/lib/pdf-utils"
 import { CellGroup, Member } from "@prisma/client"
+import { useSession } from "next-auth/react"
 
 interface MemberWithInviter extends Member {
   invitedBy: {
@@ -23,6 +24,8 @@ interface CellGroupWithMembers extends CellGroup {
 export default function CellGroupDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.role === 'ADMIN'
   const [cellGroup, setCellGroup] = useState<CellGroupWithMembers | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -127,9 +130,11 @@ export default function CellGroupDetailsPage({ params }: { params: Promise<{ id:
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">{cellGroup.name}</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => router.push(`/cell-groups/${id}/edit`)}>
-            Edit Cell Group
-          </Button>
+          {isAdmin && (
+            <Button variant="outline" onClick={() => router.push(`/cell-groups/${id}/edit`)}>
+              Edit Cell Group
+            </Button>
+          )}
           <Button onClick={handleExportMembers}>
             <Download className="mr-2 h-4 w-4" />
             Export Members (PDF)
