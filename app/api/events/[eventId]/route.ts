@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
+import { auth } from "@/auth"
 
 export async function GET(
   request: Request,
@@ -58,6 +59,14 @@ export async function PUT(
   context: { params: Promise<{ eventId: string }> }
 ) {
   try {
+    const session = await auth()
+    if (!session || session.user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: "Only admins can edit events" },
+        { status: 403 }
+      )
+    }
+
     const { eventId } = await context.params
     const body = await request.json()
     const { name, type, date, description } = body
@@ -96,6 +105,14 @@ export async function DELETE(
   context: { params: Promise<{ eventId: string }> }
 ) {
   try {
+    const session = await auth()
+    if (!session || session.user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: "Only admins can delete events" },
+        { status: 403 }
+      )
+    }
+
     const { eventId } = await context.params
     await prisma.event.delete({
       where: {

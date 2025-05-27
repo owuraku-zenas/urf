@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
+import { auth } from "@/auth"
 
 export async function GET() {
   try {
@@ -34,6 +35,14 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const session = await auth()
+    if (!session || session.user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: "Only admins can create events" },
+        { status: 403 }
+      )
+    }
+
     const body = await request.json()
     console.log("Creating event with data:", body)
 
@@ -52,6 +61,7 @@ export async function POST(request: Request) {
         type: body.type,
         date: new Date(body.date),
         description: body.description || null,
+        createdById: session.user.id,
       },
     })
 
