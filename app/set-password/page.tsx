@@ -18,11 +18,8 @@ function SetPasswordForm() {
   const token = searchParams.get("token");
 
   useEffect(() => {
-    // Show form after a short delay
-    const timer = setTimeout(() => {
-      setShowForm(true)
-    }, 300)
-    return () => clearTimeout(timer)
+    // Show form immediately
+    setShowForm(true)
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,7 +70,7 @@ function SetPasswordForm() {
 
       {/* Sliding form container */}
       <div 
-        className={`fixed right-0 top-0 h-full w-full md:w-1/2 bg-white dark:bg-gray-900 transition-transform duration-500 ease-in-out transform ${
+        className={`fixed right-0 top-0 h-full w-full md:w-1/2 bg-white dark:bg-gray-900 transition-transform duration-300 ease-out transform ${
           showForm ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
