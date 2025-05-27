@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Plus, Eye } from "lucide-react"
+import { useSession } from "next-auth/react"
 
 interface Event {
   id: string
@@ -30,6 +31,8 @@ export default function EventsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedType, setSelectedType] = useState<string>("all")
   const [error, setError] = useState<string | null>(null)
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.role === 'ADMIN'
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -81,12 +84,14 @@ export default function EventsPage() {
       <div className="w-full max-w-7xl mx-auto px-5 py-10">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold">Church Events</h1>
-          <Button asChild className="w-full sm:w-auto">
-            <Link href="/events/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Create New Event
-            </Link>
-          </Button>
+          {isAdmin && (
+            <Button asChild className="w-full sm:w-auto">
+              <Link href="/events/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Create New Event
+              </Link>
+            </Button>
+          )}
         </div>
 
         <Card className="mb-6">

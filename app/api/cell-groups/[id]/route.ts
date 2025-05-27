@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
+import { auth } from "@/auth"
 
 // Validation schema
 const UpdateCellGroupSchema = z.object({
@@ -51,6 +52,14 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const session = await auth()
+    if (!session || session.user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: "Only admins can edit cell groups" },
+        { status: 403 }
+      )
+    }
+
     const body = await request.json()
     
     // Validate request body
@@ -88,6 +97,46 @@ export async function PUT(
     console.error("Error updating cell group:", error)
     return NextResponse.json(
       { error: "Failed to update cell group" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await auth()
+    if (!session || session.user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: "Only admins can delete cell groups" },
+        { status: 403 }
+      )
+    }
+
+    // Check if cell group exists
+    const existingCellGroup = await prisma.cellGroup.findUnique({
+      where: { id: params.id },
+    })
+
+    if (!existingCellGroup) {
+      return NextResponse.json(
+        { error: "Cell group not found" },
+        { status: 404 }
+      )
+    }
+
+    // Delete cell group
+    await prisma.cellGroup.delete({
+      where: { id: params.id },
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error("Error deleting cell group:", error)
+    return NextResponse.json(
+      { error: "Failed to delete cell group" },
       { status: 500 }
     )
   }

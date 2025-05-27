@@ -1,117 +1,121 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
+import { Pencil, Trash2 } from "lucide-react"
 import Link from "next/link"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { useToast } from "@/components/ui/use-toast"
+import { CellGroup, Member } from "@prisma/client"
+import { useRouter } from "next/navigation"
 
-interface Member {
-  id: string
-  name: string
-  phone: string
-  university: string | null
-  program: string | null
+interface MemberWithInviter extends Member {
+  invitedBy: {
+    id: string
+    name: string
+  } | null
 }
 
-interface CellGroup {
-  id: string
-  name: string
-  description: string | null
-  createdAt: Date
-  updatedAt: Date
-  members: Member[]
+interface CellGroupWithMembers extends CellGroup {
+  members: MemberWithInviter[]
 }
 
 interface CellGroupDetailsProps {
-  cellGroup: CellGroup
+  cellGroup: CellGroupWithMembers
+  isAdmin: boolean
 }
 
-export default function CellGroupDetails({ cellGroup }: CellGroupDetailsProps) {
+export default function CellGroupDetails({ cellGroup, isAdmin }: CellGroupDetailsProps) {
+  const router = useRouter()
+  const { toast } = useToast()
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`/api/cell-groups/${cellGroup.id}`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) {
+        throw new Error('Failed to delete cell group')
+      }
+      toast({
+        title: "Success",
+        description: "Cell group deleted successfully",
+      })
+      router.push('/cell-groups')
+    } catch (error) {
+      console.error('Error deleting cell group:', error)
+      toast({
+        title: "Error",
+        description: "Failed to delete cell group",
+        variant: "destructive",
+      })
+    }
+  }
+
   return (
-    <div className="container mx-auto py-10 px-4">
-      <div className="mb-6">
-        <Link
-          href="/cell-groups"
-          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-50"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-2 h-4 w-4"
-          >
-            <path d="m12 19-7-7 7-7"></path>
-            <path d="M19 12H5"></path>
-          </svg>
-          Back to Cell Groups
-        </Link>
+    <div className="container mx-auto py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">{cellGroup.name}</h1>
+        {isAdmin && (
+          <div className="flex gap-4">
+            <Link href={`/cell-groups/${cellGroup.id}/edit`}>
+              <Button variant="outline">
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit Cell Group
+              </Button>
+            </Link>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Cell Group
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the cell group
+                    and remove all associated data.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
-        <div className="p-6">
-          <h2 className="text-xl font-bold mb-1">{cellGroup.name}</h2>
-          <p className="text-sm text-gray-500 mb-6">{cellGroup.description}</p>
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">Description</h2>
+        <p className="text-gray-600">
+          {cellGroup.description || "No description available"}
+        </p>
+      </div>
 
-          <div className="mt-8">
-            <h3 className="text-lg font-semibold mb-4">Members</h3>
-            {cellGroup.members.length === 0 ? (
-              <p className="text-gray-500">No members in this cell group yet.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Name
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Phone
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        University
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Program
-                      </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {cellGroup.members.map((member) => (
-                      <tr key={member.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {member.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {member.phone}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {member.university || "-"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {member.program || "-"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <Link
-                            href={`/members/${member.id}`}
-                            className="text-blue-600 hover:text-blue-900"
-                          >
-                            View
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold mb-4">Members</h2>
+        {cellGroup.members.length === 0 ? (
+          <p className="text-gray-500">No members yet</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {cellGroup.members.map((member) => (
+              <div
+                key={member.id}
+                className="border rounded-lg p-4"
+              >
+                <h3 className="font-medium">{member.name}</h3>
+                <p className="text-sm text-gray-500">
+                  Invited by: {member.invitedBy?.name || 'Unknown'}
+                </p>
               </div>
-            )}
+            ))}
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
