@@ -6,6 +6,17 @@ export default auth((req) => {
   const isOnLoginPage = req.nextUrl.pathname === "/login"
   const isOnSetPasswordPage = req.nextUrl.pathname === "/set-password"
 
+  // Allow static files (e.g., images, css, js) and Next.js internals
+  if (
+    req.nextUrl.pathname.startsWith("/_next") ||
+    req.nextUrl.pathname.startsWith("/static") ||
+    req.nextUrl.pathname.startsWith("/favicon.ico") ||
+    req.nextUrl.pathname.startsWith("/api") ||
+    req.nextUrl.pathname.match(/\.(.*)$/) // Allow all files with an extension
+  ) {
+    return NextResponse.next()
+  }
+
   // Allow access to login page and set-password page
   if (isOnLoginPage || isOnSetPasswordPage) {
     if (isLoggedIn && isOnLoginPage) {

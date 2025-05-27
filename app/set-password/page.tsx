@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import Image from "next/image";
 
 function SetPasswordForm() {
   const [password, setPassword] = useState("");
@@ -90,7 +91,8 @@ function SetPasswordForm() {
       {/* Right side - Set Password Form */}
       <div className="flex-1 flex items-center justify-center bg-white dark:bg-gray-900">
         <div className="w-full max-w-[400px] p-8 space-y-8">
-          <div className="space-y-2 text-center">
+          <div className="flex flex-col items-center space-y-2 text-center">
+            <Image src="/church-logo.PNG" alt="Church Logo" width={160} height={80} className="object-contain h-20 w-auto" />
             <h1 className="text-3xl font-bold tracking-tight">Set Your Password</h1>
             <p className="text-sm text-muted-foreground">
               Enter a new password to activate your account

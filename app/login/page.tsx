@@ -5,7 +5,7 @@ export default function LoginPage() {
   return (
     <div className="absolute inset-0 flex z-[100]">
       {/* Left side - Graphic */}
-      <div className="hidden lg:flex w-1/2 bg-blue-600 relative overflow-hidden rounded-3xl m-4">
+      <div className="hidden lg:flex w-1/2 bg-blue-600 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-700 opacity-90" />
         <div className="relative z-10 flex flex-col items-center justify-center w-full h-full text-white p-12">
           <div className="max-w-md space-y-6">
@@ -52,7 +52,8 @@ export default function LoginPage() {
       {/* Right side - Login Form */}
       <div className="flex-1 flex items-center justify-center bg-white dark:bg-gray-900">
         <div className="w-full max-w-[400px] p-8 space-y-8">
-          <div className="space-y-2 text-center">
+          <div className="flex flex-col items-center space-y-2 text-center">
+            <Image src="/church-logo.PNG" alt="Church Logo" width={160} height={80} className="object-contain h-20 w-auto" />
             <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
             <p className="text-sm text-muted-foreground">
               Enter your credentials to access your account
