@@ -125,22 +125,72 @@ export const generateEventAttendancePDF = (
     doc.text(options.subtitle, 14, 30)
   }
 
-  // Add event info
+  let yOffset = options.subtitle ? 40 : 30
+
+  // Add event details section
+  doc.setFontSize(16)
+  doc.text('Event Details', 14, yOffset)
+  yOffset += 10
+
+  doc.setFontSize(12)
+  doc.text(`Event Name: ${event.name}`, 14, yOffset)
+  yOffset += 7
+  doc.text(`Date: ${new Date(event.date).toLocaleDateString()}`, 14, yOffset)
+  yOffset += 7
+  doc.text(`Type: ${event.type.replace(/_/g, ' ')}`, 14, yOffset)
+  yOffset += 7
+  doc.text(`Total Attendance: ${event.attendance.length}`, 14, yOffset)
+  yOffset += 15
+
+  // Add description if exists
+  if (event.description) {
+    doc.setFontSize(14)
+    doc.text('Description', 14, yOffset)
+    yOffset += 7
+    
+    doc.setFontSize(12)
+    const descriptionLines = doc.splitTextToSize(event.description, 180)
+    doc.text(descriptionLines, 14, yOffset)
+    yOffset += (descriptionLines.length * 7) + 10
+  }
+
+  // Add preparations if exists
+  if (event.preparations) {
+    doc.setFontSize(14)
+    doc.text('Preparations/Plans', 14, yOffset)
+    yOffset += 7
+    
+    doc.setFontSize(12)
+    const preparationsLines = doc.splitTextToSize(event.preparations, 180)
+    doc.text(preparationsLines, 14, yOffset)
+    yOffset += (preparationsLines.length * 7) + 10
+  }
+
+  // Add feedback if exists
+  if (event.feedback) {
+    doc.setFontSize(14)
+    doc.text('Feedback/Remarks', 14, yOffset)
+    yOffset += 7
+    
+    doc.setFontSize(12)
+    const feedbackLines = doc.splitTextToSize(event.feedback, 180)
+    doc.text(feedbackLines, 14, yOffset)
+    yOffset += (feedbackLines.length * 7) + 15
+  }
+
+  // Add attendance list
   doc.setFontSize(14)
-  doc.text(`Event: ${event.name}`, 14, options.subtitle ? 40 : 30)
-  doc.text(`Date: ${new Date(event.date).toLocaleDateString()}`, 14, options.subtitle ? 50 : 40)
-  doc.text(`Type: ${event.type}`, 14, options.subtitle ? 60 : 50)
-  doc.text(`Total Attendance: ${event.attendance.length}`, 14, options.subtitle ? 70 : 60)
+  doc.text('Attendance List', 14, yOffset)
+  yOffset += 10
 
   // Add table
   autoTable(doc, {
-    startY: options.subtitle ? 80 : 70,
-    head: [['Name', 'Phone', 'Cell Group', 'Marked At']],
+    startY: yOffset,
+    head: [['Name', 'Phone', 'Cell Group']],
     body: event.attendance.map(attendance => [
       attendance.member.name,
       attendance.member.phone,
-      attendance.member.cellGroup?.name || 'N/A',
-      new Date(attendance.createdAt).toLocaleString()
+      attendance.member.cellGroup?.name || 'N/A'
     ]),
     theme: 'grid',
     headStyles: { fillColor: [41, 128, 185] }
