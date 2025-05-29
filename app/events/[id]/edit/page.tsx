@@ -7,6 +7,13 @@ import { useToast } from "@/components/ui/use-toast"
 import { z } from "zod"
 import { use } from "react"
 import { EventType } from "@prisma/client"
+import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { ArrowLeft } from "lucide-react"
 
 // Validation schema
 const EventFormSchema = z.object({
@@ -14,6 +21,8 @@ const EventFormSchema = z.object({
   type: z.nativeEnum(EventType),
   date: z.string().min(1, "Date is required"),
   description: z.string().max(500, "Description is too long").nullable().optional(),
+  preparations: z.string().max(2000, "Preparations text is too long").nullable().optional(),
+  feedback: z.string().max(2000, "Feedback text is too long").nullable().optional(),
 })
 
 type EventFormData = z.infer<typeof EventFormSchema>
@@ -31,6 +40,8 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
     type: EventType.SUNDAY,
     date: "",
     description: "",
+    preparations: "",
+    feedback: "",
   })
 
   useEffect(() => {
@@ -142,131 +153,135 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
   }
 
   return (
-    <div className="container mx-auto py-10 px-4">
+    <div className="container mx-auto py-10">
       <div className="mb-6">
-        <Link
-          href={`/events/${id}`}
-          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-50"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-2 h-4 w-4"
-          >
-            <path d="m12 19-7-7 7-7"></path>
-            <path d="M19 12H5"></path>
-          </svg>
-          Back to Event
-        </Link>
+        <Button variant="outline" asChild>
+          <Link href="/events">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Events
+          </Link>
+        </Button>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
-        <div className="p-6">
-          <h2 className="text-xl font-bold mb-1">Edit Event</h2>
-          <p className="text-sm text-gray-500 mb-6">Update the event's information</p>
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div className="space-y-2">
-                <label htmlFor="name" className="block text-sm font-medium">
-                  Event Name *
-                </label>
-                <input
+      <Card>
+        <CardHeader>
+          <CardTitle>Edit Event</CardTitle>
+          <CardDescription>Update event details</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
                   id="name"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  required
-                  className={`w-full rounded-md border ${errors.name ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                  placeholder="Event name"
                 />
                 {errors.name && (
                   <p className="text-sm text-red-500">{errors.name}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="type" className="block text-sm font-medium">
-                  Event Type *
-                </label>
-                <select
-                  id="type"
+              <div className="grid gap-2">
+                <Label htmlFor="type">Type</Label>
+                <Select
                   name="type"
                   value={formData.type}
-                  onChange={handleChange}
-                  required
-                  className={`w-full rounded-md border ${errors.type ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                  onValueChange={(value) => handleChange({ target: { name: 'type', value } } as any)}
                 >
-                  {Object.values(EventType).map((type) => (
-                    <option key={type} value={type}>
-                      {type.replace(/_/g, ' ')}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select event type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EventType.SUNDAY}>Sunday Service</SelectItem>
+                    <SelectItem value={EventType.MIDWEEK}>Midweek Service</SelectItem>
+                    <SelectItem value={EventType.PRAYER}>Prayer Meeting</SelectItem>
+                    <SelectItem value={EventType.SPECIAL}>Special Event</SelectItem>
+                  </SelectContent>
+                </Select>
                 {errors.type && (
                   <p className="text-sm text-red-500">{errors.type}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="date" className="block text-sm font-medium">
-                  Date *
-                </label>
-                <input
+              <div className="grid gap-2">
+                <Label htmlFor="date">Date</Label>
+                <Input
                   id="date"
                   name="date"
                   type="date"
                   value={formData.date}
                   onChange={handleChange}
-                  required
-                  className={`w-full rounded-md border ${errors.date ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                 />
                 {errors.date && (
                   <p className="text-sm text-red-500">{errors.date}</p>
                 )}
               </div>
 
-              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="description" className="block text-sm font-medium">
-                  Description
-                </label>
-                <textarea
+              <div className="grid gap-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
                   id="description"
                   name="description"
-                  value={formData.description ?? ""}
+                  value={formData.description || ""}
                   onChange={handleChange}
-                  rows={4}
-                  className={`w-full rounded-md border ${errors.description ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                  placeholder="Brief description of the event"
+                  className="h-20"
                 />
                 {errors.description && (
                   <p className="text-sm text-red-500">{errors.description}</p>
                 )}
               </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="preparations">Preparations/Plans</Label>
+                <Textarea
+                  id="preparations"
+                  name="preparations"
+                  value={formData.preparations || ""}
+                  onChange={handleChange}
+                  placeholder="What needs to be prepared for this event? What are the plans?"
+                  className="h-32"
+                />
+                {errors.preparations && (
+                  <p className="text-sm text-red-500">{errors.preparations}</p>
+                )}
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="feedback">Feedback/Remarks</Label>
+                <Textarea
+                  id="feedback"
+                  name="feedback"
+                  value={formData.feedback || ""}
+                  onChange={handleChange}
+                  placeholder="Any feedback or remarks about the event"
+                  className="h-32"
+                />
+                {errors.feedback && (
+                  <p className="text-sm text-red-500">{errors.feedback}</p>
+                )}
+              </div>
             </div>
 
-            <div className="mt-6 flex justify-end space-x-4">
-              <Link
-                href={`/events/${id}`}
-                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-50"
+            <div className="flex justify-end gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.push("/events")}
               >
                 Cancel
-              </Link>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-              >
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Saving..." : "Save Changes"}
-              </button>
+              </Button>
             </div>
           </form>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   )
 } 

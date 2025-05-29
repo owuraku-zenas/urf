@@ -61,7 +61,8 @@ export async function POST(request: Request) {
         type: body.type,
         date: new Date(body.date),
         description: body.description || null,
-        createdById: session.user.id,
+        preparations: body.preparations || null,
+        feedback: body.feedback || null,
       },
     })
 

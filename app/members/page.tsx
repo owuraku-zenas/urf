@@ -139,44 +139,48 @@ export default function MembersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4 mb-4">
-            <Input
-              placeholder="Search by name, phone, or email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full sm:max-w-sm"
-            />
-            <Select
-              value={selectedCellGroup}
-              onValueChange={setSelectedCellGroup}
-            >
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Select cell group" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Cell Groups</SelectItem>
-                {cellGroups.map((group) => (
-                  <SelectItem key={group.id} value={group.id}>
-                    {group.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <div className="flex gap-2 w-full sm:w-auto">
+          <div className="flex flex-col gap-4 mb-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-full sm:w-[180px]"
-                placeholder="Start date"
+                placeholder="Search by name, phone, or email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full sm:max-w-sm"
               />
-              <Input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="w-full sm:w-[180px]"
-                placeholder="End date"
-              />
+              <Select
+                value={selectedCellGroup}
+                onValueChange={setSelectedCellGroup}
+              >
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Select cell group" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Cell Groups</SelectItem>
+                  {cellGroups.map((group) => (
+                    <SelectItem key={group.id} value={group.id}>
+                      {group.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <Input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full sm:w-[180px]"
+                  placeholder="Start date"
+                />
+                <Input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-full sm:w-[180px]"
+                  placeholder="End date"
+                />
+              </div>
               <Button
                 variant="outline"
                 onClick={() => {
@@ -196,9 +200,9 @@ export default function MembersPage() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Phone</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Cell Group</TableHead>
-                  <TableHead>Invited By</TableHead>
+                  <TableHead className="hidden sm:table-cell">Email</TableHead>
+                  <TableHead className="hidden sm:table-cell">Cell Group</TableHead>
+                  <TableHead className="hidden sm:table-cell">Invited By</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -213,11 +217,22 @@ export default function MembersPage() {
                   filteredMembers.map((member) => (
                     <TableRow key={member.id}>
                       <TableCell className="font-medium">
-                        {member.name}
+                        <div>
+                          {member.name}
+                          <div className="sm:hidden text-sm text-gray-500 mt-1">
+                            {member.email || 'N/A'}
+                          </div>
+                          <div className="sm:hidden text-sm text-gray-500">
+                            Cell Group: {member.cellGroup?.name || 'No Cell Group'}
+                          </div>
+                          <div className="sm:hidden text-sm text-gray-500">
+                            Invited by: {member.invitedBy?.name || 'Not invited by anyone'}
+                          </div>
+                        </div>
                       </TableCell>
                       <TableCell>{member.phone}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.email || 'N/A'}</TableCell>
-                      <TableCell>{member.cellGroup?.name || 'No Cell Group'}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{member.cellGroup?.name || 'No Cell Group'}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.invitedBy?.name || 'Not invited by anyone'}</TableCell>
                       <TableCell className="text-right">
                         <Link href={`/members/${member.id}`}>

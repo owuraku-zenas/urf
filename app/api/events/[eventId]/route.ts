@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { prisma } from "@/lib/prisma"
 import { auth } from "@/auth"
 
 export async function GET(
@@ -69,7 +69,7 @@ export async function PUT(
 
     const { eventId } = await context.params
     const body = await request.json()
-    const { name, type, date, description } = body
+    const { name, type, date, description, preparations, feedback } = body
 
     if (!name || !type || !date) {
       return NextResponse.json(
@@ -87,6 +87,8 @@ export async function PUT(
         type,
         date: new Date(date),
         description,
+        preparations,
+        feedback,
       },
     })
 

@@ -3,12 +3,13 @@ import { prisma } from "@/lib/prisma"
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params
     const attendance = await prisma.attendance.findMany({
       where: {
-        memberId: params.id
+        memberId: id
       },
       select: {
         id: true,

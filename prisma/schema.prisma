@@ -94,6 +94,8 @@ model Event {
   type        EventType
   date        DateTime
   description String?
+  preparations String?     @db.Text
+  feedback    String?     @db.Text
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   attendance  Attendance[]
