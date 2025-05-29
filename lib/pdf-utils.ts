@@ -265,4 +265,272 @@ export const generateAttendanceTrendsPDF = (
   })
 
   doc.save(`${options.filename}.pdf`)
+}
+
+export const generateReportWithChartsPDF = async (
+  title: string,
+  charts: { title: string; data: any[]; type: 'line' | 'bar' | 'pie' }[],
+  options: ExportOptions
+) => {
+  try {
+    const doc = new jsPDF()
+    
+    // Add title
+    doc.setFontSize(24)
+    doc.text(options.title, 14, 20)
+    if (options.subtitle) {
+      doc.setFontSize(12)
+      doc.text(options.subtitle, 14, 30)
+    }
+
+    let yOffset = options.subtitle ? 40 : 30
+
+    // Add each chart
+    for (const chart of charts) {
+      try {
+        // Add chart title
+        doc.setFontSize(18)
+        doc.text(chart.title, 14, yOffset)
+        yOffset += 10
+
+        // Create a canvas element to render the chart
+        const canvas = document.createElement('canvas')
+        canvas.width = 800
+        canvas.height = 400
+        const ctx = canvas.getContext('2d')
+
+        if (!ctx) {
+          throw new Error('Failed to create canvas context')
+        }
+
+        // Set background
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+        const width = 700
+        const height = 300
+        const padding = 60
+        const chartWidth = width - padding * 2
+        const chartHeight = height - padding * 2
+
+        // Calculate data ranges
+        const values = chart.data.map(d => d.value);
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+
+        // Add some padding to the range, handle case with single value
+        const range = max === min ? min * 0.1 : max - min;
+        const paddedMin = Math.max(0, min === max ? min * 0.9 : min - range * 0.1);
+        let paddedMax = max === min ? max * 1.1 : max + range * 0.1;
+        
+        // Ensure paddedMin and paddedMax are different for single data point
+        if (paddedMin === paddedMax) {
+            paddedMax = paddedMin + 1; // Add a small range
+        }
+
+        // Render chart based on type
+        if (chart.type === 'line') {
+          // Draw chart area
+          ctx.fillStyle = '#f8fafc'
+          ctx.fillRect(padding, padding, chartWidth, chartHeight)
+
+          // Draw grid lines
+          ctx.strokeStyle = '#e2e8f0'
+          ctx.lineWidth = 1
+          const gridLines = 5
+          for (let i = 0; i <= gridLines; i++) {
+            const y = padding + (chartHeight * i) / gridLines
+            ctx.beginPath()
+            ctx.moveTo(padding, y)
+            ctx.lineTo(width - padding, y)
+            ctx.stroke()
+          }
+
+          // Draw axes
+          ctx.strokeStyle = '#64748b'
+          ctx.lineWidth = 2
+          ctx.beginPath()
+          ctx.moveTo(padding, padding)
+          ctx.lineTo(padding, height - padding)
+          ctx.lineTo(width - padding, height - padding)
+          ctx.stroke()
+
+          // Draw axis labels
+          ctx.fillStyle = '#64748b'
+          ctx.font = '12px Arial'
+          ctx.textAlign = 'right'
+          for (let i = 0; i <= gridLines; i++) {
+            const value = paddedMin + ((paddedMax - paddedMin) * i) / gridLines
+            const y = padding + (chartHeight * i) / gridLines
+            ctx.fillText(value.toFixed(0), padding - 10, y + 4)
+          }
+
+          // Draw data points and lines
+          const xStep = chart.data.length > 1 ? chartWidth / (chart.data.length - 1) : 0;
+          const yStep = chartHeight / (paddedMax - paddedMin)
+
+          // Draw line
+          ctx.beginPath()
+          ctx.strokeStyle = '#2563eb'
+          ctx.lineWidth = 3
+          chart.data.forEach((point, i) => {
+            const x = padding + i * xStep
+            const y = height - padding - (point.value - paddedMin) * yStep
+            if (i === 0) {
+              ctx.moveTo(x, y)
+            } else {
+              ctx.lineTo(x, y)
+            }
+          })
+          ctx.stroke()
+
+          // Draw data points
+          ctx.fillStyle = '#2563eb'
+          chart.data.forEach((point, i) => {
+            const x = padding + i * xStep
+            const y = height - padding - (point.value - paddedMin) * yStep
+            ctx.beginPath()
+            ctx.arc(x, y, 4, 0, Math.PI * 2)
+            ctx.fill()
+          })
+
+          // Draw x-axis labels
+          ctx.fillStyle = '#64748b'
+          ctx.font = '12px Arial'
+          ctx.textAlign = 'center'
+          chart.data.forEach((point, i) => {
+            const x = padding + i * xStep
+            const y = height - padding + 20
+            ctx.fillText(point.label, x, y)
+          })
+        } else if (chart.type === 'bar') {
+           // Draw chart area
+           ctx.fillStyle = '#f8fafc'
+           ctx.fillRect(padding, padding, chartWidth, chartHeight)
+
+           // Draw grid lines
+           ctx.strokeStyle = '#e2e8f0'
+           ctx.lineWidth = 1
+           const gridLines = 5
+           for (let i = 0; i <= gridLines; i++) {
+             const y = padding + (chartHeight * i) / gridLines
+             ctx.beginPath()
+             ctx.moveTo(padding, y)
+             ctx.lineTo(width - padding, y)
+             ctx.stroke()
+           }
+
+           // Draw axes
+           ctx.strokeStyle = '#64748b'
+           ctx.lineWidth = 2
+           ctx.beginPath()
+           ctx.moveTo(padding, padding)
+           ctx.lineTo(padding, height - padding)
+           ctx.lineTo(width - padding, height - padding)
+           ctx.stroke()
+
+           // Draw axis labels
+           ctx.fillStyle = '#64748b'
+           ctx.font = '12px Arial'
+           ctx.textAlign = 'right'
+           for (let i = 0; i <= gridLines; i++) {
+             const value = paddedMin + ((paddedMax - paddedMin) * i) / gridLines
+             const y = padding + (chartHeight * i) / gridLines
+             ctx.fillText(value.toFixed(0), padding - 10, y + 4)
+           }
+
+           // Draw bars
+           const barWidth = chart.data.length > 0 ? chartWidth / chart.data.length * 0.6 : 0;
+           const xStep = chart.data.length > 0 ? chartWidth / chart.data.length : 0;
+           const yStep = chartHeight / (paddedMax - paddedMin);
+           
+           chart.data.forEach((point, i) => {
+             const x = padding + i * xStep + (xStep - barWidth) / 2;
+             const barHeight = (point.value - paddedMin) * yStep;
+             const y = height - padding - barHeight;
+
+             ctx.fillStyle = '#2563eb'; // Use a consistent color
+             ctx.fillRect(x, y, barWidth, barHeight);
+
+             // Draw value label above the bar
+             ctx.fillStyle = '#000';
+             ctx.font = '10px Arial';
+             ctx.textAlign = 'center';
+             ctx.fillText(point.value.toString(), x + barWidth / 2, y - 5);
+             
+             // Draw x-axis label below the bar
+             ctx.fillStyle = '#64748b';
+             ctx.font = '12px Arial';
+             ctx.textAlign = 'center';
+             ctx.fillText(point.label, x + barWidth / 2, height - padding + 15);
+           });
+        } else if (chart.type === 'pie') {
+            const centerX = padding + chartWidth / 2;
+            const centerY = padding + chartHeight / 2;
+            const radius = Math.min(chartWidth, chartHeight) / 2 * 0.8; // Use 80% of the available space
+            let startAngle = 0;
+            const total = chart.data.reduce((sum, point) => sum + point.value, 0);
+
+            // Define some colors
+            const colors = ['#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0', '#00BCD4', '#8BC34A', '#FFEB3B', '#FF9800', '#E91E63'];
+
+            chart.data.forEach((point, i) => {
+                const sliceAngle = (point.value / total) * 2 * Math.PI;
+                const endAngle = startAngle + sliceAngle;
+
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fill();
+
+                // Draw slice label (percentage and value)
+                const labelAngle = startAngle + sliceAngle / 2;
+                const labelRadius = radius * 1.2; // Position labels outside the circle
+                const labelX = centerX + labelRadius * Math.cos(labelAngle);
+                const labelY = centerY + labelRadius * Math.sin(labelAngle);
+
+                ctx.fillStyle = '#000';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                const percentage = total === 0 ? 0 : ((point.value / total) * 100).toFixed(1);
+                ctx.fillText(`${point.label}: ${point.value} (${percentage}%)`, labelX, labelY);
+
+                startAngle = endAngle;
+            });
+
+        }
+        else {
+          throw new Error(`Unsupported chart type: ${chart.type}`)
+        }
+
+        // Add chart image to PDF
+        const imgData = canvas.toDataURL('image/png')
+        doc.addImage(imgData, 'PNG', 14, yOffset, 180, 100)
+        yOffset += 120
+
+        // Add new page if we're running out of space
+        if (yOffset > 250) {
+          doc.addPage()
+          yOffset = 20
+        }
+      } catch (error) {
+        console.error(`Error rendering chart "${chart.title}":`, error)
+        // Add error message to PDF
+        doc.setFontSize(12)
+        doc.setTextColor(255, 0, 0)
+        doc.text(`Error rendering chart: ${chart.title}`, 14, yOffset)
+        doc.setTextColor(0, 0, 0)
+        yOffset += 20
+      }
+    }
+
+    doc.save(`${options.filename}.pdf`)
+  } catch (error) {
+    console.error('Error generating PDF:', error)
+    throw new Error(`Failed to generate PDF: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
 } 
