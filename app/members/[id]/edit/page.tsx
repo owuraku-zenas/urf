@@ -11,7 +11,29 @@ import { use } from "react"
 const MemberFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
   email: z.string().email("Invalid email address").nullable().optional(),
-  phone: z.string().min(1, "Phone number is required").regex(/^[0-9+\-\s()]*$/, "Invalid phone number format"),
+  phone: z.string()
+    .min(1, "Phone number is required")
+    .transform(val => val.replace(/[\s\-()]/g, '')) // Remove spaces, hyphens, and parentheses
+    .refine(val => {
+      // Check if it starts with +233 or 0
+      if (!val.startsWith('+233') && !val.startsWith('0')) {
+        return false;
+      }
+      // If starts with 0, convert to +233 format
+      if (val.startsWith('0')) {
+        val = '+233' + val.slice(1);
+      }
+      // Check if the remaining digits are exactly 9 numbers
+      const remainingDigits = val.slice(4);
+      return /^\d{9}$/.test(remainingDigits);
+    }, "Phone number must be a valid Ghanaian number starting with +233 or 0 followed by 9 digits")
+    .transform(val => {
+      // Convert to +233 format if it starts with 0
+      if (val.startsWith('0')) {
+        return '+233' + val.slice(1);
+      }
+      return val;
+    }),
   dateOfBirth: z.string().nullable().optional().transform(val => val === "" ? null : val),
   joinDate: z.string().min(1, "Join date is required"),
   university: z.string().max(100, "University name is too long").nullable().optional(),
