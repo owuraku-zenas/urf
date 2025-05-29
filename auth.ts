@@ -59,17 +59,25 @@ export const {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.role = user.role
         token.id = user.id
+        token.name = user.name
       }
+      
+      // Handle session updates
+      if (trigger === "update" && session) {
+        token.name = session.user.name
+      }
+      
       return token
     },
     async session({ session, token }) {
       if (token) {
         session.user.role = token.role
         session.user.id = token.id
+        session.user.name = token.name
       }
       return session
     },
