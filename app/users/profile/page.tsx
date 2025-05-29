@@ -41,6 +41,8 @@ export default function ProfilePage() {
     fetchUser();
   }, []);
 
+
+  
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentPassword || !newPassword || !confirmPassword) {
