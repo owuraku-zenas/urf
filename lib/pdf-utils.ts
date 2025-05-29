@@ -21,6 +21,7 @@ interface MemberWithCellGroup {
   roomNumber: string
   createdAt: string
   updatedAt: string
+  joinDate: string
   cellGroupId: string | null
   invitedById: string | null
   cellGroup: {
@@ -65,7 +66,7 @@ export const generateMemberListPDF = (
       member.phone,
       member.email || 'N/A',
       member.cellGroup?.name || 'N/A',
-      new Date(member.createdAt).toLocaleDateString()
+      new Date(member.joinDate).toLocaleDateString()
     ]),
     theme: 'grid',
     headStyles: { fillColor: [41, 128, 185] }
