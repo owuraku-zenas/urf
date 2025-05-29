@@ -28,6 +28,8 @@ interface Event {
   type: EventType
   date: Date
   description: string | null
+  preparations: string | null
+  feedback: string | null
   createdAt: Date
   updatedAt: Date
   attendance: (Attendance & {
@@ -170,7 +172,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
   }
 
   return (
-    <div className="py-10">
+    <div className="container mx-auto py-10">
       <div className="mb-6">
         <Button
           variant="outline"
@@ -239,62 +241,91 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         </div>
       </div>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Event Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Date</dt>
-              <dd className="mt-1 text-sm text-gray-900">
-                {new Date(event.date).toLocaleDateString()}
-              </dd>
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>{event.name}</CardTitle>
+            <CardDescription>
+              {event.type.replace(/_/g, ' ')} • {new Date(event.date).toLocaleDateString()}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4">
+              {event.description && (
+                <div>
+                  <h3 className="font-semibold mb-2">Description</h3>
+                  <p className="text-gray-600 whitespace-pre-wrap">{event.description}</p>
+                </div>
+              )}
+              
+              {event.preparations && (
+                <div>
+                  <h3 className="font-semibold mb-2">Preparations/Plans</h3>
+                  <p className="text-gray-600 whitespace-pre-wrap">{event.preparations}</p>
+                </div>
+              )}
+              
+              {event.feedback && (
+                <div>
+                  <h3 className="font-semibold mb-2">Feedback/Remarks</h3>
+                  <p className="text-gray-600 whitespace-pre-wrap">{event.feedback}</p>
+                </div>
+              )}
             </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Type</dt>
-              <dd className="mt-1 text-sm text-gray-900">
-                {event.type}
-              </dd>
-            </div>
-            {event.description && (
-              <div className="md:col-span-2">
-                <dt className="text-sm font-medium text-gray-500">Description</dt>
-                <dd className="mt-1 text-sm text-gray-900">{event.description}</dd>
-              </div>
-            )}
-          </dl>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Attendance Records</CardTitle>
-          <CardDescription>
-            {event.attendance.length} members present
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Cell Group</TableHead>
-                <TableHead>Phone</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {event.attendance.map((record) => (
-                <TableRow key={record.id}>
-                  <TableCell>{record.member.name}</TableCell>
-                  <TableCell>{record.member.cellGroup?.name || 'N/A'}</TableCell>
-                  <TableCell>{record.member.phone}</TableCell>
+        <Card>
+          <CardHeader>
+            <CardTitle>Event Details</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Date</dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {new Date(event.date).toLocaleDateString()}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Type</dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {event.type}
+                </dd>
+              </div>
+            </dl>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Attendance Records</CardTitle>
+            <CardDescription>
+              {event.attendance.length} members present
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Cell Group</TableHead>
+                  <TableHead>Phone</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {event.attendance.map((record) => (
+                  <TableRow key={record.id}>
+                    <TableCell>{record.member.name}</TableCell>
+                    <TableCell>{record.member.cellGroup?.name || 'N/A'}</TableCell>
+                    <TableCell>{record.member.phone}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 } 

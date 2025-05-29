@@ -61,6 +61,8 @@ export async function POST(request: Request) {
         type: body.type,
         date: new Date(body.date),
         description: body.description || null,
+        preparations: body.preparations || null,
+        feedback: body.feedback || null,
       },
     })
 
