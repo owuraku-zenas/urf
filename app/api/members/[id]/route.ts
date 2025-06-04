@@ -103,7 +103,7 @@ export async function PUT(
         hostel: body.hostel,
         roomNumber: body.roomNumber,
         cellGroupId: body.cellGroupId,
-        invitedById: body.invitedById,
+        invitedById: body.invitedById === "" ? null : body.invitedById,
       },
       include: {
         cellGroup: {

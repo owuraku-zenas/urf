@@ -116,6 +116,15 @@ export async function DELETE(
     }
 
     const { eventId } = await context.params
+
+    // First delete all attendance records for this event
+    await prisma.attendance.deleteMany({
+      where: {
+        eventId: eventId
+      }
+    })
+
+    // Then delete the event
     await prisma.event.delete({
       where: {
         id: eventId,

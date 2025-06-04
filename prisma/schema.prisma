@@ -118,7 +118,7 @@ model Attendance {
   updatedAt DateTime         @updatedAt
 
   member    Member           @relation(fields: [memberId], references: [id])
-  event     Event            @relation(fields: [eventId], references: [id])
+  event     Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([memberId])
   @@index([eventId])
