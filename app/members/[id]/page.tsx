@@ -274,6 +274,17 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                       </Link>
                     </div>
                   )}
+                  {member.invitedBy && (
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-gray-500" />
+                      <Link
+                        href={`/members/${member.invitedBy.id}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        Invited by: {member.invitedBy.name}
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
               {(member.hostel || member.roomNumber) && (

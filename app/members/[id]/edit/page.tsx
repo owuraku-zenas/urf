@@ -187,6 +187,8 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
         description: "Member has been updated successfully",
       })
 
+      // Refresh the page to show updated data
+      router.refresh()
       router.push(`/members/${id}`)
     } catch (error) {
       console.error("Error updating member:", error)
