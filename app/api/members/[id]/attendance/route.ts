@@ -7,33 +7,43 @@ export async function GET(
 ) {
   try {
     const { id } = await context.params
-    const attendance = await prisma.attendance.findMany({
+
+    // Get all events
+    const allEvents = await prisma.event.findMany({
+      select: {
+        id: true,
+        name: true,
+        date: true
+      },
+      orderBy: {
+        date: 'desc'
+      }
+    })
+
+    // Get member's attendance records
+    const memberAttendance = await prisma.attendance.findMany({
       where: {
         memberId: id
       },
       select: {
         id: true,
         eventId: true,
-        event: {
-          select: {
-            name: true,
-            date: true
-          }
-        },
-        status: true,
-        createdAt: true
-      },
-      orderBy: {
-        createdAt: 'desc'
+        status: true
       }
     })
 
-    const formattedAttendance = attendance.map(record => ({
-      id: record.id,
-      eventId: record.eventId,
-      eventName: record.event.name,
-      date: record.event.date.toISOString(),
-      status: record.status
+    // Create a map of event IDs to attendance status
+    const attendanceMap = new Map(
+      memberAttendance.map(record => [record.eventId, record.status])
+    )
+
+    // Format the response to include all events
+    const formattedAttendance = allEvents.map(event => ({
+      id: attendanceMap.get(event.id) ? memberAttendance.find(r => r.eventId === event.id)?.id : `absent-${event.id}`,
+      eventId: event.id,
+      eventName: event.name,
+      date: event.date.toISOString(),
+      status: attendanceMap.get(event.id) || 'ABSENT'
     }))
 
     return NextResponse.json(formattedAttendance)

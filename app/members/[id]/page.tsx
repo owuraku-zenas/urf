@@ -112,27 +112,38 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
 
   // Prepare data for charts
   const attendanceByStatus = filteredAttendance.reduce((acc, record) => {
-    acc[record.status] = (acc[record.status] || 0) + 1
+    if (record.status === 'PRESENT') {
+      acc['PRESENT'] = (acc['PRESENT'] || 0) + 1
+    }
     return acc
   }, {} as Record<string, number>)
 
-  const pieChartData = Object.entries(attendanceByStatus).map(([status, count]) => ({
-    name: status,
-    value: count
-  }))
+  // Calculate total events and absent count
+  const totalEvents = filteredAttendance.length
+  const presentCount = attendanceByStatus['PRESENT'] || 0
+  const absentCount = totalEvents - presentCount
+
+  const pieChartData = [
+    { name: 'Present', value: presentCount },
+    { name: 'Absent', value: absentCount }
+  ]
 
   const monthlyAttendance = filteredAttendance.reduce((acc, record) => {
     const month = new Date(record.date).toLocaleString('default', { month: 'short' })
     if (!acc[month]) {
-      acc[month] = { present: 0, absent: 0 }
+      acc[month] = { present: 0, total: 0 }
     }
-    acc[month][record.status.toLowerCase() as 'present' | 'absent']++
+    if (record.status === 'PRESENT') {
+      acc[month].present++
+    }
+    acc[month].total++
     return acc
-  }, {} as Record<string, { present: number; absent: number }>)
+  }, {} as Record<string, { present: number; total: number }>)
 
   const barChartData = Object.entries(monthlyAttendance).map(([month, data]) => ({
     month,
-    ...data
+    present: data.present,
+    absent: data.total - data.present
   }))
 
   const COLORS = ['#4CAF50', '#F44336']
@@ -377,13 +388,13 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card>
                   <CardContent className="pt-6">
-                    <div className="text-2xl font-bold">{attendanceByStatus['PRESENT'] || 0}</div>
+                    <div className="text-2xl font-bold">{presentCount}</div>
                     <p className="text-sm text-gray-500">Present</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="pt-6">
-                    <div className="text-2xl font-bold">{attendanceByStatus['ABSENT'] || 0}</div>
+                    <div className="text-2xl font-bold">{absentCount}</div>
                     <p className="text-sm text-gray-500">Absent</p>
                   </CardContent>
                 </Card>
