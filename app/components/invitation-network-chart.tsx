@@ -54,22 +54,8 @@ export default function InvitationNetworkChart() {
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [width, setWidth] = useState(0)
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
-
-  useEffect(() => {
-    const updateWidth = () => {
-      const container = document.getElementById('graph-container')
-      if (container) {
-        setWidth(container.offsetWidth)
-      }
-    }
-
-    updateWidth()
-    window.addEventListener('resize', updateWidth)
-    return () => window.removeEventListener('resize', updateWidth)
-  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -176,44 +162,39 @@ export default function InvitationNetworkChart() {
           </div>
         </div>
 
-        <div id="graph-container" className="h-[400px] w-full border rounded-lg">
-          {typeof window !== 'undefined' && width > 0 && (
-            <ForceGraph2D
-              width={width}
-              height={400}
-              graphData={graphData}
-              nodeLabel="name"
-              nodeRelSize={6}
-              linkDirectionalArrowLength={6}
-              linkDirectionalArrowRelPos={1}
-              nodeCanvasObject={(node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-                const label = node.name
-                const fontSize = 12/globalScale
-                ctx.font = `${fontSize}px Sans-Serif`
-                const textWidth = ctx.measureText(label).width
-                const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2)
+        <div className="h-[400px] w-full border rounded-lg">
+          {typeof window !== 'undefined' && (
+            <div className="w-full h-full">
+              <ForceGraph2D
+                width={document.getElementById('graph-container')?.offsetWidth || 800}
+                height={400}
+                graphData={graphData}
+                nodeLabel="name"
+                nodeRelSize={6}
+                linkDirectionalArrowLength={6}
+                linkDirectionalArrowRelPos={1}
+                nodeCanvasObject={(node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+                  const label = node.name
+                  const fontSize = 12/globalScale
+                  ctx.font = `${fontSize}px Sans-Serif`
+                  const textWidth = ctx.measureText(label).width
+                  const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2)
 
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
-                ctx.fillRect(
-                  node.x! - bckgDimensions[0] / 2,
-                  node.y! - bckgDimensions[1] / 2,
-                  bckgDimensions[0],
-                  bckgDimensions[1]
-                )
+                  ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+                  ctx.fillRect(
+                    node.x! - bckgDimensions[0] / 2,
+                    node.y! - bckgDimensions[1] / 2,
+                    bckgDimensions[0],
+                    bckgDimensions[1]
+                  )
 
-                ctx.textAlign = 'center'
-                ctx.textBaseline = 'middle'
-                ctx.fillStyle = node.color
-                ctx.fillText(label, node.x!, node.y!)
-              }}
-              onEngineStop={() => {
-                // Force a re-render after the graph stabilizes
-                const container = document.getElementById('graph-container')
-                if (container) {
-                  container.style.opacity = '1'
-                }
-              }}
-            />
+                  ctx.textAlign = 'center'
+                  ctx.textBaseline = 'middle'
+                  ctx.fillStyle = node.color
+                  ctx.fillText(label, node.x!, node.y!)
+                }}
+              />
+            </div>
           )}
         </div>
         <div className="mt-4">
