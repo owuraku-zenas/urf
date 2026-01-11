@@ -9,7 +9,8 @@
     "lint": "next lint",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
-    "db:seed": "ts-node -T prisma/seed.ts"
+    "db:seed": "ts-node -T prisma/seed.ts",
+    "update-member-status": "ts-node -T scripts/update-member-status.ts"
   },
   "prisma": {
     "seed": "ts-node -T prisma/seed.ts"

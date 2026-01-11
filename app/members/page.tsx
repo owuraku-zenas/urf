@@ -50,6 +50,7 @@ export default function MembersPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCellGroup, setSelectedCellGroup] = useState("all")
+  const [selectedStatus, setSelectedStatus] = useState("all")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
 
@@ -87,13 +88,16 @@ export default function MembersPage() {
       member.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.email.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCellGroup = selectedCellGroup === 'all' || member.cellGroupId === selectedCellGroup
+    const matchesStatus = selectedStatus === 'all' || 
+      (selectedStatus === 'active' && member.isActive) ||
+      (selectedStatus === 'inactive' && !member.isActive)
     
     // Date range filtering
     const memberDate = new Date(member.createdAt)
     const matchesDateRange = (!startDate || memberDate >= new Date(startDate)) &&
       (!endDate || memberDate <= new Date(endDate + 'T23:59:59'))
 
-    return matchesSearch && matchesCellGroup && matchesDateRange
+    return matchesSearch && matchesCellGroup && matchesStatus && matchesDateRange
   })
 
   const handleExportPDF = () => {
@@ -162,6 +166,19 @@ export default function MembersPage() {
                       {group.name}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={selectedStatus}
+                onValueChange={setSelectedStatus}
+              >
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
                 </SelectContent>
               </Select>
             </div>
