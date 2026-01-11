@@ -104,6 +104,7 @@ export async function PUT(
         roomNumber: body.roomNumber,
         cellGroupId: body.cellGroupId,
         invitedById: body.invitedById === "" ? null : body.invitedById,
+        isActive: body.isActive !== undefined ? body.isActive : false,
       },
       include: {
         cellGroup: {

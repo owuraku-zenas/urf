@@ -35,6 +35,7 @@ interface Member {
   updatedAt: string
   cellGroupId: string | null
   invitedById: string | null
+  isActive: boolean
 }
 
 interface CellGroup {
@@ -199,6 +200,7 @@ export default function MembersPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead className="hidden sm:table-cell">Email</TableHead>
                   <TableHead className="hidden sm:table-cell">Cell Group</TableHead>
@@ -217,20 +219,25 @@ export default function MembersPage() {
                   filteredMembers.map((member) => (
                     <TableRow key={member.id}>
                       <TableCell className="font-medium">
-                        <div>
-                          {member.name}
-                          <div className="sm:hidden text-sm text-gray-500 mt-1">
-                            {member.email || 'N/A'}
-                          </div>
-                          <div className="sm:hidden text-sm text-gray-500">
-                            Cell Group: {member.cellGroup?.name || 'No Cell Group'}
-                          </div>
-                          <div className="sm:hidden text-sm text-gray-500">
-                            Invited by: {member.invitedBy?.name || 'Not invited by anyone'}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{member.phone}</TableCell>
+  <div>
+    {member.name}
+    <div className="sm:hidden text-sm text-gray-500 mt-1">
+      {member.email || 'N/A'}
+    </div>
+    <div className="sm:hidden text-sm text-gray-500">
+      Cell Group: {member.cellGroup?.name || 'No Cell Group'}
+    </div>
+    <div className="sm:hidden text-sm text-gray-500">
+      Invited by: {member.invitedBy?.name || 'Not invited by anyone'}
+    </div>
+  </div>
+</TableCell>
+<TableCell>
+  <span className={member.isActive ? 'text-green-600 font-medium' : 'text-gray-400 font-medium'}>
+    {member.isActive ? 'Active' : 'Not Active'}
+  </span>
+</TableCell>
+<TableCell>{member.phone}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.email || 'N/A'}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.cellGroup?.name || 'No Cell Group'}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.invitedBy?.name || 'Not invited by anyone'}</TableCell>

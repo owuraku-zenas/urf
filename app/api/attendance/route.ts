@@ -38,6 +38,16 @@ export async function POST(request: Request) {
       },
     })
 
+    // Update member isActive if 5 or more PRESENT attendances
+    const count = await prisma.attendance.count({
+      where: { memberId, status: 'PRESENT' }
+    })
+    if (count >= 5) {
+      await prisma.member.update({ where: { id: memberId }, data: { isActive: true } })
+    } else {
+      await prisma.member.update({ where: { id: memberId }, data: { isActive: false } })
+    }
+
     return NextResponse.json(attendance)
   } catch (error) {
     console.error("Error creating attendance record:", error)
@@ -71,6 +81,16 @@ export async function PUT(request: Request) {
         member: true,
       },
     })
+
+    // Update member isActive if 5 or more PRESENT attendances
+    const count = await prisma.attendance.count({
+      where: { memberId, status: 'PRESENT' }
+    })
+    if (count >= 5) {
+      await prisma.member.update({ where: { id: memberId }, data: { isActive: true } })
+    } else {
+      await prisma.member.update({ where: { id: memberId }, data: { isActive: false } })
+    }
 
     return NextResponse.json(attendance)
   } catch (error) {

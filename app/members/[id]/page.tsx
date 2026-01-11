@@ -8,13 +8,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input"
 import { Member, CellGroup } from "@prisma/client"
 import { use } from "react"
-import { ArrowLeft, Edit, Mail, Phone, Users, Calendar, GraduationCap, BookOpen, Home, DoorOpen } from "lucide-react"
+import { ArrowLeft, Edit, Mail, Phone, Users, Calendar, GraduationCap, BookOpen, Home, DoorOpen, CheckCircle, XCircle } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { z } from "zod"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts'
 
 interface MemberWithRelations extends Member {
+  isActive: boolean;
   cellGroup: {
     id: string
     name: string
@@ -206,7 +207,26 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="text-2xl">{member.name}</CardTitle>
+              <div className="flex items-center gap-3">
+                <CardTitle className="text-2xl">{member.name}</CardTitle>
+                <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium ${
+                  member.isActive 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {member.isActive ? (
+                    <>
+                      <CheckCircle className="h-4 w-4" />
+                      Active
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="h-4 w-4" />
+                      Inactive
+                    </>
+                  )}
+                </span>
+              </div>
               <CardDescription>Member Details</CardDescription>
             </div>
             <div className="flex gap-2">

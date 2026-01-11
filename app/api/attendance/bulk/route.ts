@@ -45,6 +45,14 @@ export async function POST(request: Request) {
       )
     )
 
+    // For each member, update isActive if 5 or more PRESENT attendances
+    const memberIds = attendances.map(a => a.memberId)
+    await Promise.all(memberIds.map(async memberId => {
+      const count = await prisma.attendance.count({ where: { memberId, status: 'PRESENT' } })
+      const isActive = count >= 5
+      await prisma.member.update({ where: { id: memberId }, data: { isActive } })
+    }))
+
     return NextResponse.json(createdAttendances)
   } catch (error) {
     console.error("Error creating attendance records:", error)
