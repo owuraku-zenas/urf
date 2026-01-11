@@ -43,6 +43,7 @@ const MemberFormSchema = z.object({
   roomNumber: z.string().max(20, "Room number is too long").nullable().optional(),
   cellGroupId: z.string().min(1, "Cell group is required"),
   invitedById: z.string().nullable().optional(),
+  isActive: z.boolean().optional(),
 })
 
 type MemberFormData = z.infer<typeof MemberFormSchema>
@@ -80,6 +81,7 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
     roomNumber: "",
     cellGroupId: "",
     invitedById: "",
+    isActive: false,
   })
 
   useEffect(() => {
@@ -97,6 +99,7 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
           ...memberData,
           dateOfBirth: memberData.dateOfBirth ? new Date(memberData.dateOfBirth).toISOString().split('T')[0] : "",
           joinDate: memberData.joinDate ? new Date(memberData.joinDate).toISOString().split('T')[0] : "",
+          isActive: memberData.isActive ?? false,
         }
         
         setFormData(formattedData)
@@ -145,9 +148,13 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-    validateField(name as keyof MemberFormData, value)
+    const { name, value, type } = e.target
+    const checked = (e.target as HTMLInputElement).checked
+    const fieldValue = type === 'checkbox' ? checked : value
+    setFormData((prev) => ({ ...prev, [name]: fieldValue }))
+    if (type !== 'checkbox') {
+      validateField(name as keyof MemberFormData, value)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -454,6 +461,25 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
                 {errors.invitedById && (
                   <p className="text-sm text-red-500">{errors.invitedById}</p>
                 )}
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <div className="flex items-center space-x-2">
+                  <input
+                    id="isActive"
+                    name="isActive"
+                    type="checkbox"
+                    checked={formData.isActive ?? false}
+                    onChange={handleChange}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="isActive" className="block text-sm font-medium">
+                    Active Member
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500 ml-6">
+                  Check this box if the member is active (has 5 or more attendances)
+                </p>
               </div>
             </div>
 

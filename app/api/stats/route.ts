@@ -9,6 +9,8 @@ export async function GET() {
       cellGroupCount,
       totalAttendance,
       totalEvents,
+      activeMemberCount,
+      inactiveMemberCount,
     ] = await Promise.all([
       prisma.member.count(),
       prisma.event.count(),
@@ -21,6 +23,12 @@ export async function GET() {
           },
         },
       }),
+      prisma.member.count({
+        where: { isActive: true }
+      }),
+      prisma.member.count({
+        where: { isActive: false }
+      }),
     ])
 
     const attendanceRate = totalEvents > 0
@@ -32,6 +40,8 @@ export async function GET() {
       eventCount,
       cellGroupCount,
       attendanceRate,
+      activeMemberCount,
+      inactiveMemberCount,
     })
   } catch (error) {
     console.error("Error fetching stats:", error)

@@ -8,6 +8,8 @@ interface Stats {
   eventCount: number
   cellGroupCount: number
   attendanceRate: number
+  activeMemberCount: number
+  inactiveMemberCount: number
 }
 
 export default function Home() {
@@ -17,6 +19,8 @@ export default function Home() {
     eventCount: 0,
     cellGroupCount: 0,
     attendanceRate: 0,
+    activeMemberCount: 0,
+    inactiveMemberCount: 0,
   })
   const [error, setError] = useState<string | null>(null)
 
@@ -81,6 +85,14 @@ export default function Home() {
             <div className="p-4 sm:p-6 pt-0">
               <div className="text-2xl sm:text-3xl font-bold">{loading ? "..." : stats.memberCount}</div>
               <p className="text-xs text-gray-500">Total registered members</p>
+              <div className="flex gap-4 mt-2 text-sm">
+                <span className="text-green-600 font-medium">
+                  {loading ? "..." : stats.activeMemberCount} Active
+                </span>
+                <span className="text-gray-400 font-medium">
+                  {loading ? "..." : stats.inactiveMemberCount} Inactive
+                </span>
+              </div>
               <Link
                 href="/members"
                 className="mt-4 block w-full rounded-md bg-blue-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-blue-700"

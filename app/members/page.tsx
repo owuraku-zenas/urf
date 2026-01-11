@@ -35,6 +35,7 @@ interface Member {
   updatedAt: string
   cellGroupId: string | null
   invitedById: string | null
+  isActive: boolean
 }
 
 interface CellGroup {
@@ -49,6 +50,7 @@ export default function MembersPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCellGroup, setSelectedCellGroup] = useState("all")
+  const [selectedStatus, setSelectedStatus] = useState("all")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
 
@@ -86,13 +88,16 @@ export default function MembersPage() {
       member.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.email.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCellGroup = selectedCellGroup === 'all' || member.cellGroupId === selectedCellGroup
+    const matchesStatus = selectedStatus === 'all' || 
+      (selectedStatus === 'active' && member.isActive) ||
+      (selectedStatus === 'inactive' && !member.isActive)
     
     // Date range filtering
     const memberDate = new Date(member.createdAt)
     const matchesDateRange = (!startDate || memberDate >= new Date(startDate)) &&
       (!endDate || memberDate <= new Date(endDate + 'T23:59:59'))
 
-    return matchesSearch && matchesCellGroup && matchesDateRange
+    return matchesSearch && matchesCellGroup && matchesStatus && matchesDateRange
   })
 
   const handleExportPDF = () => {
@@ -163,6 +168,19 @@ export default function MembersPage() {
                   ))}
                 </SelectContent>
               </Select>
+              <Select
+                value={selectedStatus}
+                onValueChange={setSelectedStatus}
+              >
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -199,6 +217,7 @@ export default function MembersPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead className="hidden sm:table-cell">Email</TableHead>
                   <TableHead className="hidden sm:table-cell">Cell Group</TableHead>
@@ -217,20 +236,25 @@ export default function MembersPage() {
                   filteredMembers.map((member) => (
                     <TableRow key={member.id}>
                       <TableCell className="font-medium">
-                        <div>
-                          {member.name}
-                          <div className="sm:hidden text-sm text-gray-500 mt-1">
-                            {member.email || 'N/A'}
-                          </div>
-                          <div className="sm:hidden text-sm text-gray-500">
-                            Cell Group: {member.cellGroup?.name || 'No Cell Group'}
-                          </div>
-                          <div className="sm:hidden text-sm text-gray-500">
-                            Invited by: {member.invitedBy?.name || 'Not invited by anyone'}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{member.phone}</TableCell>
+  <div>
+    {member.name}
+    <div className="sm:hidden text-sm text-gray-500 mt-1">
+      {member.email || 'N/A'}
+    </div>
+    <div className="sm:hidden text-sm text-gray-500">
+      Cell Group: {member.cellGroup?.name || 'No Cell Group'}
+    </div>
+    <div className="sm:hidden text-sm text-gray-500">
+      Invited by: {member.invitedBy?.name || 'Not invited by anyone'}
+    </div>
+  </div>
+</TableCell>
+<TableCell>
+  <span className={member.isActive ? 'text-green-600 font-medium' : 'text-gray-400 font-medium'}>
+    {member.isActive ? 'Active' : 'Not Active'}
+  </span>
+</TableCell>
+<TableCell>{member.phone}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.email || 'N/A'}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.cellGroup?.name || 'No Cell Group'}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.invitedBy?.name || 'Not invited by anyone'}</TableCell>
