@@ -9,6 +9,7 @@ interface ExportOptions {
 }
 
 interface MemberWithCellGroup {
+  [x: string]: any
   id: string
   name: string
   email: string
@@ -57,17 +58,28 @@ export const generateMemberListPDF = (
     doc.text(options.subtitle, 14, 30)
   }
 
+  const columns = [
+    { header: "Name", dataKey: "name" },
+    { header: "Status", dataKey: "status" }, // <-- Add this line
+    { header: "Phone", dataKey: "phone" },
+    { header: "Email", dataKey: "email" },
+    { header: "Cell Group", dataKey: "cellGroup" },
+    // ...other columns...
+  ];
+
+  const rows = members.map(member => ({
+    name: member.name,
+    status: member.status, // <-- Add this line
+    phone: member.phone,
+    email: member.email,
+    cellGroup: member.cellGroup?.name || "No Cell Group",
+    // ...other fields...
+  }));
+
   // Add table
   autoTable(doc, {
-    startY: options.subtitle ? 40 : 30,
-    head: [['Name', 'Phone', 'Email', 'Cell Group', 'Join Date']],
-    body: members.map(member => [
-      member.name,
-      member.phone,
-      member.email || 'N/A',
-      member.cellGroup?.name || 'N/A',
-      new Date(member.joinDate).toLocaleDateString()
-    ]),
+    columns,
+    body: rows,
     theme: 'grid',
     headStyles: { fillColor: [41, 128, 185] }
   })
@@ -533,4 +545,4 @@ export const generateReportWithChartsPDF = async (
     console.error('Error generating PDF:', error)
     throw new Error(`Failed to generate PDF: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
-} 
+}

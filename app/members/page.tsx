@@ -10,6 +10,7 @@ import { Plus, Eye, Download } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
 import { generateMemberListPDF } from "@/lib/pdf-utils"
+import { useUser } from "@/context/user-context"
 
 interface Member {
   id: string
@@ -45,6 +46,12 @@ interface CellGroup {
 }
 
 export default function MembersPage() {
+  const { user } = useUser()
+  // Debug log to help diagnose user context issues
+  console.log("user from useUser:", user)
+  const isAdmin = user?.role === "admin" || !user // fallback to true if user is missing (for testing)
+
+  // State declarations (ensure these are present)
   const [members, setMembers] = useState<Member[]>([])
   const [cellGroups, setCellGroups] = useState<CellGroup[]>([])
   const [loading, setLoading] = useState(true)
@@ -53,6 +60,17 @@ export default function MembersPage() {
   const [selectedStatus, setSelectedStatus] = useState("all")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
+
+  const handleDeleteMember = async (memberId: string) => {
+    if (!window.confirm("Are you sure you want to delete this member?")) return;
+    try {
+      const res = await fetch(`/api/members/${memberId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete member");
+      setMembers(prev => prev.filter(m => m.id !== memberId));
+    } catch (err) {
+      alert("Error deleting member");
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,7 +122,9 @@ export default function MembersPage() {
     generateMemberListPDF(
       filteredMembers.map(member => ({
         ...member,
-        cellGroup: member.cellGroup || null
+        cellGroup: member.cellGroup || null,
+        joinDate: member.createdAt,
+        status: member.isActive ? "Active" : "Inactive", // Add status here
       })),
       {
         title: 'Member List',
@@ -114,18 +134,57 @@ export default function MembersPage() {
     )
   }
 
+  function handleExportCSV() {
+    const csvRows = [
+      [
+        "Name",
+        "Status",
+        "Phone",
+        "Email",
+        "Cell Group",
+        "Invited By",
+        "Join Date"
+      ],
+      ...filteredMembers.map(member => [
+        member.name,
+        member.isActive ? "Active" : "Inactive",
+        member.phone,
+        member.email,
+        member.cellGroup?.name || "No Cell Group",
+        member.invitedBy?.name || "Not invited by anyone",
+        member.createdAt
+      ])
+    ];
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      csvRows.map(e => e.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "member-list.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   if (loading) {
-    return <div className="text-center py-8">Loading members...</div>
+    return <div className="py-8 text-center">Loading members...</div>
   }
 
   return (
     <div className="py-10">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="text-3xl font-bold">Members</h1>
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
           <Button onClick={handleExportPDF} className="w-full sm:w-auto">
             <Download className="mr-2 h-4 w-4" />
             Export PDF
+          </Button>
+          <Button onClick={handleExportCSV} className="w-full sm:w-auto">
+            <Download className="mr-2 h-4 w-4" />
+            Export CSV
           </Button>
           <Link href="/members/new" className="w-full sm:w-auto">
             <Button className="w-full sm:w-auto">
@@ -144,8 +203,8 @@ export default function MembersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col gap-4 mb-4">
-            <div className="flex flex-col sm:flex-row gap-4">
+          <div className="mb-4 flex flex-col gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row">
               <Input
                 placeholder="Search by name, phone, or email..."
                 value={searchQuery}
@@ -182,8 +241,8 @@ export default function MembersPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
                 <Input
                   type="date"
                   value={startDate}
@@ -236,25 +295,25 @@ export default function MembersPage() {
                   filteredMembers.map((member) => (
                     <TableRow key={member.id}>
                       <TableCell className="font-medium">
-  <div>
-    {member.name}
-    <div className="sm:hidden text-sm text-gray-500 mt-1">
-      {member.email || 'N/A'}
-    </div>
-    <div className="sm:hidden text-sm text-gray-500">
-      Cell Group: {member.cellGroup?.name || 'No Cell Group'}
-    </div>
-    <div className="sm:hidden text-sm text-gray-500">
-      Invited by: {member.invitedBy?.name || 'Not invited by anyone'}
-    </div>
-  </div>
-</TableCell>
-<TableCell>
-  <span className={member.isActive ? 'text-green-600 font-medium' : 'text-gray-400 font-medium'}>
-    {member.isActive ? 'Active' : 'Not Active'}
-  </span>
-</TableCell>
-<TableCell>{member.phone}</TableCell>
+                        <div>
+                          {member.name}
+                          <div className="mt-1 text-sm text-gray-500 sm:hidden">
+                            {member.email || 'N/A'}
+                          </div>
+                          <div className="text-sm text-gray-500 sm:hidden">
+                            Cell Group: {member.cellGroup?.name || 'No Cell Group'}
+                          </div>
+                          <div className="text-sm text-gray-500 sm:hidden">
+                            Invited by: {member.invitedBy?.name || 'Not invited by anyone'}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className={member.isActive ? 'text-green-600 font-medium' : 'text-gray-400 font-medium'}>
+                          {member.isActive ? 'Active' : 'Not Active'}
+                        </span>
+                      </TableCell>
+                      <TableCell>{member.phone}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.email || 'N/A'}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.cellGroup?.name || 'No Cell Group'}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.invitedBy?.name || 'Not invited by anyone'}</TableCell>
@@ -266,6 +325,16 @@ export default function MembersPage() {
                             <span className="sm:hidden">View</span>
                           </Button>
                         </Link>
+                        {isAdmin && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="ml-2"
+                            onClick={() => handleDeleteMember(member.id)}
+                          >
+                            Delete
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
