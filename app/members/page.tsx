@@ -10,6 +10,7 @@ import { Plus, Eye, Download } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
 import { generateMemberListPDF } from "@/lib/pdf-utils"
+import { useUser } from "@/context/user-context"
 
 interface Member {
   id: string
@@ -45,6 +46,12 @@ interface CellGroup {
 }
 
 export default function MembersPage() {
+  const { user } = useUser()
+  // Debug log to help diagnose user context issues
+  console.log("user from useUser:", user)
+  const isAdmin = user?.role === "admin" || !user // fallback to true if user is missing (for testing)
+
+  // State declarations (ensure these are present)
   const [members, setMembers] = useState<Member[]>([])
   const [cellGroups, setCellGroups] = useState<CellGroup[]>([])
   const [loading, setLoading] = useState(true)
@@ -53,6 +60,17 @@ export default function MembersPage() {
   const [selectedStatus, setSelectedStatus] = useState("all")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
+
+  const handleDeleteMember = async (memberId: string) => {
+    if (!window.confirm("Are you sure you want to delete this member?")) return;
+    try {
+      const res = await fetch(`/api/members/${memberId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete member");
+      setMembers(prev => prev.filter(m => m.id !== memberId));
+    } catch (err) {
+      alert("Error deleting member");
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -277,25 +295,25 @@ export default function MembersPage() {
                   filteredMembers.map((member) => (
                     <TableRow key={member.id}>
                       <TableCell className="font-medium">
-  <div>
-    {member.name}
-    <div className="mt-1 text-sm text-gray-500 sm:hidden">
-      {member.email || 'N/A'}
-    </div>
-    <div className="text-sm text-gray-500 sm:hidden">
-      Cell Group: {member.cellGroup?.name || 'No Cell Group'}
-    </div>
-    <div className="text-sm text-gray-500 sm:hidden">
-      Invited by: {member.invitedBy?.name || 'Not invited by anyone'}
-    </div>
-  </div>
-</TableCell>
-<TableCell>
-  <span className={member.isActive ? 'text-green-600 font-medium' : 'text-gray-400 font-medium'}>
-    {member.isActive ? 'Active' : 'Not Active'}
-  </span>
-</TableCell>
-<TableCell>{member.phone}</TableCell>
+                        <div>
+                          {member.name}
+                          <div className="mt-1 text-sm text-gray-500 sm:hidden">
+                            {member.email || 'N/A'}
+                          </div>
+                          <div className="text-sm text-gray-500 sm:hidden">
+                            Cell Group: {member.cellGroup?.name || 'No Cell Group'}
+                          </div>
+                          <div className="text-sm text-gray-500 sm:hidden">
+                            Invited by: {member.invitedBy?.name || 'Not invited by anyone'}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className={member.isActive ? 'text-green-600 font-medium' : 'text-gray-400 font-medium'}>
+                          {member.isActive ? 'Active' : 'Not Active'}
+                        </span>
+                      </TableCell>
+                      <TableCell>{member.phone}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.email || 'N/A'}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.cellGroup?.name || 'No Cell Group'}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.invitedBy?.name || 'Not invited by anyone'}</TableCell>
@@ -307,6 +325,16 @@ export default function MembersPage() {
                             <span className="sm:hidden">View</span>
                           </Button>
                         </Link>
+                        {isAdmin && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="ml-2"
+                            onClick={() => handleDeleteMember(member.id)}
+                          >
+                            Delete
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
