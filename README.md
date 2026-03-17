@@ -81,6 +81,11 @@ This README serves as a running log of all major changes, migrations, and featur
 - Updated `app/members/new/page.tsx` and `app/members/[id]/edit/page.tsx` with dropdowns and text inputs for the new semantic tracking variables.
 - Handled empty payload fields properly by storing them as `null` bounds within the database to maintain consistency.
 
+### [2026-03-17] Automated Semester Commitment Logic
+- Implemented `lib/commitment.ts` to automatically infer member commitment status (`COMMITTED`, `UNCOMMITTED`, `AT_RISK`) based on semester attendance percentages (>= 70% threshold).
+- Integrated calculation triggers into `POST /api/attendance` and `PUT /api/attendance` to run asynchronously on record changes.
+- Built explicit admin override endpoint `PATCH /api/commitments` to allow leadership to manually enforce statuses.
+
 ---
 
 ### How to Use This Log

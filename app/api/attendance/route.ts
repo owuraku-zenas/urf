@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { calculateMemberCommitment } from "@/lib/commitment"
 
 export async function GET(request: Request) {
   try {
@@ -64,6 +65,13 @@ export async function POST(request: Request) {
       await prisma.member.update({ where: { id: memberId }, data: { isActive: false } })
     }
 
+    if (event.semesterId) {
+      // Run asynchronously so we don't block the request response
+      calculateMemberCommitment(memberId, event.semesterId).catch(err => {
+        console.error("Failed to automatically calculate member commitment:", err)
+      })
+    }
+
     return NextResponse.json(attendance)
   } catch (error) {
     console.error("Error creating attendance record:", error)
@@ -118,6 +126,13 @@ export async function PUT(request: Request) {
       await prisma.member.update({ where: { id: memberId }, data: { isActive: true } })
     } else {
       await prisma.member.update({ where: { id: memberId }, data: { isActive: false } })
+    }
+
+    if (event.semesterId) {
+      // Run asynchronously so we don't block the request response
+      calculateMemberCommitment(memberId, event.semesterId).catch(err => {
+        console.error("Failed to automatically calculate member commitment:", err)
+      })
     }
 
     return NextResponse.json(attendance)

@@ -97,15 +97,15 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 ---
 
 ## 6. Logic: Automated Commitment Calculation
-- [ ] **Define Thresholds**: Store or hardcode (e.g., 70% attendance required) the threshold for "COMMITTED" status.
-- [ ] **Create Calculation Service**: Write a backend utility (`lib/commitment.ts`) that:
+- [x] **Define Thresholds**: Store or hardcode (e.g., 70% attendance required) the threshold for "COMMITTED" status.
+- [x] **Create Calculation Service**: Write a backend utility (`lib/commitment.ts`) that:
   - Takes a `memberId` and `semesterId`.
   - Counts total events in that semester.
   - Counts total attendances for that member in that semester.
   - Calculates percentage.
   - Upserts `SemesterCommitment` setting status to `COMMITTED`, `UNCOMMITTED`, or `AT_RISK`.
-- [ ] **Trigger Automation**: Call this calculation service after every `POST /api/attendance` creation or deletion.
-- [ ] **Admin Override (PATCH `/api/commitments`)**: Build endpoint for admins to manually set `status` and `overrideReason`.
+- [x] **Trigger Automation**: Call this calculation service after every `POST /api/attendance` creation or deletion.
+- [x] **Admin Override (PATCH `/api/commitments`)**: Build endpoint for admins to manually set `status` and `overrideReason`.
 
 ---
 
