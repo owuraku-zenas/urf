@@ -26,7 +26,7 @@ This plan outlines the steps to extend the current church management system with
 - [x] **Design & add Semester model** to the database (Prisma schema):
     - Fields: `id`, `name`, `start_date`, `end_date`, `academic_year`, `status` (active, closed)
  - [x] **Create admin UI** for listing, creating, and editing semesters.
-- [ ] **Enforce only one active semester** and prevent overlapping dates (backend & UI validation).
+- [x] **Enforce only one active semester** and prevent overlapping dates (backend & UI validation).
 - [ ] **Auto-carry forward active members** and reset attendance on new semester creation.
 - [ ] **Lock editing of dates once semester is active.**
 - [ ] **Prevent deletion of semesters with attendance records.**

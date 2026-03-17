@@ -57,7 +57,8 @@ export default function SemestersPage() {
     if (res.ok) {
       setShowModal(false)
       setForm({ name: "", startDate: "", endDate: "", academicYear: "", status: "ACTIVE" })
-      setSemesters(await res.json())
+      const newSemester = await res.json()
+      setSemesters(prev => [newSemester, ...prev])
     }
   }
 

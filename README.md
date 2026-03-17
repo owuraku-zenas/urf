@@ -37,6 +37,21 @@ This README serves as a running log of all major changes, migrations, and featur
 
 ---
 
+### [2026-03-17] Semester Management API & Business Logic
+- Created API route `app/api/semesters/route.ts` with `GET` and `POST` handlers.
+- Implemented admin-only authorization for creating semesters.
+- Enforced business logic in the `POST` endpoint to prevent multiple active semesters and overlapping semester dates.
+- This provides the backend foundation for the semester management UI.
+
+---
+
+### [2026-03-17] Complete Semester CRUD API Implementation
+- Added `app/api/semesters/[id]/route.ts` handling `GET`, `PATCH`, and `DELETE` requests.
+- Enforced admin-only authorization on `PATCH` and `DELETE` modifying operations to secure semester records.
+- Completed full CRUD capability for the Semester model.
+
+---
+
 ### How to Use This Log
 - Every time a major change is made (e.g., migration, new model, new UI, new API), add a dated entry here.
 - Summarize what was changed, why, and any important notes for future developers or admins.
