@@ -34,7 +34,8 @@ const MemberFormSchema = z.object({
       }
       return val;
     }),
-  dateOfBirth: z.string().nullable().optional().transform(val => val === "" ? null : val),
+  birthMonth: z.string().optional(),
+  birthDay: z.string().optional(),
   joinDate: z.string().min(1, "Join date is required"),
   university: z.string().max(100, "University name is too long").nullable().optional(),
   program: z.string().max(100, "Program name is too long").nullable().optional(),
@@ -81,7 +82,8 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
     name: "",
     email: "",
     phone: "",
-    dateOfBirth: "",
+    birthMonth: "",
+    birthDay: "",
     joinDate: "",
     university: "",
     program: "",
@@ -109,7 +111,8 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
         // Format dates for input fields
         const formattedData = {
           ...memberData,
-          dateOfBirth: memberData.dateOfBirth ? new Date(memberData.dateOfBirth).toISOString().split('T')[0] : "",
+          birthMonth: memberData.dateOfBirth ? String(new Date(memberData.dateOfBirth).getUTCMonth() + 1) : "",
+          birthDay: memberData.dateOfBirth ? String(new Date(memberData.dateOfBirth).getUTCDate()) : "",
           joinDate: memberData.joinDate ? new Date(memberData.joinDate).toISOString().split('T')[0] : "",
           isActive: memberData.isActive ?? false,
           admissionYear: memberData.admissionYear ?? "",
@@ -197,12 +200,22 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
         throw new Error("Please fix the form errors")
       }
 
+      // Mock the year to 1970 for privacy (only storing month and day)
+      let finalDateOfBirth = null;
+      if (formData.birthMonth && formData.birthDay) {
+        finalDateOfBirth = `1970-${formData.birthMonth.padStart(2, '0')}-${formData.birthDay.padStart(2, '0')}T00:00:00.000Z`
+      }
+
+      // Strip UI-only fields and inject database model constraints
+      const { birthMonth, birthDay, ...submitData } = formData;
+      const apiPayload = { ...submitData, dateOfBirth: finalDateOfBirth };
+
       const response = await fetch(`/api/members/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(apiPayload),
       })
 
       const responseData = await response.json()
@@ -340,21 +353,39 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
                 )}
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="dateOfBirth" className="block text-sm font-medium">
+              <div className="space-y-2 col-span-1 md:col-span-2">
+                <label className="block text-sm font-medium">
                   Date of Birth
                 </label>
-                <input
-                  id="dateOfBirth"
-                  name="dateOfBirth"
-                  type="date"
-                  value={formData.dateOfBirth ?? ""}
-                  onChange={handleChange}
-                  className={`w-full rounded-md border ${errors.dateOfBirth ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
-                />
-                {errors.dateOfBirth && (
-                  <p className="text-sm text-red-500">{errors.dateOfBirth}</p>
-                )}
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <select
+                      name="birthMonth"
+                      value={formData.birthMonth}
+                      onChange={handleChange}
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="">Month</option>
+                      {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
+                        <option key={month} value={month.toString()}>{new Date(2000, month - 1, 1).toLocaleString('default', { month: 'long' })}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex-1">
+                    <select
+                      name="birthDay"
+                      value={formData.birthDay}
+                      onChange={handleChange}
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="">Day</option>
+                      {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+                        <option key={day} value={day.toString()}>{day}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500">For privacy reasons, only your birth month and day are collected.</p>
               </div>
 
               <div className="space-y-2">
