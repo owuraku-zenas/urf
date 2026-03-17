@@ -68,6 +68,21 @@ This README serves as a running log of all major changes, migrations, and featur
 
 ---
 
+---
+
+### [2026-03-17] Fixed Prisma Client Type Error
+- Regenerated Prisma Client to resolve TypeScript type errors `EventWhereInput | undefined` regarding the newly added `semesterId` field on the `Event` model.
+
+---
+
+### [2026-03-17] Exhaustive Member CRUD Tracking & Frontend UI Updates
+- Extended the `Member` model and API routes (`POST /api/members`, `PUT /api/members/[id]`) to support `admissionYear`, `joinedSemesterId`, and `currentAcademicLevel`.
+- Created backend utility `lib/progression.ts` to dynamically calculate a member's academic level based on their admission year and the current active academic year.
+- Updated `app/members/new/page.tsx` and `app/members/[id]/edit/page.tsx` with dropdowns and text inputs for the new semantic tracking variables.
+- Handled empty payload fields properly by storing them as `null` bounds within the database to maintain consistency.
+
+---
+
 ### How to Use This Log
 - Every time a major change is made (e.g., migration, new model, new UI, new API), add a dated entry here.
 - Summarize what was changed, why, and any important notes for future developers or admins.

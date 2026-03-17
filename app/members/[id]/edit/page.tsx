@@ -44,6 +44,9 @@ const MemberFormSchema = z.object({
   cellGroupId: z.string().min(1, "Cell group is required"),
   invitedById: z.string().nullable().optional(),
   isActive: z.boolean().optional(),
+  admissionYear: z.string().regex(/^\d{4}$/, "Admission year must be a 4-digit number").nullable().optional(),
+  currentAcademicLevel: z.string().nullable().optional(),
+  joinedSemesterId: z.string().nullable().optional(),
 })
 
 type MemberFormData = z.infer<typeof MemberFormSchema>
@@ -58,6 +61,11 @@ interface Member {
   name: string
 }
 
+interface Semester {
+  id: string
+  name: string
+}
+
 export default function EditMemberPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
@@ -66,6 +74,7 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
   const [loading, setLoading] = useState(true)
   const [cellGroups, setCellGroups] = useState<CellGroup[]>([])
   const [members, setMembers] = useState<Member[]>([])
+  const [semesters, setSemesters] = useState<Semester[]>([])
   const [errors, setErrors] = useState<Partial<Record<keyof MemberFormData, string>>>({})
 
   const [formData, setFormData] = useState<MemberFormData>({
@@ -82,6 +91,9 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
     cellGroupId: "",
     invitedById: "",
     isActive: false,
+    admissionYear: "",
+    currentAcademicLevel: "",
+    joinedSemesterId: "",
   })
 
   useEffect(() => {
@@ -100,6 +112,9 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
           dateOfBirth: memberData.dateOfBirth ? new Date(memberData.dateOfBirth).toISOString().split('T')[0] : "",
           joinDate: memberData.joinDate ? new Date(memberData.joinDate).toISOString().split('T')[0] : "",
           isActive: memberData.isActive ?? false,
+          admissionYear: memberData.admissionYear ?? "",
+          currentAcademicLevel: memberData.currentAcademicLevel ?? "",
+          joinedSemesterId: memberData.joinedSemesterId ?? "",
         }
         
         setFormData(formattedData)
@@ -119,6 +134,13 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
         }
         const membersData = await membersResponse.json()
         setMembers(membersData)
+
+        // Fetch semesters for join selection
+        const semestersResponse = await fetch("/api/semesters")
+        if (semestersResponse.ok) {
+          const semestersData = await semestersResponse.json()
+          setSemesters(semestersData)
+        }
       } catch (error) {
         console.error("Error fetching data:", error)
         toast({
@@ -460,6 +482,73 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
                 </select>
                 {errors.invitedById && (
                   <p className="text-sm text-red-500">{errors.invitedById}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="admissionYear" className="block text-sm font-medium">
+                  Admission Year
+                </label>
+                <input
+                  id="admissionYear"
+                  name="admissionYear"
+                  value={formData.admissionYear ?? ""}
+                  onChange={handleChange}
+                  placeholder="YYYY"
+                  className={`w-full rounded-md border ${errors.admissionYear ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                />
+                {errors.admissionYear && (
+                  <p className="text-sm text-red-500">{errors.admissionYear}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="currentAcademicLevel" className="block text-sm font-medium">
+                  Current Academic Level
+                </label>
+                <select
+                  id="currentAcademicLevel"
+                  name="currentAcademicLevel"
+                  value={formData.currentAcademicLevel ?? ""}
+                  onChange={handleChange}
+                  className={`w-full rounded-md border ${errors.currentAcademicLevel ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                >
+                  <option value="">Select level...</option>
+                  <option value="100">Level 100</option>
+                  <option value="200">Level 200</option>
+                  <option value="300">Level 300</option>
+                  <option value="400">Level 400</option>
+                  <option value="500">Level 500</option>
+                  <option value="600">Level 600</option>
+                  <option value="POSTGRAD">Postgraduate</option>
+                  <option value="ALUMNI">Alumni</option>
+                  <option value="OTHER">Other</option>
+                </select>
+                {errors.currentAcademicLevel && (
+                  <p className="text-sm text-red-500">{errors.currentAcademicLevel}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="joinedSemesterId" className="block text-sm font-medium">
+                  Joined Semester
+                </label>
+                <select
+                  id="joinedSemesterId"
+                  name="joinedSemesterId"
+                  value={formData.joinedSemesterId ?? ""}
+                  onChange={handleChange}
+                  className={`w-full rounded-md border ${errors.joinedSemesterId ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                >
+                  <option value="">Select a semester...</option>
+                  {semesters.map((semester) => (
+                    <option key={semester.id} value={semester.id}>
+                      {semester.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.joinedSemesterId && (
+                  <p className="text-sm text-red-500">{errors.joinedSemesterId}</p>
                 )}
               </div>
 

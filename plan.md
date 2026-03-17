@@ -88,11 +88,11 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 - [ ] **Frontend**: Update the Event Creation modal/form to include a hidden field or automatic assignment of the currently active/selected semester from Context.
 
 ### B. Member CRUD Updates
-- [ ] **Update Member Model**: Add `admissionYear String?` and `currentAcademicLevel String?` to the Member schema.
-- [ ] **Add joinedSemesterId**: Add `joinedSemesterId String?` to track when a user officially joined the church group. Members are inherently global and persistent, so this is just a joining record, not a restricting boundary.
-- [ ] **Member Creation (POST `/api/members`)**: Add `admissionYear`, `joinedSemesterId`, and `currentAcademicLevel` to the creation payload.
-- [ ] **Member Update (PATCH `/api/members/[id]`)**: Allow manual overrides of academic levels via the UI.
-- [ ] **Automated Level Progression**: Write a utility function that infers a member's current academic level relative to a given `Semester.academicYear` based on their `admissionYear`.
+- [x] **Update Member Model**: Add `admissionYear String?` and `currentAcademicLevel String?` to the Member schema.
+- [x] **Add joinedSemesterId**: Add `joinedSemesterId String?` to track when a user officially joined the church group. Members are inherently global and persistent, so this is just a joining record, not a restricting boundary.
+- [x] **Member Creation (POST `/api/members`)**: Add `admissionYear`, `joinedSemesterId`, and `currentAcademicLevel` to the creation payload.
+- [x] **Member Update (PATCH `/api/members/[id]`)**: Allow manual overrides of academic levels via the UI.
+- [x] **Automated Level Progression**: Write a utility function that infers a member's current academic level relative to a given `Semester.academicYear` based on their `admissionYear`.
 
 ---
 

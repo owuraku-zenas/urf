@@ -105,6 +105,9 @@ export async function PUT(
         cellGroupId: body.cellGroupId,
         invitedById: body.invitedById === "" ? null : body.invitedById,
         isActive: body.isActive !== undefined ? body.isActive : false,
+        admissionYear: body.admissionYear,
+        currentAcademicLevel: body.currentAcademicLevel,
+        joinedSemesterId: body.joinedSemesterId === "" ? null : body.joinedSemesterId,
       },
       include: {
         cellGroup: {

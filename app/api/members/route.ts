@@ -55,13 +55,23 @@ export async function POST(request: Request) {
     }
 
     // Extract IDs and remove them from the data object
-    const { cellGroupId, invitedById, ...restData } = data
+    const { 
+      cellGroupId, 
+      invitedById, 
+      joinedSemesterId,
+      admissionYear,
+      currentAcademicLevel,
+      ...restData 
+    } = data
 
     const member = await prisma.member.create({
       data: {
         ...restData,
         dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
         joinDate: data.joinDate ? new Date(data.joinDate) : new Date(),
+        joinedSemesterId: joinedSemesterId === "" ? null : joinedSemesterId,
+        admissionYear: admissionYear === "" ? null : admissionYear,
+        currentAcademicLevel: currentAcademicLevel === "" ? null : currentAcademicLevel,
         cellGroup: {
           connect: { id: cellGroupId }
         },
