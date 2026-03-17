@@ -44,11 +44,9 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 - [ ] Update `Semester` model to include a reverse relation: `events Event[]`.
 
 ### B. The `Attendance` <-> `Semester` Relationship
-- [ ] Add `semesterId String?` to the `Attendance` model in `schema.prisma`.
-- [ ] Establish relation: `semester Semester? @relation(fields: [semesterId], references: [id])` inside the `Attendance` model.
-- [ ] Update `Semester` model to include a reverse relation: `attendances Attendance[]`.
+*Decided against direct linkage.* Attendance is implicitly linked to a Semester entirely through the `Event` it is attached to. No `semesterId` goes on the `Attendance` model.
 
-### C. The `Member` <-> `Semester` Relationship (SemesterCommitment)
+### C. The `Member` <-> `Semester` Relationship
 *Members exist across semesters, but their "commitment level" changes per semester. We need a join table.*
 - [ ] Create new model `SemesterCommitment`.
 - [ ] Add fields: 
@@ -89,18 +87,10 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
   - Allow `semesterId` to be updated if an event was miscategorized.
 - [ ] **Frontend**: Update the Event Creation modal/form to include a hidden field or automatic assignment of the currently active/selected semester from Context.
 
-### B. Attendance CRUD Updates
-- [ ] **Create (POST `/api/attendance`)**:
-  - Update logic to extract `semesterId` from the associated `Event`.
-  - Save `semesterId` explicitly in the `Attendance` record for faster querying.
-- [ ] **Read (GET `/api/attendance`)**:
-  - Update queries to filter by `semesterId`.
-- [ ] **Delete/Update**: No major relational changes, but ensure cascading deletes do not break commitment calculations.
-- [ ] **Frontend**: Ensure attendance lists only show attendance for the currently selected semester.
-
-### C. Member Classification & Level Tracking
+### B. Member CRUD Updates
 - [ ] **Update Member Model**: Add `admissionYear String?` and `currentAcademicLevel String?` to the Member schema.
-- [ ] **Member Creation (POST `/api/members`)**: Add `admissionYear` and `currentAcademicLevel` to the creation payload.
+- [ ] **Add joinedSemesterId**: Add `joinedSemesterId String?` to track when a user officially joined the church group. Members are inherently global and persistent, so this is just a joining record, not a restricting boundary.
+- [ ] **Member Creation (POST `/api/members`)**: Add `admissionYear`, `joinedSemesterId`, and `currentAcademicLevel` to the creation payload.
 - [ ] **Member Update (PATCH `/api/members/[id]`)**: Allow manual overrides of academic levels via the UI.
 - [ ] **Automated Level Progression**: Write a utility function that infers a member's current academic level relative to a given `Semester.academicYear` based on their `admissionYear`.
 
@@ -120,15 +110,14 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 ---
 
 ## 7. Data Migration: Historical Cleanup
-*Before enforcing `semesterId` as mandatory on Attendance/Event tables, historical data must be cleaned.*
+*Before enforcing `semesterId` as mandatory on Event tables, historical data must be cleaned.*
 
 - [ ] **Create "Initial" Semester**: Insert a dummy semester into the database to hold all data from before this system existed.
 - [ ] **Write Data Migration Script** (`scripts/migrate-historical-semesters.ts`):
     - Retrieve the "Initial" semester ID.
     - Run `prisma.event.updateMany({ where: { semesterId: null }, data: { semesterId: initialId } })`.
-    - Run `prisma.attendance.updateMany({ where: { semesterId: null }, data: { semesterId: initialId } })`.
 - [ ] **Execute script in staging & production**.
-- [ ] **Lock Schema (Optional)**: Update `schema.prisma` to make `semesterId` strictly required (`String` instead of `String?`), generate, and run final migration.
+- [ ] **Lock Schema (Optional)**: Update `schema.prisma` to make `semesterId` strictly required on Event (`String` instead of `String?`), generate, and run final migration.
 
 ---
 
