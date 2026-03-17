@@ -132,8 +132,8 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 ---
 
 ## 9. Birth Date Handling & Automation
-- [x] **UI Update**: Change frontend date picker to only request `Month` and `Day` with a visual disclaimer about privacy.
-- [x] **Schema Update**: Ensure `dateOfBirth` doesn't strictly depend on a valid year, or mock the year to `1970` uniformly.
+- [x] **UI Update**: Change frontend date picker to exclusively capture `birthMonth` and `birthDay` dropdowns with a privacy disclaimer.
+- [ ] **Schema Update**: Remove the native DateTime `dateOfBirth` field entirely from the Member Prisma Schema. Add `birthMonth (Int?)` and `birthDay (Int?)` numerical columns explicitly to strip year dependency from the backend architecture.
 - [x] **Cron Job Job**: Implement a daily cron script (using Vercel Cron or GitHub Actions) that queries `prisma.member.findMany` where birth month/day equals today.
 - [ ] **Integration**: Connect Cron result to SMS backend.
 

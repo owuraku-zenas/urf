@@ -9,31 +9,22 @@ export async function GET(request: Request) {
       return new NextResponse("Unauthorized", { status: 401 })
     }
 
-    // 1. Determine today's Month and Day (in UTC to match the 1970 mock initialization)
+    // 1. Determine today's Month and Day
     const today = new Date()
     const currentMonth = today.getUTCMonth() + 1
     const currentDay = today.getUTCDate()
 
-    // 2. Fetch all members who have a registered dateOfBirth
-    const members = await prisma.member.findMany({
+    // 2. Fetch all members whose birthMonth and birthDay match today exactly
+    const birthdayMembers = await prisma.member.findMany({
       where: {
-        dateOfBirth: {
-          not: null
-        }
+        birthMonth: currentMonth,
+        birthDay: currentDay
       },
       select: {
         id: true,
         name: true,
-        phone: true,
-        dateOfBirth: true
+        phone: true
       }
-    })
-
-    // 3. Filter members whose birth month and day match today
-    const birthdayMembers = members.filter(member => {
-      if (!member.dateOfBirth) return false;
-      const birthDate = new Date(member.dateOfBirth)
-      return birthDate.getUTCMonth() + 1 === currentMonth && birthDate.getUTCDate() === currentDay
     })
 
     if (birthdayMembers.length === 0) {

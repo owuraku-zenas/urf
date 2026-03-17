@@ -61,13 +61,16 @@ export async function POST(request: Request) {
       joinedSemesterId,
       admissionYear,
       currentAcademicLevel,
+      birthMonth,
+      birthDay,
       ...restData 
     } = data
 
     const member = await prisma.member.create({
       data: {
         ...restData,
-        dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+        birthMonth: birthMonth ? parseInt(birthMonth.toString()) : null,
+        birthDay: birthDay ? parseInt(birthDay.toString()) : null,
         joinDate: data.joinDate ? new Date(data.joinDate) : new Date(),
         joinedSemesterId: joinedSemesterId === "" ? null : joinedSemesterId,
         admissionYear: admissionYear === "" ? null : admissionYear,

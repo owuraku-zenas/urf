@@ -62,7 +62,8 @@ model Member {
   name        String
   email       String?      @unique
   phone       String   @unique
-  dateOfBirth DateTime?
+  birthMonth  Int?
+  birthDay    Int?
   joinDate    DateTime     @default(now())
   university  String?
   program     String?

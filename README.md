@@ -95,7 +95,9 @@ This README serves as a running log of all major changes, migrations, and featur
 - Appended a new "Commitments" visual card to the frontend grid that maps the number of `COMMITTED`, `AT_RISK`, and `UNCOMMITTED` members for the selected timeframe.
 - Updated all visual React chart components (`MemberGrowthChart`, `CellGroupAttendanceChart`, `EventTypeAnalysisChart`, `InvitationNetworkChart`) to subscribe to the `useSemester` context and accurately reflect dynamic timeframe data.
 - Enforced `semesterId` filters across all specific internal reporting endpoints (`/api/reports/member-growth`, `/api/reports/attendance-trends`, `/api/cell-groups`, `/api/members`) ensuring PDF CSV exports contain accurate timeframe boundaries.
-- Refactored `app/members/new/page.tsx` and `app/members/[id]/edit/page.tsx` schemas to exclusively consume `Month` and `Day` dropdowns for `dateOfBirth` entry, masking the year securely to 1970.
+- Refactored `app/members/new/page.tsx` and `app/members/[id]/edit/page.tsx` schemas to exclusively consume `Month` and `Day` dropdowns for `dateOfBirth` entry.
+- Hardened Member Database Architecture by dropping the `dateOfBirth` DateTime column natively and implementing standalone scalar integer fields `birthMonth` and `birthDay` for definitive year abstraction.
+- Refactored `app/api/members/route.ts` and `app/api/members/[id]/route.ts` mappings to serialize form payloads into Prisma's standard Integer requirements.
 - Built a Vercel Cron compatible endpoint at `/api/cron/birthdays` to parse the database locally for UTC matches with the current day and month.
 - Added `vercel.json` to schedule the recurring birthday endpoint execution daily at 8:00 AM UTC.
 
