@@ -71,9 +71,16 @@ model Member {
   roomNumber  String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  
+  admissionYear        String?
+  currentAcademicLevel String?
+  joinedSemesterId     String?
+  joinedSemester       Semester? @relation("MemberJoinedSemester", fields: [joinedSemesterId], references: [id])
+
   cellGroupId String?
   invitedById String?
   attendances Attendance[]
+  commitments SemesterCommitment[]
   cellGroup   CellGroup?   @relation(fields: [cellGroupId], references: [id])
   invitedBy   Member?      @relation("MemberInvites", fields: [invitedById], references: [id])
   invitees    Member[]     @relation("MemberInvites")
@@ -99,6 +106,8 @@ model Event {
   feedback    String?     @db.Text
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  semesterId  String?
+  semester    Semester?    @relation(fields: [semesterId], references: [id])
   attendance  Attendance[]
 
   @@index([date])
@@ -134,6 +143,10 @@ model Semester {
   status       SemesterStatus @default(ACTIVE)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  events       Event[]
+  joinedMembers Member[] @relation("MemberJoinedSemester")
+  commitments  SemesterCommitment[]
 }
 
 enum SemesterStatus {
@@ -152,3 +165,27 @@ enum EventType {
   PRAYER
   SPECIAL
 }
+
+model SemesterCommitment {
+  id             String           @id @default(cuid())
+  memberId       String
+  semesterId     String
+  status         CommitmentStatus @default(UNCOMMITTED)
+  overrideReason String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  member   Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  semester Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, semesterId])
+  @@index([memberId])
+  @@index([semesterId])
+}
+
+enum CommitmentStatus {
+  COMMITTED
+  UNCOMMITTED
+  AT_RISK
+}
+

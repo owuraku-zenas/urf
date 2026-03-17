@@ -154,9 +154,32 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 
 ---
 
-## 11. Testing & Migration
-- [ ] **Test all new features in staging/dev environment.**
-- [ ] **Validate data integrity after migration.**
+## 11. Testing & Quality Assurance
+*Comprehensive test coverage is required to ensure these critical relational changes do not compromise the integrity of the application.*
+
+### A. Unit Testing (Backend Logic)
+- [ ] **Setup Test Environment**: Ensure `.env.test` correctly targets `urf_test` database.
+- [ ] **Test Commitment Logic**: Write isolated Jest tests for `lib/commitment.ts`. Provide mock attendance data and assert that the correct threshold triggers the transition between UNCOMMITTED and COMMITTED per semester.
+- [ ] **Test Utility Functions**: Write unit tests for the level progression algorithm (e.g., verifying `admissionYear` 2024 evaluates correctly in `academicYear` 2026).
+
+### B. Integration Testing (APIs & Database)
+- [ ] **Semester CRUD API Tests**:
+  - Test `POST /api/semesters` blocking date overlaps.
+  - Test `POST /api/semesters` enforcing single active status.
+  - Test Admin authorization bounds (expecting 401s for non-admin users).
+- [ ] **Event & Attendance API Tests**:
+  - Test `POST /api/events` successfully capturing the provided `semesterId`.
+  - Test `POST /api/attendance` correctly inheriting `semesterId` from the active context.
+  - Test `GET /api/events` filtering by specific `semesterId` parameters.
+
+### C. End-to-End Testing (Frontend UI)
+- [ ] **Semester Switching Workflow**: Use Playwright/Cypress to log in as Admin, create a semester, and toggle the global Semester Context dropdown to verify the React state updates dynamically across all dashboard charts and list views.
+- [ ] **Member Creation & Level Selection**: Create an E2E test verifying a new member can be created successfully with the new `admissionYear` and `joinedSemesterId` dropdowns.
+- [ ] **Admin Protected Routes**: E2E test to navigate directly to `/semesters` URL as an unauthorized base user to confirm the middleware redirects to `/`.
+
+### D. Migration Testing
+- [ ] **Dry-Run Historical Migration**: Run the `migrate-historical-semesters.ts` script against a copy of the production database (`urf_test`) before executing in production.
+- [ ] **Assertion**: Assert that `0` records remain where `semesterId === null` in the `Event` table.
 
 ---
 

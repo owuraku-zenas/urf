@@ -53,6 +53,14 @@ This README serves as a running log of all major changes, migrations, and featur
 
 ---
 
+### [2026-03-17] Database Relationship Expansion & QA Planning
+- Added relationships connecting `Semester` to `Event` and `SemesterCommitment`.
+- Added `joinedSemesterId`, `admissionYear`, and `currentAcademicLevel` to `Member` for progression tracking.
+- Resolved Prisma inverse relation validation issues and successfully executed migrations across the Neon database.
+- Expanded `plan.md` to feature a comprehensive "Testing & Assurance" QA section detailing Unit, E2E, and Migration tests.
+
+---
+
 ### How to Use This Log
 - Every time a major change is made (e.g., migration, new model, new UI, new API), add a dated entry here.
 - Summarize what was changed, why, and any important notes for future developers or admins.
