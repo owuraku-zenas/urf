@@ -88,6 +88,14 @@ This README serves as a running log of all major changes, migrations, and featur
 
 ---
 
+### [2026-03-17] Multi-Semester Analytics Dashboard Update & Historical Migration Skipped
+- **Note:** The historical data migration script (`scripts/migrate-historical-semesters.ts`) was written but explicitly skipped per user instructions. Historical records without a `semesterId` will currently remain un-versioned.
+- Updated the backend `/api/stats` endpoint to accept an optional `semesterId` query param. The route now strictly aggregates counts and parses new `SemesterCommitment` counters per the given global context.
+- Modified the main `app/page.tsx` dashboard to subscribe to the `useSemester` context hook, meaning the homepage metrics now instantly react and filter mathematically when different semesters are selected from the navigation bar.
+- Appended a new "Commitments" visual card to the frontend grid that maps the number of `COMMITTED`, `AT_RISK`, and `UNCOMMITTED` members for the selected timeframe.
+
+---
+
 ### How to Use This Log
 - Every time a major change is made (e.g., migration, new model, new UI, new API), add a dated entry here.
 - Summarize what was changed, why, and any important notes for future developers or admins.

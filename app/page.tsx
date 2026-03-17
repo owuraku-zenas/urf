@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useSemester } from "@/context/semester-context"
 
 interface Stats {
   memberCount: number
@@ -10,9 +11,13 @@ interface Stats {
   attendanceRate: number
   activeMemberCount: number
   inactiveMemberCount: number
+  committedCount: number
+  uncommittedCount: number
+  atRiskCount: number
 }
 
 export default function Home() {
+  const { selectedSemester } = useSemester()
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<Stats>({
     memberCount: 0,
@@ -21,13 +26,16 @@ export default function Home() {
     attendanceRate: 0,
     activeMemberCount: 0,
     inactiveMemberCount: 0,
+    committedCount: 0,
+    uncommittedCount: 0,
+    atRiskCount: 0,
   })
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch("/api/stats")
+        const response = await fetch(`/api/stats?semesterId=${selectedSemester || ""}`)
         if (!response.ok) {
           throw new Error("Failed to fetch stats")
         }
@@ -41,7 +49,7 @@ export default function Home() {
     }
 
     fetchStats()
-  }, [])
+  }, [selectedSemester])
 
   if (error) {
     return (
@@ -232,6 +240,45 @@ export default function Home() {
                 className="mt-4 block w-full rounded-md bg-blue-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-blue-700"
               >
                 View Reports
+              </Link>
+            </div>
+          </div>
+
+          {/* Commitments Card */}
+          <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div className="flex flex-row items-center justify-between space-y-0 p-4 sm:p-6 pb-2">
+              <h3 className="text-lg sm:text-xl font-medium">Commitments</h3>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-5 w-5 text-gray-500"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"></path>
+              </svg>
+            </div>
+            <div className="p-4 sm:p-6 pt-0">
+              <div className="text-2xl sm:text-3xl font-bold">{loading ? "..." : stats.committedCount}</div>
+              <p className="text-xs text-gray-500">Committed members</p>
+              <div className="flex gap-4 mt-2 text-sm">
+                <span className="text-yellow-600 font-medium">
+                  {loading ? "..." : stats.atRiskCount} At Risk
+                </span>
+                <span className="text-red-500 font-medium">
+                  {loading ? "..." : stats.uncommittedCount} Uncommitted
+                </span>
+              </div>
+              <Link
+                href="/reports"
+                className="mt-4 block w-full rounded-md bg-blue-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-blue-700"
+              >
+                View Analytics
               </Link>
             </div>
           </div>

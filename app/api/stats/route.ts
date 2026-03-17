@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const semesterId = searchParams.get("semesterId")
+
+    const eventWhere = semesterId ? { semesterId } : undefined;
+    const attendanceWhere = semesterId ? { event: { semesterId } } : undefined;
+
     const [
       memberCount,
       eventCount,
@@ -11,13 +17,17 @@ export async function GET() {
       totalEvents,
       activeMemberCount,
       inactiveMemberCount,
+      committedCount,
+      uncommittedCount,
+      atRiskCount,
     ] = await Promise.all([
       prisma.member.count(),
-      prisma.event.count(),
+      prisma.event.count({ where: eventWhere }),
       prisma.cellGroup.count(),
-      prisma.attendance.count(),
+      prisma.attendance.count({ where: attendanceWhere }),
       prisma.event.count({
         where: {
+          ...eventWhere,
           attendance: {
             some: {},
           },
@@ -29,6 +39,9 @@ export async function GET() {
       prisma.member.count({
         where: { isActive: false }
       }),
+      semesterId ? prisma.semesterCommitment.count({ where: { semesterId, status: 'COMMITTED' } }) : 0,
+      semesterId ? prisma.semesterCommitment.count({ where: { semesterId, status: 'UNCOMMITTED' } }) : 0,
+      semesterId ? prisma.semesterCommitment.count({ where: { semesterId, status: 'AT_RISK' } }) : 0,
     ])
 
     const attendanceRate = totalEvents > 0
@@ -42,6 +55,9 @@ export async function GET() {
       attendanceRate,
       activeMemberCount,
       inactiveMemberCount,
+      committedCount,
+      uncommittedCount,
+      atRiskCount,
     })
   } catch (error) {
     console.error("Error fetching stats:", error)

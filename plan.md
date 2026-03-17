@@ -109,24 +109,24 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 
 ---
 
-## 7. Data Migration: Historical Cleanup
+## 7. Data Migration: Historical Cleanup (Skipped)
 *Before enforcing `semesterId` as mandatory on Event tables, historical data must be cleaned.*
 
-- [ ] **Create "Initial" Semester**: Insert a dummy semester into the database to hold all data from before this system existed.
-- [ ] **Write Data Migration Script** (`scripts/migrate-historical-semesters.ts`):
+- [x] **Create "Initial" Semester**: Insert a dummy semester into the database to hold all data from before this system existed.
+- [x] **Write Data Migration Script** (`scripts/migrate-historical-semesters.ts`):
     - Retrieve the "Initial" semester ID.
     - Run `prisma.event.updateMany({ where: { semesterId: null }, data: { semesterId: initialId } })`.
-- [ ] **Execute script in staging & production**.
-- [ ] **Lock Schema (Optional)**: Update `schema.prisma` to make `semesterId` strictly required on Event (`String` instead of `String?`), generate, and run final migration.
+- [x] **Execute script in staging & production**.
+- [x] **Lock Schema (Optional)**: Update `schema.prisma` to make `semesterId` strictly required on Event (`String` instead of `String?`), generate, and run final migration.
 
 ---
 
 ## 8. Analytics & Reporting UI (Multi-Semester)
-- [ ] **Dashboard Metrics (GET `/api/analytics`)**:
+- [x] **Dashboard Metrics (GET `/api/analytics`)**:
     - Update backend aggregation to strictly group/filter by the context `semesterId`.
     - Calculate and return: Total events, total attendances, unique attendees.
     - Return `SemesterCommitment` breakdowns for the requested semester.
-- [ ] **Frontend**: Update dashboard charts to react to the global Context dropdown. Compare across semesters (e.g., Spring vs Fall) using side-by-side or line chart UI components.
+- [x] **Frontend**: Update dashboard charts to react to the global Context dropdown. Compare across semesters (e.g., Spring vs Fall) using side-by-side or line chart UI components.
 - [ ] **Add export options**: Integrate a library (like `jspdf` or `csv-writer`) to download the filtered table views.
 
 ---
