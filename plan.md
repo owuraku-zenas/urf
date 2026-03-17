@@ -1,4 +1,4 @@
-# Church Membership & Attendance Tracking App: Comprehensive Feature Extension Plan
+# Church Membership & Attendance Tracking App: Exhaustive Feature Extension Plan
 
 ## 0. Environment & Database Separation (Complete)
 - [x] **Set up dedicated development and testing databases** (e.g., `urf_dev`, `urf_test`) to avoid impacting production data.
@@ -11,7 +11,7 @@
 ---
 
 ## Purpose
-This plan outlines the steps to extend the current church management system with robust semester-based tracking, analytics, and SMS automation. This document has been heavily expanded to be highly specific regarding database relationships, full CRUD (Create, Read, Update, Delete) implementation, and data migrations.
+This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current church management system with robust semester-based tracking, analytics, and SMS automation. Every single model relationship, API route, and frontend component adjustment required for full CRUD compatibility is detailed below.
 
 ---
 
@@ -35,25 +35,36 @@ This plan outlines the steps to extend the current church management system with
 
 ---
 
-## 3. Database Schema: Relational Expansion
-*These steps are critical for permanently linking all app data to specific semesters.*
+## 3. Database Schema: Exhaustive Relational Expansion
+*These steps permanently link all core domain entities (Events, Attendance, Members) to the Semester system.*
 
-- [ ] **Establish `Semester` <-> `Attendance` Relationship:**
-    - Update `Attendance` model in `schema.prisma`.
-    - Add field `semesterId String?`.
-    - Add relation: `semester Semester? @relation(fields: [semesterId], references: [id])`.
-    - *(Optional but recommended)* Make `semesterId` required after initial data migration.
-- [ ] **Establish `Semester` <-> `Event` Relationship:**
-    - Since attendance is tied to events, update `Event` model in `schema.prisma`.
-    - Add field `semesterId String?`.
-    - Add relation: `semester Semester? @relation(fields: [semesterId], references: [id])`.
-- [ ] **Establish `Semester` <-> `Member` Relationship (For Commitment tracking):**
-    - Create a new join model `SemesterCommitment` to track a member's status per semester.
-    - Fields: `id`, `memberId`, `semesterId`, `status` (COMMITTED, UNCOMMITTED, AT_RISK), `overrideReason` (if admin overrides).
-    - Establish relations to both `Member` and `Semester`.
-- [ ] **Run Prisma Migrations:**
-    - Run `npx prisma migrate dev --name add-semester-relations`.
-    - Generate prisma client `npx prisma generate`.
+### A. The `Event` <-> `Semester` Relationship
+- [ ] Add `semesterId String?` to the `Event` model in `schema.prisma`.
+- [ ] Establish relation: `semester Semester? @relation(fields: [semesterId], references: [id])` inside the `Event` model.
+- [ ] Update `Semester` model to include a reverse relation: `events Event[]`.
+
+### B. The `Attendance` <-> `Semester` Relationship
+- [ ] Add `semesterId String?` to the `Attendance` model in `schema.prisma`.
+- [ ] Establish relation: `semester Semester? @relation(fields: [semesterId], references: [id])` inside the `Attendance` model.
+- [ ] Update `Semester` model to include a reverse relation: `attendances Attendance[]`.
+
+### C. The `Member` <-> `Semester` Relationship (SemesterCommitment)
+*Members exist across semesters, but their "commitment level" changes per semester. We need a join table.*
+- [ ] Create new model `SemesterCommitment`.
+- [ ] Add fields: 
+  - `id String @id @default(cuid())`
+  - `memberId String`
+  - `semesterId String`
+  - `status CommitmentStatus @default(UNCOMMITTED)` (Enum: COMMITTED, UNCOMMITTED, AT_RISK)
+  - `overrideReason String?`
+  - `createdAt DateTime @default(now())`
+  - `updatedAt DateTime @updatedAt`
+- [ ] Establish relations to `Member` and `Semester`.
+- [ ] Add compound unique constraint: `@@unique([memberId, semesterId])` to ensure one commitment record per member per semester.
+
+### D. Run Migrations
+- [ ] Run `npx prisma migrate dev --name add-exhaustive-semester-relations`.
+- [ ] Run `npx prisma generate` to update the TypeScript client.
 
 ---
 
@@ -65,60 +76,92 @@ This plan outlines the steps to extend the current church management system with
 
 ---
 
-## 5. Attendance & Event CRUD Optimization
-- [ ] **Create/Update Event (Backend)**: Modify `POST /api/events` and `PATCH /api/events/[id]` to require and save `semesterId`.
-- [ ] **Create/Update Attendance (Backend)**: Modify attendance logging logic to automatically attach the `active` (or currently selected) `semesterId` to every new `Attendance` record.
-- [ ] **Read Events & Attendance (Backend)**: Update `GET` queries to accept a `semesterId` query parameter, filtering out data from outside the selected semester window.
-- [ ] **Auto-calculate commitment status** per member per semester (committed, uncommitted, below threshold).
-- [ ] **Implement attendance thresholds** (configurable per semester).
-- [ ] **Allow admin override** of commitment status, with logging (admin_id, timestamp, reason).
-- [ ] **Update UI (Frontend)**: Update the events calendar and attendance logging pages to explicitly show the active semester they are recording against.
+## 5. Exhaustive CRUD Updates for Existing Models
+
+### A. Event CRUD Updates
+- [ ] **Create (POST `/api/events`)**: 
+  - Update validation schema to require `semesterId`.
+  - Pass `semesterId` payload to `prisma.event.create()`.
+- [ ] **Read (GET `/api/events`)**: 
+  - Accept `?semesterId=xyz` parameter.
+  - Update `prisma.event.findMany()` where clause to filter by `semesterId`.
+- [ ] **Update (PATCH `/api/events/[id]`)**: 
+  - Allow `semesterId` to be updated if an event was miscategorized.
+- [ ] **Frontend**: Update the Event Creation modal/form to include a hidden field or automatic assignment of the currently active/selected semester from Context.
+
+### B. Attendance CRUD Updates
+- [ ] **Create (POST `/api/attendance`)**:
+  - Update logic to extract `semesterId` from the associated `Event`.
+  - Save `semesterId` explicitly in the `Attendance` record for faster querying.
+- [ ] **Read (GET `/api/attendance`)**:
+  - Update queries to filter by `semesterId`.
+- [ ] **Delete/Update**: No major relational changes, but ensure cascading deletes do not break commitment calculations.
+- [ ] **Frontend**: Ensure attendance lists only show attendance for the currently selected semester.
+
+### C. Member Classification & Level Tracking
+- [ ] **Update Member Model**: Add `admissionYear String?` and `currentAcademicLevel String?` to the Member schema.
+- [ ] **Member Creation (POST `/api/members`)**: Add `admissionYear` and `currentAcademicLevel` to the creation payload.
+- [ ] **Member Update (PATCH `/api/members/[id]`)**: Allow manual overrides of academic levels via the UI.
+- [ ] **Automated Level Progression**: Write a utility function that infers a member's current academic level relative to a given `Semester.academicYear` based on their `admissionYear`.
 
 ---
 
-## 6. Member Classification & Level Tracking
-- [ ] **Track first-time attendees** per service, per semester.
-- [ ] **Add academic level field** to member profiles; infer from admission year and active semester.
-- [ ] **Report new Level 100 members** per semester.
-- [ ] **Update Member CRUD**: Add academic level and admission year to Member Creation (`POST`) and Edit (`PATCH`) forms.
+## 6. Logic: Automated Commitment Calculation
+- [ ] **Define Thresholds**: Store or hardcode (e.g., 70% attendance required) the threshold for "COMMITTED" status.
+- [ ] **Create Calculation Service**: Write a backend utility (`lib/commitment.ts`) that:
+  - Takes a `memberId` and `semesterId`.
+  - Counts total events in that semester.
+  - Counts total attendances for that member in that semester.
+  - Calculates percentage.
+  - Upserts `SemesterCommitment` setting status to `COMMITTED`, `UNCOMMITTED`, or `AT_RISK`.
+- [ ] **Trigger Automation**: Call this calculation service after every `POST /api/attendance` creation or deletion.
+- [ ] **Admin Override (PATCH `/api/commitments`)**: Build endpoint for admins to manually set `status` and `overrideReason`.
 
 ---
 
 ## 7. Data Migration: Historical Cleanup
 *Before enforcing `semesterId` as mandatory on Attendance/Event tables, historical data must be cleaned.*
 
-- [ ] **Create a "Legacy" or "Initial" Semester** in the database.
-- [ ] **Write a Node.js data migration script** (`scripts/migrate-historical-semesters.ts`):
-    - Find all `Event` records missing a `semesterId`. Assign them to the Legacy semester (or map them based on their exact `date` if previous semester dates are known).
-    - Find all `Attendance` records missing a `semesterId` and do the same.
-- [ ] **Execute migration script in production/staging**.
-- [ ] *(Optional)* Update `schema.prisma` to make `semesterId` strictly required (`String` instead of `String?`), then create a final migration.
+- [ ] **Create "Initial" Semester**: Insert a dummy semester into the database to hold all data from before this system existed.
+- [ ] **Write Data Migration Script** (`scripts/migrate-historical-semesters.ts`):
+    - Retrieve the "Initial" semester ID.
+    - Run `prisma.event.updateMany({ where: { semesterId: null }, data: { semesterId: initialId } })`.
+    - Run `prisma.attendance.updateMany({ where: { semesterId: null }, data: { semesterId: initialId } })`.
+- [ ] **Execute script in staging & production**.
+- [ ] **Lock Schema (Optional)**: Update `schema.prisma` to make `semesterId` strictly required (`String` instead of `String?`), generate, and run final migration.
 
 ---
 
 ## 8. Analytics & Reporting UI (Multi-Semester)
-- [ ] **Update Dashboards (Read/GET)** to dynamically fetch data based on the Global Semester Context `id`:
-    - Show totals: Total events, total attendances, unique attendees.
-    - Show commitment breakdowns.
-    - Compare across semesters (e.g., Spring vs Fall).
-- [ ] **Add export options** (PDF, CSV) for all reports.
+- [ ] **Dashboard Metrics (GET `/api/analytics`)**:
+    - Update backend aggregation to strictly group/filter by the context `semesterId`.
+    - Calculate and return: Total events, total attendances, unique attendees.
+    - Return `SemesterCommitment` breakdowns for the requested semester.
+- [ ] **Frontend**: Update dashboard charts to react to the global Context dropdown. Compare across semesters (e.g., Spring vs Fall) using side-by-side or line chart UI components.
+- [ ] **Add export options**: Integrate a library (like `jspdf` or `csv-writer`) to download the filtered table views.
 
 ---
 
 ## 9. Birth Date Handling & Automation
-- [ ] **Update Member Schema**: Store only day and month for birth dates (no year).
-- [ ] **Add disclaimer in UI** for birth date entry.
-- [ ] **Implement daily birthday check job** (backend script or cron job).
-- [ ] **Send birthday SMS and notify admins** on dashboard.
+- [ ] **UI Update**: Change frontend date picker to only request `Month` and `Day` with a visual disclaimer about privacy.
+- [ ] **Schema Update**: Ensure `dateOfBirth` doesn't strictly depend on a valid year, or mock the year to `1970` uniformly.
+- [ ] **Cron Job Job**: Implement a daily cron script (using Vercel Cron or GitHub Actions) that queries `prisma.member.findMany` where birth month/day equals today.
+- [ ] **Integration**: Connect Cron result to SMS backend.
 
 ---
 
 ## 10. SMS System
-- [ ] **Build SMS composition UI** with recipient filters (semester, commitment, academic level).
-- [ ] **Integrate with local SMS provider** via API.
-- [ ] **Backend APIs**: Create `POST /api/sms/send` and `GET /api/sms/logs`.
-- [ ] **Support manual and scheduled SMS** (including birthdays and event reminders).
-- [ ] **Show delivery status and logs** in the UI.
+- [ ] **Provider Integration**: Select local provider, store API keys in `.env`, create `lib/sms.ts` wrapper.
+- [ ] **Backend APIs (`/api/sms/send`)**:
+  - Accept payload: `message`, `recipientIds`, `filters`.
+  - Fetch user phone numbers.
+  - Dispatch to provider, return tracking IDs.
+- [ ] **Build SMS UI**:
+  - Create `/admin/sms` page.
+  - Add Member Multi-Select table, with quick-filters for "All Commited", "All Level 100s", "All in active semester".
+  - Text area for composition with character count formatting.
+- [ ] **Logs Model**: Add an `SmsLog` model to prisma to track sent messages and statuses.
+- [ ] **Show Logs UI**: Display delivery history.
 
 ---
 
@@ -130,4 +173,4 @@ This plan outlines the steps to extend the current church management system with
 
 ## 12. Conclusion & Summary
 - All changes must be backward compatible.
-- The core of this structural upgrade relies on establishing explicit Prisma relations to the `Semester` model across `Event`, `Attendance`, and `Member` (via `SemesterCommitment`), allowing for robust, isolated semantic querying across different academic periods.
+- The core of this structural upgrade relies on establishing explicit Prisma relations to the `Semester` model across `Event`, `Attendance`, and `Member` (via `SemesterCommitment`), allowing for robust, isolated semantic querying and accurate reporting across different academic periods.
