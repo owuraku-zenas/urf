@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { useSemester } from "@/context/semester-context"
 
 interface Event {
   id: string
@@ -25,6 +26,7 @@ interface CellGroup {
 }
 
 export default function CellGroupAttendanceChart() {
+  const { selectedSemester } = useSemester()
   const [events, setEvents] = useState<Event[]>([])
   const [cellGroups, setCellGroups] = useState<CellGroup[]>([])
   const [loading, setLoading] = useState(true)
@@ -32,9 +34,10 @@ export default function CellGroupAttendanceChart() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const semesterQuery = selectedSemester ? `?semesterId=${selectedSemester}` : ''
         const [eventsRes, cellGroupsRes] = await Promise.all([
-          fetch('/api/events'),
-          fetch('/api/cell-groups')
+          fetch(`/api/events${semesterQuery}`),
+          fetch(`/api/cell-groups${semesterQuery}`)
         ])
 
         if (!eventsRes.ok || !cellGroupsRes.ok) {
@@ -61,7 +64,7 @@ export default function CellGroupAttendanceChart() {
     }
 
     fetchData()
-  }, [])
+  }, [selectedSemester])
 
   const chartData = events.map(event => {
     const dataPoint: any = {

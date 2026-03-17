@@ -93,6 +93,8 @@ This README serves as a running log of all major changes, migrations, and featur
 - Updated the backend `/api/stats` endpoint to accept an optional `semesterId` query param. The route now strictly aggregates counts and parses new `SemesterCommitment` counters per the given global context.
 - Modified the main `app/page.tsx` dashboard to subscribe to the `useSemester` context hook, meaning the homepage metrics now instantly react and filter mathematically when different semesters are selected from the navigation bar.
 - Appended a new "Commitments" visual card to the frontend grid that maps the number of `COMMITTED`, `AT_RISK`, and `UNCOMMITTED` members for the selected timeframe.
+- Updated all visual React chart components (`MemberGrowthChart`, `CellGroupAttendanceChart`, `EventTypeAnalysisChart`, `InvitationNetworkChart`) to subscribe to the `useSemester` context and accurately reflect dynamic timeframe data.
+- Enforced `semesterId` filters across all specific internal reporting endpoints (`/api/reports/member-growth`, `/api/reports/attendance-trends`, `/api/cell-groups`, `/api/members`) ensuring PDF CSV exports contain accurate timeframe boundaries.
 
 ---
 

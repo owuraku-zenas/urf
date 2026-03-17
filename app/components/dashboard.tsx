@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useEffect, useState } from "react"
+import { useSemester } from "@/context/semester-context"
 import {
   LineChart,
   Line,
@@ -57,6 +58,7 @@ interface CellGroup {
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8']
 
 export default function Dashboard() {
+  const { selectedSemester } = useSemester()
   const [members, setMembers] = useState<Member[]>([])
   const [events, setEvents] = useState<Event[]>([])
   const [cellGroups, setCellGroups] = useState<CellGroup[]>([])
@@ -65,10 +67,11 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const semesterQuery = selectedSemester ? `?semesterId=${selectedSemester}` : ''
         const [membersRes, eventsRes, cellGroupsRes] = await Promise.all([
-          fetch('/api/members'),
-          fetch('/api/events'),
-          fetch('/api/cell-groups')
+          fetch(`/api/members${semesterQuery}`),
+          fetch(`/api/events${semesterQuery}`),
+          fetch(`/api/cell-groups${semesterQuery}`)
         ])
 
         if (!membersRes.ok || !eventsRes.ok || !cellGroupsRes.ok) {
@@ -92,7 +95,7 @@ export default function Dashboard() {
     }
 
     fetchData()
-  }, [])
+  }, [selectedSemester])
 
   // Calculate statistics
   const totalMembers = members?.length || 0

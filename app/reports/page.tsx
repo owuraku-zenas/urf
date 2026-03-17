@@ -11,20 +11,23 @@ import MemberGrowthChart from "../components/member-growth-chart"
 import EventTypeAnalysisChart from "../components/event-type-analysis-chart"
 import InvitationNetworkChart from "../components/invitation-network-chart"
 import { generateReportWithChartsPDF } from "@/lib/pdf-utils"
+import { useSemester } from "@/context/semester-context"
 
 export default function ReportsPage() {
   const [isExporting, setIsExporting] = useState(false)
   const { toast } = useToast()
+  const { selectedSemester } = useSemester()
 
   const handleExport = async () => {
     setIsExporting(true)
     try {
       // Get chart data from the components
+      const semesterQuery = selectedSemester ? `?semesterId=${selectedSemester}` : ''
       const [memberGrowthResponse, attendanceResponse, cellGroupResponse, membersResponse] = await Promise.all([
-        fetch('/api/reports/member-growth'),
-        fetch('/api/reports/attendance-trends'),
-        fetch('/api/cell-groups'),
-        fetch('/api/members')
+        fetch(`/api/reports/member-growth${semesterQuery}`),
+        fetch(`/api/reports/attendance-trends${semesterQuery}`),
+        fetch(`/api/cell-groups${semesterQuery}`),
+        fetch(`/api/members${semesterQuery}`)
       ])
 
       // Check if any of the responses failed

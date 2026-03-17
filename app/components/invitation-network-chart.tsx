@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import dynamic from 'next/dynamic'
+import { useSemester } from "@/context/semester-context"
 
 // Import ForceGraph2D with no SSR and loading fallback
 const ForceGraph2D = dynamic(
@@ -51,6 +52,7 @@ interface GraphData {
 }
 
 export default function InvitationNetworkChart() {
+  const { selectedSemester } = useSemester()
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -60,7 +62,8 @@ export default function InvitationNetworkChart() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/members')
+        const semesterQuery = selectedSemester ? `?semesterId=${selectedSemester}` : ''
+        const response = await fetch(`/api/members${semesterQuery}`)
         if (!response.ok) {
           throw new Error('Failed to fetch members')
         }
@@ -76,7 +79,7 @@ export default function InvitationNetworkChart() {
     }
 
     fetchData()
-  }, [])
+  }, [selectedSemester])
 
   const filteredMembers = members.map(member => ({
     ...member,

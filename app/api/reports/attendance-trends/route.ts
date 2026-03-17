@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const semesterId = searchParams.get("semesterId")
+
     const [events, members] = await Promise.all([
       prisma.event.findMany({
+        where: semesterId ? { semesterId } : undefined,
         include: {
           _count: {
             select: {

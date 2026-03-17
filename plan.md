@@ -127,7 +127,7 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
     - Calculate and return: Total events, total attendances, unique attendees.
     - Return `SemesterCommitment` breakdowns for the requested semester.
 - [x] **Frontend**: Update dashboard charts to react to the global Context dropdown. Compare across semesters (e.g., Spring vs Fall) using side-by-side or line chart UI components.
-- [ ] **Add export options**: Integrate a library (like `jspdf` or `csv-writer`) to download the filtered table views.
+- [x] **Add export options**: Integrate a library (like `jspdf` or `csv-writer`) to download the filtered table views.
 
 ---
 

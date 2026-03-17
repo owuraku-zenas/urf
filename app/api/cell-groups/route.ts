@@ -2,14 +2,17 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/auth"
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const semesterId = searchParams.get("semesterId")
+
     console.log("Fetching cell groups...")
     const cellGroups = await prisma.cellGroup.findMany({
       include: {
         _count: {
           select: {
-            members: true,
+            members: semesterId ? { where: { joinedSemesterId: semesterId } } : true,
           },
         },
       },
