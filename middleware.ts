@@ -36,6 +36,11 @@ export default auth((req) => {
       new URL(`/login?from=${encodeURIComponent(from)}`, req.nextUrl)
     )
   }
+  // Admin only routes protection
+  const isAdminRoute = req.nextUrl.pathname.startsWith("/semesters")
+  if (isAdminRoute && req.auth?.user?.role !== "ADMIN") {
+    return NextResponse.redirect(new URL("/", req.nextUrl))
+  }
 
   return NextResponse.next()
 })

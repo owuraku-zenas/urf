@@ -49,6 +49,7 @@ This README serves as a running log of all major changes, migrations, and featur
 - Added `app/api/semesters/[id]/route.ts` handling `GET`, `PATCH`, and `DELETE` requests.
 - Enforced admin-only authorization on `PATCH` and `DELETE` modifying operations to secure semester records.
 - Completed full CRUD capability for the Semester model.
+- Added Next.js Middleware route protection to ensure `/semesters` pages are only viewable by users with the `ADMIN` role.
 
 ---
 
