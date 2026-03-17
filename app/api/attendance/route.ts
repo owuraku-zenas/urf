@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const semesterId = searchParams.get("semesterId")
+
     const attendances = await prisma.attendance.findMany({
+      where: semesterId ? { event: { semesterId } } : undefined,
       include: {
         event: true,
         member: true,
@@ -24,6 +28,18 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Event ID and member ID are required" },
         { status: 400 }
+      )
+    }
+
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: { semesterId: true }
+    })
+
+    if (!event) {
+      return NextResponse.json(
+        { error: "Event not found" },
+        { status: 404 }
       )
     }
 
@@ -67,6 +83,18 @@ export async function PUT(request: Request) {
       return NextResponse.json(
         { error: "ID, event ID, and member ID are required" },
         { status: 400 }
+      )
+    }
+
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: { semesterId: true }
+    })
+
+    if (!event) {
+      return NextResponse.json(
+        { error: "Event not found" },
+        { status: 404 }
       )
     }
 

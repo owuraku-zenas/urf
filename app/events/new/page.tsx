@@ -13,9 +13,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
+import { useSemester } from "@/context/semester-context"
 
 export default function NewEventPage() {
   const router = useRouter()
+  const { selectedSemester } = useSemester()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -33,6 +35,7 @@ export default function NewEventPage() {
       const formattedData = {
         ...formData,
         date: new Date(formData.date).toISOString(),
+        semesterId: selectedSemester,
       }
 
       const response = await fetch("/api/events", {

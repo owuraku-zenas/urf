@@ -61,6 +61,13 @@ This README serves as a running log of all major changes, migrations, and featur
 
 ---
 
+### [2026-03-17] Event & Attendance CRUD Semester Integration
+- Updated `POST /api/events` and `PATCH /api/events/[id]` to rigidly require and save `semesterId`.
+- Updated `GET /api/events` and `GET /api/attendance` to support a `semesterId` query parameter, filtering out irrelevant historical data.
+- Refactored `app/events/new/page.tsx` event creation form to automatically draw the active `SemesterContext` and attach it to outgoing API requests.
+
+---
+
 ### How to Use This Log
 - Every time a major change is made (e.g., migration, new model, new UI, new API), add a dated entry here.
 - Summarize what was changed, why, and any important notes for future developers or admins.
