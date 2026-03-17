@@ -7,6 +7,8 @@ import { Toaster as SonnerToaster } from "sonner"
 import { cn } from "@/lib/utils"
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { Header } from "@/components/header"
+import { SemesterSelector } from "@/components/semester-selector"
+import { SemesterProvider } from "../context/semester-context"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -21,21 +23,29 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <AuthProvider>
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1 relative">
-              <div className="w-full max-w-7xl mx-auto px-5 py-5">
-                {children}
-              </div>
-            </main>
-          </div>
-          <Toaster />
-          <SonnerToaster />
-        </AuthProvider>
-      </body>
-    </html>
+    <SemesterProvider initialSemester={null}>
+      <html lang="en">
+        <body className={inter.className}>
+          <AuthProvider>
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              <header className="bg-white border-b mb-6 py-4 px-6 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  {/* ...existing nav/logo... */}
+                </div>
+                <SemesterSelector />
+              </header>
+              <main className="flex-1 relative">
+                <div className="w-full max-w-7xl mx-auto px-5 py-5">
+                  {children}
+                </div>
+              </main>
+              <SonnerToaster />
+              <Toaster />
+            </div>
+          </AuthProvider>
+        </body>
+      </html>
+    </SemesterProvider>
   )
 }

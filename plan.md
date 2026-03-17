@@ -1,12 +1,12 @@
 # Church Membership & Attendance Tracking App: Feature Extension Plan
 
-## 0. Environment & Database Separation (Do This First!)
-- [ ] **Set up dedicated development and testing databases** (e.g., `urf_dev`, `urf_test`) to avoid impacting production data.
-- [ ] **Configure environment variables** (`.env.local`, `.env.test`, `.env.production`) for separate database URLs.
-- [ ] **Document how to switch between databases** for development, testing, and production.
-- [ ] **Test your local/dev environment with the new database before making any schema or code changes.**
-- [ ] **Schedule regular database backups** (especially before migrations).
-- [ ] **Test backup and restore procedures** to ensure you can recover from migration errors.
+## 0. Environment & Database Separation (Complete)
+- [x] **Set up dedicated development and testing databases** (e.g., `urf_dev`, `urf_test`) to avoid impacting production data.
+- [x] **Configure environment variables** (`.env.local`, `.env.test`, `.env.production`) for separate database URLs.
+- [x] **Document how to switch between databases** for development, testing, and production.
+- [x] **Test your local/dev environment with the new database before making any schema or code changes.**
+- [x] **Schedule regular database backups** (especially before migrations).
+- [x] **Test backup and restore procedures** to ensure you can recover from migration errors.
 
 ---
 
@@ -23,9 +23,9 @@ This plan outlines the steps to extend the current church management system with
 ---
 
 ## 2. Semester Management
-- [ ] **Design & add Semester model** to the database (Prisma schema):
+- [x] **Design & add Semester model** to the database (Prisma schema):
     - Fields: `id`, `name`, `start_date`, `end_date`, `academic_year`, `status` (active, closed)
-- [ ] **Create admin UI** for listing, creating, and editing semesters.
+ - [x] **Create admin UI** for listing, creating, and editing semesters.
 - [ ] **Enforce only one active semester** and prevent overlapping dates (backend & UI validation).
 - [ ] **Auto-carry forward active members** and reset attendance on new semester creation.
 - [ ] **Lock editing of dates once semester is active.**
@@ -34,10 +34,10 @@ This plan outlines the steps to extend the current church management system with
 ---
 
 ## 3. Semester Selection & Context
-- [ ] **Add semester selector UI** (dropdown or top bar) visible on all analytics/reporting/admin pages.
-- [ ] **Store selected semester in context or global state.**
-- [ ] **Ensure all queries, analytics, and reports use the selected semester as a filter.**
-- [ ] **Default to the active semester on login.**
+- [x] **Add semester selector UI** (dropdown or top bar) visible on all analytics/reporting/admin pages.
+- [x] **Store selected semester in context or global state.**
+- [x] **Ensure all queries, analytics, and reports use the selected semester as a filter.**
+- [x] **Default to the active semester on login.**
 
 ---
 

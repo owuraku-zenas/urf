@@ -11,6 +11,7 @@ import Link from "next/link"
 import { format } from "date-fns"
 import { generateMemberListPDF } from "@/lib/pdf-utils"
 import { useUser } from "@/context/user-context"
+import { useSemester } from "../../context/semester-context"
 
 interface Member {
   id: string
@@ -47,6 +48,7 @@ interface CellGroup {
 
 export default function MembersPage() {
   const { user } = useUser()
+  const { selectedSemester } = useSemester()
   // Debug log to help diagnose user context issues
   console.log("user from useUser:", user)
   const isAdmin = user?.role === "admin" || !user // fallback to true if user is missing (for testing)
@@ -76,7 +78,7 @@ export default function MembersPage() {
     const fetchData = async () => {
       try {
         const [membersRes, cellGroupsRes] = await Promise.all([
-          fetch('/api/members'),
+          fetch(`/api/members?semesterId=${selectedSemester || ""}`),
           fetch('/api/cell-groups')
         ])
 
@@ -99,7 +101,7 @@ export default function MembersPage() {
     }
 
     fetchData()
-  }, [])
+  }, [selectedSemester])
 
   const filteredMembers = members.filter(member => {
     const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
