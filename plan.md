@@ -145,12 +145,12 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
   - Accept payload: `message`, `recipientIds`, `filters`.
   - Fetch user phone numbers.
   - Dispatch to provider, return tracking IDs.
-- [ ] **Build SMS UI**:
+- [x] **Build SMS UI**:
   - Create `/admin/sms` page.
   - Add Member Multi-Select table, with quick-filters for "All Commited", "All Level 100s", "All in active semester".
   - Text area for composition with character count formatting.
 - [x] **Logs Model**: Add an `SmsLog` model to prisma to track sent messages and statuses.
-- [ ] **Show Logs UI**: Display delivery history.
+- [x] **Show Logs UI**: Display delivery history.
 
 ---
 

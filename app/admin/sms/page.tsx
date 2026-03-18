@@ -7,6 +7,11 @@ export const metadata = {
 }
 
 export default async function SmsAdminPage() {
+  const activeSemester = await prisma.semester.findFirst({
+    where: { status: "ACTIVE" },
+    select: { id: true }
+  })
+
   // Fetch members to pass to the client component for the multi-select table
   const members = await prisma.member.findMany({
     where: {
@@ -17,6 +22,7 @@ export default async function SmsAdminPage() {
       name: true,
       phone: true,
       isActive: true,
+      currentAcademicLevel: true,
       cellGroup: {
         select: { name: true }
       },
@@ -48,7 +54,11 @@ export default async function SmsAdminPage() {
         </p>
       </div>
 
-      <SmsDashboard initialMembers={members} initialLogs={logs} />
+      <SmsDashboard 
+        initialMembers={members} 
+        initialLogs={logs} 
+        activeSemesterId={activeSemester?.id || null} 
+      />
     </div>
   )
 }

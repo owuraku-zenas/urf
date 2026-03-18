@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button"
 interface SmsDashboardProps {
   initialMembers: any[]
   initialLogs: any[]
+  activeSemesterId: string | null
 }
 
-export default function SmsDashboard({ initialMembers, initialLogs }: SmsDashboardProps) {
+export default function SmsDashboard({ initialMembers, initialLogs, activeSemesterId }: SmsDashboardProps) {
   const { toast } = useToast()
   
   // State
@@ -18,11 +19,34 @@ export default function SmsDashboard({ initialMembers, initialLogs }: SmsDashboa
   const [message, setMessage] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [activeTab, setActiveTab] = useState<"compose" | "history">("compose")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [filterMode, setFilterMode] = useState<"all" | "committed" | "level100" | "active">("all")
+
+  // Filter members based on search and quick filters
+  const filteredMembers = members.filter(member => {
+    // 1. Search Query
+    if (searchQuery && !member.name.toLowerCase().includes(searchQuery.toLowerCase()) && !member.phone.includes(searchQuery)) {
+      return false
+    }
+    
+    // 2. Quick Filters
+    if (filterMode === "committed") {
+      return member.commitments?.some((c: any) => c.semesterId === activeSemesterId && c.status === "COMMITTED")
+    }
+    if (filterMode === "level100") {
+      return member.currentAcademicLevel === "100"
+    }
+    if (filterMode === "active") {
+      return member.commitments?.some((c: any) => c.semesterId === activeSemesterId)
+    }
+    
+    return true
+  })
 
   // Handlers
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedIds(members.map(m => m.id))
+      setSelectedIds(filteredMembers.map(m => m.id))
     } else {
       setSelectedIds([])
     }
@@ -102,27 +126,58 @@ export default function SmsDashboard({ initialMembers, initialLogs }: SmsDashboa
               <span className="text-sm text-gray-500">{selectedIds.length} selected</span>
             </div>
             
-            {/* Realistically you'd want a search input here */}
+            <div className="p-4 border-b bg-white flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-sm font-medium text-gray-500 mr-1">Filters:</span>
+                <button 
+                  onClick={() => setFilterMode("all")}
+                  className={`px-3 py-1 text-xs rounded-full border ${filterMode === "all" ? "bg-primary text-primary-foreground border-primary" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                >All</button>
+                <button 
+                  onClick={() => setFilterMode("committed")}
+                  className={`px-3 py-1 text-xs rounded-full border ${filterMode === "committed" ? "bg-primary text-primary-foreground border-primary" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                >Committed Only</button>
+                <button 
+                  onClick={() => setFilterMode("level100")}
+                  className={`px-3 py-1 text-xs rounded-full border ${filterMode === "level100" ? "bg-primary text-primary-foreground border-primary" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                >Level 100s</button>
+                <button 
+                  onClick={() => setFilterMode("active")}
+                  className={`px-3 py-1 text-xs rounded-full border ${filterMode === "active" ? "bg-primary text-primary-foreground border-primary" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                >Active Semester</button>
+              </div>
+              <input 
+                type="text" 
+                placeholder="Search name or phone..." 
+                className="text-sm border rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary w-full sm:w-auto"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
 
             <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+              {filteredMembers.length === 0 ? (
+                <div className="p-8 text-center text-gray-500">No members match the current filters.</div>
+              ) : (
               <table className="w-full text-sm text-left">
-                <thead className="text-xs text-gray-500 uppercase bg-gray-50 sticky top-0">
+                <thead className="text-xs text-gray-500 uppercase bg-gray-50 sticky top-0 z-10">
                   <tr>
                     <th className="p-4 w-4">
                       <input 
                         type="checkbox" 
                         className="rounded border-gray-300"
-                        checked={selectedIds.length === members.length && members.length > 0}
+                        checked={selectedIds.length === filteredMembers.length && filteredMembers.length > 0}
                         onChange={handleSelectAll}
                       />
                     </th>
                     <th className="px-6 py-3">Name</th>
                     <th className="px-6 py-3">Phone</th>
+                    <th className="px-6 py-3">Level</th>
                     <th className="px-6 py-3 hidden md:table-cell">Cell Group</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {members.map(member => (
+                  {filteredMembers.map(member => (
                     <tr key={member.id} className="bg-white border-b hover:bg-gray-50">
                       <td className="p-4">
                         <input 
@@ -134,6 +189,7 @@ export default function SmsDashboard({ initialMembers, initialLogs }: SmsDashboa
                       </td>
                       <td className="px-6 py-4 font-medium text-gray-900">{member.name}</td>
                       <td className="px-6 py-4 text-gray-500">{member.phone}</td>
+                      <td className="px-6 py-4 text-gray-500">{member.currentAcademicLevel || "-"}</td>
                       <td className="px-6 py-4 hidden md:table-cell text-gray-500">
                         {member.cellGroup?.name || "-"}
                       </td>
@@ -141,6 +197,7 @@ export default function SmsDashboard({ initialMembers, initialLogs }: SmsDashboa
                   ))}
                 </tbody>
               </table>
+              )}
             </div>
           </div>
         </div>
