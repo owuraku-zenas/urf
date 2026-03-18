@@ -101,6 +101,17 @@ This README serves as a running log of all major changes, migrations, and featur
 - Built a Vercel Cron compatible endpoint at `/api/cron/birthdays` to parse the database locally for UTC matches with the current day and month.
 - Added `vercel.json` to schedule the recurring birthday endpoint execution daily at 8:00 AM UTC.
 
+### [2026-03-18] SMS Notification System & UI Implementation
+- Integrated local SMS provider wrapper in `lib/sms.ts`.
+- Created robust backend endpoint `POST /api/sms/send` to orchestrate batch SMS dispatches.
+- Added `SmsLog` model and `SmsStatus` enum to `schema.prisma` to track delivery history and statuses.
+- Built a comprehensive Admin Dashboard at `/admin/sms` with a multi-select grid, message composer with length calculators, and delivery history table.
+- Implemented quick filters (All, Committed Only, Level 100s, Active Semester) in the SMS Compose tab for targeted messaging.
+
+### [2026-03-18] Exhaustive Semester CRUD Integrations 
+- Verified `Event` model integration with `Semester` is active across APIs.
+- Updated Event Edit UI to allow admins to reassign an event to a different semester if initially miscategorized.
+
 ---
 
 ### How to Use This Log
@@ -111,10 +122,10 @@ This README serves as a running log of all major changes, migrations, and featur
 ---
 
 ## Next Steps
-- [ ] Create and switch to feature branch: `feature/semester-tracking`
-- [ ] Add Semester model to Prisma schema
-- [ ] Update Attendance and Member models for semester support
-- [ ] Implement semester selection UI and context
-- [ ] Update all analytics and reports to be semester-aware
+- [x] Create and switch to feature branch: `feature/semester-tracking`
+- [x] Add Semester model to Prisma schema
+- [x] Update Attendance and Member models for semester support
+- [x] Implement semester selection UI and context
+- [x] Update all analytics and reports to be semester-aware
 
 See `plan.md` for the full roadmap.

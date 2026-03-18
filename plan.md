@@ -39,17 +39,17 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 *These steps permanently link all core domain entities (Events, Attendance, Members) to the Semester system.*
 
 ### A. The `Event` <-> `Semester` Relationship
-- [ ] Add `semesterId String?` to the `Event` model in `schema.prisma`.
-- [ ] Establish relation: `semester Semester? @relation(fields: [semesterId], references: [id])` inside the `Event` model.
-- [ ] Update `Semester` model to include a reverse relation: `events Event[]`.
+- [x] Add `semesterId String?` to the `Event` model in `schema.prisma`.
+- [x] Establish relation: `semester Semester? @relation(fields: [semesterId], references: [id])` inside the `Event` model.
+- [x] Update `Semester` model to include a reverse relation: `events Event[]`.
 
 ### B. The `Attendance` <-> `Semester` Relationship
 *Decided against direct linkage.* Attendance is implicitly linked to a Semester entirely through the `Event` it is attached to. No `semesterId` goes on the `Attendance` model.
 
 ### C. The `Member` <-> `Semester` Relationship
 *Members exist across semesters, but their "commitment level" changes per semester. We need a join table.*
-- [ ] Create new model `SemesterCommitment`.
-- [ ] Add fields: 
+- [x] Create new model `SemesterCommitment`.
+- [x] Add fields: 
   - `id String @id @default(cuid())`
   - `memberId String`
   - `semesterId String`
@@ -57,12 +57,12 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
   - `overrideReason String?`
   - `createdAt DateTime @default(now())`
   - `updatedAt DateTime @updatedAt`
-- [ ] Establish relations to `Member` and `Semester`.
-- [ ] Add compound unique constraint: `@@unique([memberId, semesterId])` to ensure one commitment record per member per semester.
+- [x] Establish relations to `Member` and `Semester`.
+- [x] Add compound unique constraint: `@@unique([memberId, semesterId])` to ensure one commitment record per member per semester.
 
 ### D. Run Migrations
-- [ ] Run `npx prisma migrate dev --name add-exhaustive-semester-relations`.
-- [ ] Run `npx prisma generate` to update the TypeScript client.
+- [x] Run `npx prisma migrate dev --name add-exhaustive-semester-relations`.
+- [x] Run `npx prisma generate` to update the TypeScript client.
 
 ---
 
