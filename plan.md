@@ -140,8 +140,8 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 ---
 
 ## 10. SMS System
-- [ ] **Provider Integration**: Select local provider, store API keys in `.env`, create `lib/sms.ts` wrapper.
-- [ ] **Backend APIs (`/api/sms/send`)**:
+- [x] **Provider Integration**: Select local provider, store API keys in `.env`, create `lib/sms.ts` wrapper.
+- [x] **Backend APIs (`/api/sms/send`)**:
   - Accept payload: `message`, `recipientIds`, `filters`.
   - Fetch user phone numbers.
   - Dispatch to provider, return tracking IDs.
@@ -149,7 +149,7 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
   - Create `/admin/sms` page.
   - Add Member Multi-Select table, with quick-filters for "All Commited", "All Level 100s", "All in active semester".
   - Text area for composition with character count formatting.
-- [ ] **Logs Model**: Add an `SmsLog` model to prisma to track sent messages and statuses.
+- [x] **Logs Model**: Add an `SmsLog` model to prisma to track sent messages and statuses.
 - [ ] **Show Logs UI**: Display delivery history.
 
 ---

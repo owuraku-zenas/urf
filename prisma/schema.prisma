@@ -85,6 +85,7 @@ model Member {
   cellGroup   CellGroup?   @relation(fields: [cellGroupId], references: [id])
   invitedBy   Member?      @relation("MemberInvites", fields: [invitedById], references: [id])
   invitees    Member[]     @relation("MemberInvites")
+  smsLogs     SmsLog[]
   isActive    Boolean      @default(false)
 }
 
@@ -188,5 +189,28 @@ enum CommitmentStatus {
   COMMITTED
   UNCOMMITTED
   AT_RISK
+}
+
+model SmsLog {
+  id             String         @id @default(cuid())
+  recipientId    String?        
+  member         Member?        @relation(fields: [recipientId], references: [id], onDelete: SetNull)
+  phoneNumber    String
+  message        String         @db.Text
+  status         SmsStatus      @default(PENDING) 
+  providerId     String?        
+  errorMessage   String?        @db.Text
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([recipientId])
+  @@index([status])
+}
+
+enum SmsStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
 }
 
