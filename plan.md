@@ -77,15 +77,15 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 ## 5. Exhaustive CRUD Updates for Existing Models
 
 ### A. Event CRUD Updates
-- [ ] **Create (POST `/api/events`)**: 
+- [x] **Create (POST `/api/events`)**: 
   - Update validation schema to require `semesterId`.
   - Pass `semesterId` payload to `prisma.event.create()`.
-- [ ] **Read (GET `/api/events`)**: 
+- [x] **Read (GET `/api/events`)**: 
   - Accept `?semesterId=xyz` parameter.
   - Update `prisma.event.findMany()` where clause to filter by `semesterId`.
-- [ ] **Update (PATCH `/api/events/[id]`)**: 
+- [x] **Update (PATCH `/api/events/[id]`)**: 
   - Allow `semesterId` to be updated if an event was miscategorized.
-- [ ] **Frontend**: Update the Event Creation modal/form to include a hidden field or automatic assignment of the currently active/selected semester from Context.
+- [x] **Frontend**: Update the Event Creation modal/form to include a hidden field or automatic assignment of the currently active/selected semester from Context.
 
 ### B. Member CRUD Updates
 - [x] **Update Member Model**: Add `admissionYear String?` and `currentAcademicLevel String?` to the Member schema.
