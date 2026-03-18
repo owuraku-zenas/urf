@@ -158,16 +158,16 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 *Comprehensive test coverage is required to ensure these critical relational changes do not compromise the integrity of the application.*
 
 ### A. Unit Testing (Backend Logic)
-- [ ] **Setup Test Environment**: Ensure `.env.test` correctly targets `urf_test` database.
-- [ ] **Test Commitment Logic**: Write isolated Jest tests for `lib/commitment.ts`. Provide mock attendance data and assert that the correct threshold triggers the transition between UNCOMMITTED and COMMITTED per semester.
-- [ ] **Test Utility Functions**: Write unit tests for the level progression algorithm (e.g., verifying `admissionYear` 2024 evaluates correctly in `academicYear` 2026).
+- [x] **Setup Test Environment**: Ensure `.env.test` correctly targets `urf_test` database.
+- [x] **Test Commitment Logic**: Write isolated Jest tests for `lib/commitment.ts`. Provide mock attendance data and assert that the correct threshold triggers the transition between UNCOMMITTED and COMMITTED per semester.
+- [x] **Test Utility Functions**: Write unit tests for the level progression algorithm (e.g., verifying `admissionYear` 2024 evaluates correctly in `academicYear` 2026).
 
 ### B. Integration Testing (APIs & Database)
-- [ ] **Semester CRUD API Tests**:
+- [x] **Semester CRUD API Tests**:
   - Test `POST /api/semesters` blocking date overlaps.
   - Test `POST /api/semesters` enforcing single active status.
   - Test Admin authorization bounds (expecting 401s for non-admin users).
-- [ ] **Event & Attendance API Tests**:
+- [x] **Event & Attendance API Tests**:
   - Test `POST /api/events` successfully capturing the provided `semesterId`.
   - Test `POST /api/attendance` correctly inheriting `semesterId` from the active context.
   - Test `GET /api/events` filtering by specific `semesterId` parameters.
