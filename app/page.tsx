@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useSemester } from "@/context/semester-context"
+import { SemesterSelector } from "@/components/semester-selector"
+import UpcomingBirthdays from "@/components/upcoming-birthdays"
 
 interface Stats {
   memberCount: number
@@ -63,13 +65,16 @@ export default function Home() {
   return (
     <main className="flex-1">
       <div className="w-full max-w-7xl mx-auto px-5 py-10">
-        <div className="mb-8 space-y-4">
-          <h1 className="text-3xl sm:text-4xl font-bold">
-            Church Management {stats.activeSemesterName ? `- ${stats.activeSemesterName}` : ""}
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-500">
-            Manage members, events, and attendance {stats.activeSemesterName ? `for ${stats.activeSemesterName}` : "in one place"}
-          </p>
+        <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-4">
+            <h1 className="text-3xl sm:text-4xl font-bold">
+              Church Management {stats.activeSemesterName ? `- ${stats.activeSemesterName}` : ""}
+            </h1>
+            <p className="text-lg sm:text-xl text-gray-500">
+              Manage members, events, and attendance {stats.activeSemesterName ? `for ${stats.activeSemesterName}` : "in one place"}
+            </p>
+          </div>
+          <SemesterSelector />
         </div>
 
         <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -286,6 +291,12 @@ export default function Home() {
                 View Analytics
               </Link>
             </div>
+          </div>
+        </div>
+
+        <div className="mt-8 grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
+          <div className="lg:col-span-1">
+            <UpcomingBirthdays />
           </div>
         </div>
       </div>

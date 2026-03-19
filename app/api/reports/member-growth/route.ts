@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma"
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const semesterId = searchParams.get("semesterId")
+    const rawSemesterId = searchParams.get("semesterId")
+    const semesterId = rawSemesterId === 'all' ? null : rawSemesterId;
 
     // Get all members ordered by creation date, optionally filtered by semester
     const members = await prisma.member.findMany({

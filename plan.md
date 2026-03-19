@@ -203,9 +203,19 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 - [x] **SMS Audit**: Debug `lib/sms.ts` and dispatch endpoints. Ensure Provider integrations and mocked delays aren't blocking payload transmission or falling into silent unhandled rejections.
 - [x] **Core Modules Audit**: Systematically test Attendance, Member Creation, and Event logging flows to identify any previously unimplemented steps or API edge cases causing silent data failures.
 - [x] **Auth & User Management**: Verify user creation flows, role assignment mechanisms (Admin vs User), and general authentication stability.
-## 14. Phase 3: Deep Analytics & Global Insights
+## 14. Phase 3: Deep Analytics, Context UI, & Global Insights
 
-### A. "All Semesters" Global Filter
+### A. Contextual Semester UI (De-globalization)
+- **Header Removal**: Strip the `SemesterSelector` out of the global `components/header.tsx` nav bar. Its absolute/flex positioning clashes significantly with the site's semantic layout.
+- **Context-Specific Re-mounting**: Inject the `SemesterSelector` explicitly into the top-level Page headers only where it is logically required to filter data:
+  - `app/page.tsx` (Dashboard)
+  - `app/reports/page.tsx` (Analytics)
+  - `app/members/page.tsx` 
+  - `app/attendance/page.tsx`
+  - `app/events/page.tsx`
+- Pages like **User Management**, **Admin SMS**, and **Semester Configurations** will no longer render the confusing global filter.
+
+### B. "All Semesters" Global Filter
 - **Semester Context**: Update `SemesterSelector` to include a static "All Semesters" (or `all`) value.
 - **API Relaxation**: Refactor all analytical (`/api/stats`, `/api/reports/*`) and operational (`/api/events`, `/api/members`) endpoints to bypass `semesterId` WHERE clauses when `semesterId === 'all'`, delivering cumulative historical payloads.
 
@@ -217,3 +227,7 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 ### C. Upcoming Birthdays Widget
 - **Dashboard Quick-Glance**: Implement an `<UpcomingBirthdays />` card natively on the main `app/page.tsx` Dashboard. By querying `birthMonth` and `birthDay` against the current UTC date, the system will highlight members whose birthdays fall within the upcoming 7-14 days.
 - **Actionable UI**: Provide a direct 1-click CTA inside the widget to route the admin to the `/admin/sms` composer, automatically pre-filling the birthday member's contact block for quick celebratory outreach.
+
+### D. Workflow & Documentation Enforcement
+- **Continuous Integration**: Ensure that periodic `git commit` operations are executed granularly after every major feature transition (UI separation, chart development, endpoint relaxing).
+- **Living Documentation**: The `README.md` changelog and `docs.md` feature summaries must be updated synchronously alongside functional code pushes to prevent documentation debt.

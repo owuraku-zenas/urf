@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { SemesterSelector } from "@/components/semester-selector"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -83,7 +84,10 @@ export default function EventsPage() {
     <main className="flex-1">
       <div className="w-full max-w-7xl mx-auto px-5 py-10">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold">Church Events</h1>
+          <div className="flex items-center gap-4 flex-wrap">
+            <h1 className="text-2xl sm:text-3xl font-bold">Church Events</h1>
+            <SemesterSelector />
+          </div>
           {isAdmin && (
             <Button asChild className="w-full sm:w-auto">
               <Link href="/events/new">

@@ -5,7 +5,8 @@ import { auth } from "@/auth"
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const semesterId = searchParams.get("semesterId")
+    const rawSemesterId = searchParams.get("semesterId")
+    const semesterId = rawSemesterId === 'all' ? null : rawSemesterId;
 
     console.log("Fetching cell groups...")
     const cellGroups = await prisma.cellGroup.findMany({

@@ -27,6 +27,7 @@ export function SemesterSelector() {
         <SelectValue placeholder="Select Semester" />
       </SelectTrigger>
       <SelectContent>
+        <SelectItem value="all">All Semesters</SelectItem>
         {semesters.map(s => (
           <SelectItem key={s.id} value={s.id}>
             {s.name} {s.status === "ACTIVE" ? "(Active)" : "(Closed)"}

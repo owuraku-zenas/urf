@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
 import { MainNav } from "@/components/main-nav"
-import { SemesterSelector } from "@/components/semester-selector"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,9 +31,6 @@ export function Header() {
           <Link href="/">
             <img src="/church-logo.png" alt="Church Logo" className="h-12 w-auto object-contain" />
           </Link>
-          <div className="hidden sm:block">
-            <SemesterSelector />
-          </div>
         </div>
         {/* Nav - center */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">

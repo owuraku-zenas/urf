@@ -12,18 +12,29 @@ All data within the application is contextualized by Semesters.
 - **Global Semester Context:** The application auto-detects and sets the "Active" semester upon login, but allows users to easily toggle their view to analyze historical data from past closed semesters.
 - **Reporting & Trends:** Attendance data and membership reports automatically filter to reflect the currently selected semester's scope, providing admins with precise organizational insights.
 
-### 2. Role-Based Access Control (RBAC)
-Security and data integrity are central to the application.
-- **Admin Users:** Have explicit and exclusive control over system configurations. Creating new semesters, closing existing ones, and viewing sensitive administrative panels are strictly locked behind Admin boundaries (both UI and API).
-- **Standard Users:** Can utilize the application for daily functioning like logging attendance and viewing metrics, without the risk of accidentally altering global configuration states.
+### 2. Member Management & Tracking
+- **Profiles & Progression**: Full registry of church members tracking complex details like `admissionYear`, `joinedSemesterId`, and computed semantic `academicLevel`.
+- **Commitment Algorithms**: The system dynamically grades members as `COMMITTED`, `AT_RISK`, or `UNCOMMITTED` automatically based on calculated semester attendance ratios.
 
-### 3. Member & Attendance Management
-- Fully integrated databases allowing seamless connection between members and their week-to-week attendance.
+### 3. Attendance & Event Logging
+- **Event Scoping**: Create typed events (Sunday Service, Mid-week, etc.) strictly bound to the active academic semester.
+- **Real-time Attendance**: Record `PRESENT` or `ABSENT` flags per member, which synchronously updates their overall semester commitment standing.
 
-### 4. SMS & Communication Automation
-- Dedicated administrative panels for batch SMS operations to dynamically filtered cell groups, commitments, and demographic subsets.
-- Built-in `Cron Job` algorithms executing fully automated Birthday dispatches mapped seamlessly against real-time membership records.
-- Encrypted "Invitee" password-reset email logic triggered universally upon initial User administrative creation.
+### 4. Cell Group Management
+- **Community Segmentation**: Architect members into specific discrete 'Cell Groups' for pastoral care.
+- **Macro-Tracking**: View attendance metrics, performance, and leaderboards isolated strictly by Cell Group boundaries.
+
+### 5. Deep Reporting & Analytics
+- **Visual Dashboards**: Track real-time growth, event attendance averages, and network invitation trees using interactive Recharts components.
+- **PDF Export Engine**: Generate formal aesthetic offline PDF reports of member directories, global attendance trends, and analytical charts with one click.
+
+### 6. SMS & Communication Automation
+- **Batch Messaging**: Dedicated administrative panels for mass SMS operations targeting dynamically filtered cell groups, commitment tiers, and demographic subsets.
+- **Cron Automations**: Built-in scheduled logic executing fully automated Birthday dispatches mapped seamlessly against real-time membership birth-month arrays.
+- **Secure Invites**: Encrypted password-reset and secure platform invitation emails triggered universally upon initial User administrative creation.
+
+### 7. Role-Based Access Control (RBAC)
+- **Admin Isolation**: Strict middleware and UI rendering lockouts keeping sensitive operations (like Semester configuration, User Management, and SMS blasts) gated solely to verified Admin credentials.
 
 ## Architecture Details
 - **Frontend/Backend:** Built seamlessly with Next.js App Router.

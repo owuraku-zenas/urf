@@ -12,6 +12,7 @@ import { format } from "date-fns"
 import { generateMemberListPDF } from "@/lib/pdf-utils"
 import { useUser } from "@/context/user-context"
 import { useSemester } from "../../context/semester-context"
+import { SemesterSelector } from "@/components/semester-selector"
 
 interface Member {
   id: string
@@ -178,7 +179,10 @@ export default function MembersPage() {
   return (
     <div className="py-10">
       <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <h1 className="text-3xl font-bold">Members</h1>
+        <div className="flex items-center gap-4 flex-wrap">
+          <h1 className="text-3xl font-bold">Members</h1>
+          <SemesterSelector />
+        </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
           <Button onClick={handleExportPDF} className="w-full sm:w-auto">
             <Download className="mr-2 h-4 w-4" />

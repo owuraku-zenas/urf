@@ -10,8 +10,11 @@ import CellGroupAttendanceChart from "../components/cell-group-attendance-chart"
 import MemberGrowthChart from "../components/member-growth-chart"
 import EventTypeAnalysisChart from "../components/event-type-analysis-chart"
 import InvitationNetworkChart from "../components/invitation-network-chart"
+import ComparativeGrowthChart from "@/components/comparative-growth-chart"
+import CommitmentTrendsChart from "@/components/commitment-trends-chart"
 import { generateReportWithChartsPDF } from "@/lib/pdf-utils"
 import { useSemester } from "@/context/semester-context"
+import { SemesterSelector } from "@/components/semester-selector"
 
 export default function ReportsPage() {
   const [isExporting, setIsExporting] = useState(false)
@@ -23,23 +26,25 @@ export default function ReportsPage() {
     try {
       // Get chart data from the components
       const semesterQuery = selectedSemester ? `?semesterId=${selectedSemester}` : ''
-      const [memberGrowthResponse, attendanceResponse, cellGroupResponse, membersResponse] = await Promise.all([
+      const [memberGrowthResponse, attendanceResponse, cellGroupResponse, membersResponse, comparisonResponse] = await Promise.all([
         fetch(`/api/reports/member-growth${semesterQuery}`),
         fetch(`/api/reports/attendance-trends${semesterQuery}`),
         fetch(`/api/cell-groups${semesterQuery}`),
-        fetch(`/api/members${semesterQuery}`)
+        fetch(`/api/members${semesterQuery}`),
+        fetch(`/api/reports/semester-comparison`)
       ])
 
       // Check if any of the responses failed
-      if (!memberGrowthResponse.ok || !attendanceResponse.ok || !cellGroupResponse.ok || !membersResponse.ok) {
+      if (!memberGrowthResponse.ok || !attendanceResponse.ok || !cellGroupResponse.ok || !membersResponse.ok || !comparisonResponse.ok) {
         throw new Error('Failed to fetch data from one or more endpoints')
       }
 
-      const [memberGrowthData, attendanceData, cellGroupData, membersData] = await Promise.all([
+      const [memberGrowthData, attendanceData, cellGroupData, membersData, comparisonData] = await Promise.all([
         memberGrowthResponse.json(),
         attendanceResponse.json(),
         cellGroupResponse.json(),
-        membersResponse.json()
+        membersResponse.json(),
+        comparisonResponse.json()
       ])
 
       // Validate the data
@@ -118,6 +123,14 @@ export default function ReportsPage() {
             label: inviter.name,
             value: inviter.count
           }))
+        },
+        {
+          title: 'Comparative Semester Growth',
+          type: 'bar' as const,
+          data: comparisonData.map((sem: any) => ({
+            label: sem.name,
+            value: sem.membersJoined
+          }))
         }
       ]
 
@@ -166,8 +179,11 @@ export default function ReportsPage() {
   return (
     <main className="flex-1">
       <div className="w-full max-w-7xl mx-auto px-5 py-10">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold">Reports & Analytics</h1>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-4 flex-wrap">
+            <h1 className="text-2xl sm:text-3xl font-bold">Reports & Analytics</h1>
+            <SemesterSelector />
+          </div>
           <Button 
             onClick={handleExport}
             disabled={isExporting}
@@ -182,6 +198,10 @@ export default function ReportsPage() {
           <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
             <MemberGrowthChart />
             <CellGroupAttendanceChart />
+          </div>
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
+            <ComparativeGrowthChart />
+            <CommitmentTrendsChart />
           </div>
           <div className="grid gap-4 sm:gap-6">
             <EventTypeAnalysisChart />

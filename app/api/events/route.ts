@@ -6,7 +6,8 @@ import { auth } from "@/auth"
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const semesterId = searchParams.get("semesterId")
+    const rawSemesterId = searchParams.get("semesterId")
+    const semesterId = rawSemesterId === 'all' ? null : rawSemesterId;
 
     const events = await prisma.event.findMany({
       where: semesterId ? { semesterId } : undefined,
