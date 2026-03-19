@@ -48,6 +48,7 @@ export async function POST(request: Request) {
       data: {
         eventId,
         memberId,
+        ...(body.status && { status: body.status }),
       },
       include: {
         event: true,
@@ -111,6 +112,7 @@ export async function PUT(request: Request) {
       data: {
         eventId,
         memberId,
+        ...(body.status && { status: body.status }),
       },
       include: {
         event: true,

@@ -3,11 +3,9 @@ import { prisma } from "@/lib/prisma";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 
-export async function POST(req: NextRequest, context: { params: { id: string } }) {
+export async function POST(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    const { params } = context;
-    // Await params if necessary (for Next.js 13+ dynamic API routes)
-    const id = typeof params.then === "function" ? (await params).id : params.id;
+    const { id } = await context.params;
     const userId = id;
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {

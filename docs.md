@@ -20,7 +20,10 @@ Security and data integrity are central to the application.
 ### 3. Member & Attendance Management
 - Fully integrated databases allowing seamless connection between members and their week-to-week attendance.
 
-*(More detailed features like SMS automation and specific reporting metrics are part of the ongoing extension and development of this platform).*
+### 4. SMS & Communication Automation
+- Dedicated administrative panels for batch SMS operations to dynamically filtered cell groups, commitments, and demographic subsets.
+- Built-in `Cron Job` algorithms executing fully automated Birthday dispatches mapped seamlessly against real-time membership records.
+- Encrypted "Invitee" password-reset email logic triggered universally upon initial User administrative creation.
 
 ## Architecture Details
 - **Frontend/Backend:** Built seamlessly with Next.js App Router.

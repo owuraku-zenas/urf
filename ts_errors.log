@@ -1,0 +1,25 @@
+app/api/users/[id]/reset-password/route.ts(10,30): error TS2339: Property 'then' does not exist on type '{ id: string; }'.
+app/api/users/change-password/route.ts(15,56): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+app/api/users/change-password/route.ts(25,14): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+app/events/[id]/page.tsx(114,43): error TS2339: Property 'dateOfBirth' does not exist on type '{ id: string; email: string | null; name: string; createdAt: Date; updatedAt: Date; phone: string; birthMonth: number | null; birthDay: number | null; joinDate: Date; ... 10 more ...; isActive: boolean; } & { ...; }'.
+app/events/[id]/page.tsx(114,84): error TS2339: Property 'dateOfBirth' does not exist on type '{ id: string; email: string | null; name: string; createdAt: Date; updatedAt: Date; phone: string; birthMonth: number | null; birthDay: number | null; joinDate: Date; ... 10 more ...; isActive: boolean; } & { ...; }'.
+app/events/[id]/page.tsx(126,32): error TS2345: Argument of type '{ attendance: { member: { email: string; dateOfBirth: string; university: string; program: string; startYear: string; hostel: string; roomNumber: string; createdAt: string; updatedAt: string; id: string; ... 11 more ...; cellGroup: CellGroup; }; ... 6 more ...; eventId: string; }[]; ... 8 more ...; updatedAt: Date; }' is not assignable to parameter of type 'EventWithAttendance'.
+  Property 'semesterId' is missing in type '{ attendance: { member: { email: string; dateOfBirth: string; university: string; program: string; startYear: string; hostel: string; roomNumber: string; createdAt: string; updatedAt: string; id: string; ... 11 more ...; cellGroup: CellGroup; }; ... 6 more ...; eventId: string; }[]; ... 8 more ...; updatedAt: Date; }' but required in type 'EventWithAttendance'.
+app/members/[id]/page.tsx(254,27): error TS2339: Property 'dateOfBirth' does not exist on type 'MemberWithRelations'.
+app/members/[id]/page.tsx(257,61): error TS2339: Property 'dateOfBirth' does not exist on type 'MemberWithRelations'.
+auth.ts(44,11): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(password: string, hash: string): Promise<boolean>', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string'.
+  Overload 2 of 2, '(password: string, hash: string, callback?: Callback<boolean> | undefined, progressCallback?: ProgressCallback | undefined): void', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string'.
+auth.ts(78,9): error TS2322: Type 'unknown' is not assignable to type 'string | undefined'.
+auth.ts(79,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+lib/db.ts(4,7): error TS2451: Cannot redeclare block-scoped variable 'prisma'.
+lib/db.ts(7,30): error TS2339: Property 'prisma' does not exist on type 'typeof globalThis'.
+lib/db.ts(10,14): error TS2339: Property 'prisma' does not exist on type 'typeof globalThis'.
+prisma/seed.ts(1,9): error TS2451: Cannot redeclare block-scoped variable 'PrismaClient'.
+prisma/seed.ts(4,7): error TS2451: Cannot redeclare block-scoped variable 'prisma'.
+scripts/update-member-status.ts(1,9): error TS2451: Cannot redeclare block-scoped variable 'PrismaClient'.
+scripts/update-member-status.ts(3,7): error TS2451: Cannot redeclare block-scoped variable 'prisma'.

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
-export function MainNav() {
+export function MainNav({ isAdmin = false }: { isAdmin?: boolean }) {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -25,6 +25,10 @@ export function MainNav() {
     { href: "/cell-groups", label: "Cell Groups" },
     { href: "/reports", label: "Reports" },
   ]
+  if (isAdmin) {
+    navItems.push({ href: "/semesters", label: "Semesters" })
+    navItems.push({ href: "/admin/sms", label: "SMS Admin" })
+  }
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link

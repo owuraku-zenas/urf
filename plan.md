@@ -186,3 +186,34 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 ## 12. Conclusion & Summary
 - All changes must be backward compatible.
 - The core of this structural upgrade relies on establishing explicit Prisma relations to the `Semester` model across `Event`, `Attendance`, and `Member` (via `SemesterCommitment`), allowing for robust, isolated semantic querying and accurate reporting across different academic periods.
+
+---
+
+## 13. Phase 2: UI/UX Redesign & Functional Audits
+
+### A. Global Semester UI Paradigm
+- [x] **Header Integration**: Relocate or embed `SemesterSelector` directly within the global application Header (`components/header.tsx`). This ensures all users inherently understand what timeframe they are viewing, regardless of the page they swap to.
+- [x] **Intuitive Dashboards**: Update Homepage (`app/page.tsx`) and Analytics endpoints to immediately reflect the explicit name of the Semester chosen, offering visual feedback when the selector changes data bounds.
+
+### B. Navigation Restructure
+- [x] **RBAC Navigation Bar**: Update `components/main-nav.tsx` to read the user's roles. Dynamically include links to `/semesters` and `/admin/sms` ONLY if the user is verified as an `ADMIN`. 
+- [x] **Mobile Sidebar**: Refactor the Next.js `Sheet` mobile navigation to mimic these conditional displays so orphaned pages are fully integrated into the UX loop.
+
+### C. Feature Integrity & Bug Hunting
+- [x] **SMS Audit**: Debug `lib/sms.ts` and dispatch endpoints. Ensure Provider integrations and mocked delays aren't blocking payload transmission or falling into silent unhandled rejections.
+- [x] **Core Modules Audit**: Systematically test Attendance, Member Creation, and Event logging flows to identify any previously unimplemented steps or API edge cases causing silent data failures.
+- [x] **Auth & User Management**: Verify user creation flows, role assignment mechanisms (Admin vs User), and general authentication stability.
+## 14. Phase 3: Deep Analytics & Global Insights
+
+### A. "All Semesters" Global Filter
+- **Semester Context**: Update `SemesterSelector` to include a static "All Semesters" (or `all`) value.
+- **API Relaxation**: Refactor all analytical (`/api/stats`, `/api/reports/*`) and operational (`/api/events`, `/api/members`) endpoints to bypass `semesterId` WHERE clauses when `semesterId === 'all'`, delivering cumulative historical payloads.
+
+### B. Advanced Analytics & Retention Graphs
+- **Semester-over-Semester Comparative Bar Chart**: Create a `<ComparativeGrowthChart />` to map membership size and attendance averages across distinct semesters side-by-side. 
+- **Commitment Ratio Visualization**: Add a `<CommitmentTrendsChart />` to the `/reports` dashboard. For specific semesters, this renders a granular Pie Chart. For "All Semesters", it renders a stacked bar chart mapping the growth/decline of `COMMITTED` vs `AT_RISK` populations over time.
+- **New Believer Growth Velocity**: Expand the existing Member Growth component to optionally display net-new additions specific to the bounding box of the active timeframe.
+
+### C. Upcoming Birthdays Widget
+- **Dashboard Quick-Glance**: Implement an `<UpcomingBirthdays />` card natively on the main `app/page.tsx` Dashboard. By querying `birthMonth` and `birthDay` against the current UTC date, the system will highlight members whose birthdays fall within the upcoming 7-14 days.
+- **Actionable UI**: Provide a direct 1-click CTA inside the widget to route the admin to the `/admin/sms` composer, automatically pre-filling the birthday member's contact block for quick celebratory outreach.

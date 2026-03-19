@@ -14,6 +14,7 @@ interface Stats {
   committedCount: number
   uncommittedCount: number
   atRiskCount: number
+  activeSemesterName?: string | null
 }
 
 export default function Home() {
@@ -63,8 +64,12 @@ export default function Home() {
     <main className="flex-1">
       <div className="w-full max-w-7xl mx-auto px-5 py-10">
         <div className="mb-8 space-y-4">
-          <h1 className="text-3xl sm:text-4xl font-bold">Church Membership Management</h1>
-          <p className="text-lg sm:text-xl text-gray-500">Manage members, events, and attendance in one place</p>
+          <h1 className="text-3xl sm:text-4xl font-bold">
+            Church Management {stats.activeSemesterName ? `- ${stats.activeSemesterName}` : ""}
+          </h1>
+          <p className="text-lg sm:text-xl text-gray-500">
+            Manage members, events, and attendance {stats.activeSemesterName ? `for ${stats.activeSemesterName}` : "in one place"}
+          </p>
         </div>
 
         <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">

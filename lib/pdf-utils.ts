@@ -14,7 +14,8 @@ interface MemberWithCellGroup {
   name: string
   email: string
   phone: string
-  dateOfBirth: string
+  birthMonth?: number | null
+  birthDay?: number | null
   university: string
   program: string
   startYear: string

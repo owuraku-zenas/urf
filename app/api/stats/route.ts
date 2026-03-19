@@ -9,6 +9,12 @@ export async function GET(request: Request) {
     const eventWhere = semesterId ? { semesterId } : undefined;
     const attendanceWhere = semesterId ? { event: { semesterId } } : undefined;
 
+    let activeSemesterName = null;
+    if (semesterId) {
+      const activeSemester = await prisma.semester.findUnique({ where: { id: semesterId } });
+      activeSemesterName = activeSemester?.name || null;
+    }
+
     const [
       memberCount,
       eventCount,
@@ -58,6 +64,7 @@ export async function GET(request: Request) {
       committedCount,
       uncommittedCount,
       atRiskCount,
+      activeSemesterName,
     })
   } catch (error) {
     console.error("Error fetching stats:", error)

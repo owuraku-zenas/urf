@@ -251,10 +251,10 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                     <Phone className="h-4 w-4 text-gray-500" />
                     <span>{member.phone || 'No phone provided'}</span>
                   </div>
-                  {member.dateOfBirth && (
+                  {member.birthMonth && member.birthDay && (
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-gray-500" />
-                      <span>Date of Birth: {new Date(member.dateOfBirth).toLocaleDateString()}</span>
+                      <span>Date of Birth: {member.birthMonth}/{member.birthDay}</span>
                     </div>
                   )}
                   {member.joinDate && (

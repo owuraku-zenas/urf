@@ -41,7 +41,7 @@ export const {
         }
 
         const isPasswordValid = await bcrypt.compare(
-          credentials.password,
+          credentials.password as string,
           user.password
         )
 
@@ -74,10 +74,10 @@ export const {
       return token
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.role = token.role
-        session.user.id = token.id
-        session.user.name = token.name
+      if (token && session.user) {
+        (session.user as any).role = token.role;
+        (session.user as any).id = token.id;
+        (session.user as any).name = token.name;
       }
       return session
     },

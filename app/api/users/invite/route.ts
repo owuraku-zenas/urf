@@ -48,17 +48,21 @@ export async function POST(req: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
     const setPasswordUrl = `${baseUrl}/set-password?token=${token}`;
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
-      to: email,
-      subject: "You're invited! Set your password",
-      html: `<p>Hello ${name},</p>
-        <p>You have been invited to join. Click the link below to set your password:</p>
-        <p><a href="${setPasswordUrl}">${setPasswordUrl}</a></p>
-        <p>This link will expire in 24 hours.</p>`,
-    });
+    if (process.env.EMAIL_SERVER_PASSWORD && process.env.EMAIL_SERVER_HOST !== "EMAIL_SERVER_HOST") {
+      await transporter.sendMail({
+        from: process.env.EMAIL_FROM,
+        to: email,
+        subject: "You're invited! Set your password",
+        html: `<p>Hello ${name},</p>
+          <p>You have been invited to join. Click the link below to set your password:</p>
+          <p><a href="${setPasswordUrl}">${setPasswordUrl}</a></p>
+          <p>This link will expire in 24 hours.</p>`,
+      });
+    } else {
+      console.warn("SMTP credentials missing or mock host found. Email not dispatched. Mock Reset URL:", setPasswordUrl);
+    }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, message: "User invited", resetUrl: process.env.NODE_ENV === "development" ? setPasswordUrl : undefined });
   } catch (err: any) {
     console.error(err);
     return NextResponse.json({ error: "Failed to invite user." }, { status: 500 });
