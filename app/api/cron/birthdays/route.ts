@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { sendSMS } from "@/lib/sms"
 
 export async function GET(request: Request) {
   try {
@@ -31,24 +32,25 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: "No birthdays today.", count: 0 })
     }
 
-    // 4. Map the matches to the upcoming SMS Integration logic
-    const messages = birthdayMembers.map(member => {
-      return {
-        recipient: member.phone,
-        message: `Happy Birthday, ${member.name}! May God bless your new age. Have a wonderful day! - From URF Leadership.`
-      }
-    })
+    // 4. Dispatch SMS using the integrated provider
+    const results = await Promise.all(
+      birthdayMembers.map((member) =>
+        sendSMS({
+          recipientId: member.id,
+          phoneNumber: member.phone,
+          message: `Happy Birthday, ${member.name}! May God bless your new age. Have a wonderful day! - From URF Leadership.`,
+        })
+      )
+    )
 
-    // TODO: Loop through `messages` array and POST to your chosen Ghanaian SMS API Provider (e.g., Hubtel, Arksekel)
-    // Example:
-    // await Promise.all(messages.map(msg => sendSMS(msg.recipient, msg.message)))
+    const successCount = results.filter((res) => res.success).length
 
-    console.log(`Successfully batched ${messages.length} birthday SMS messages.`)
+    console.log(`Successfully dispatched ${successCount}/${birthdayMembers.length} birthday SMS messages.`)
 
     return NextResponse.json({ 
-      message: "Birthday messages batched successfully", 
-      count: messages.length,
-      payload: messages // Removing in production
+      message: "Birthday messages dispatched", 
+      count: successCount,
+      totalAttempted: birthdayMembers.length
     })
 
   } catch (error) {

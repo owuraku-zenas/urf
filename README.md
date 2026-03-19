@@ -112,6 +112,10 @@ This README serves as a running log of all major changes, migrations, and featur
 - Verified `Event` model integration with `Semester` is active across APIs.
 - Updated Event Edit UI to allow admins to reassign an event to a different semester if initially miscategorized.
 
+### [2026-03-19] Birthday CRON SMS Integration
+- Implemented actual SMS dispatch via `lib/sms.ts` inside `api/cron/birthdays/route.ts`, replacing the TODO stub.
+- The script now accurately logs success metrics for the mapped `birthdayMembers` array.
+
 ---
 
 ### How to Use This Log
