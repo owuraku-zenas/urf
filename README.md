@@ -116,6 +116,10 @@ This README serves as a running log of all major changes, migrations, and featur
 - Implemented actual SMS dispatch via `lib/sms.ts` inside `api/cron/birthdays/route.ts`, replacing the TODO stub.
 - The script now accurately logs success metrics for the mapped `birthdayMembers` array.
 
+### [2026-03-19] Completion of plan.md
+- Finished verifying and integrating the outstanding SMS items.
+- Explicitly skipped E2E and migration testing per request, concluding the exhaustively detailed plan execution.
+
 ---
 
 ### How to Use This Log

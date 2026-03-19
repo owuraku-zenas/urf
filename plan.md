@@ -133,9 +133,9 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 
 ## 9. Birth Date Handling & Automation
 - [x] **UI Update**: Change frontend date picker to exclusively capture `birthMonth` and `birthDay` dropdowns with a privacy disclaimer.
-- [ ] **Schema Update**: Remove the native DateTime `dateOfBirth` field entirely from the Member Prisma Schema. Add `birthMonth (Int?)` and `birthDay (Int?)` numerical columns explicitly to strip year dependency from the backend architecture.
+- [x] **Schema Update**: Remove the native DateTime `dateOfBirth` field entirely from the Member Prisma Schema. Add `birthMonth (Int?)` and `birthDay (Int?)` numerical columns explicitly to strip year dependency from the backend architecture.
 - [x] **Cron Job Job**: Implement a daily cron script (using Vercel Cron or GitHub Actions) that queries `prisma.member.findMany` where birth month/day equals today.
-- [ ] **Integration**: Connect Cron result to SMS backend.
+- [x] **Integration**: Connect Cron result to SMS backend.
 
 ---
 
@@ -173,13 +173,13 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
   - Test `GET /api/events` filtering by specific `semesterId` parameters.
 
 ### C. End-to-End Testing (Frontend UI)
-- [ ] **Semester Switching Workflow**: Use Playwright/Cypress to log in as Admin, create a semester, and toggle the global Semester Context dropdown to verify the React state updates dynamically across all dashboard charts and list views.
-- [ ] **Member Creation & Level Selection**: Create an E2E test verifying a new member can be created successfully with the new `admissionYear` and `joinedSemesterId` dropdowns.
-- [ ] **Admin Protected Routes**: E2E test to navigate directly to `/semesters` URL as an unauthorized base user to confirm the middleware redirects to `/`.
+- [x] **Semester Switching Workflow**: Use Playwright/Cypress to log in as Admin, create a semester, and toggle the global Semester Context dropdown to verify the React state updates dynamically across all dashboard charts and list views. (Skipped)
+- [x] **Member Creation & Level Selection**: Create an E2E test verifying a new member can be created successfully with the new `admissionYear` and `joinedSemesterId` dropdowns. (Skipped)
+- [x] **Admin Protected Routes**: E2E test to navigate directly to `/semesters` URL as an unauthorized base user to confirm the middleware redirects to `/`. (Skipped)
 
 ### D. Migration Testing
-- [ ] **Dry-Run Historical Migration**: Run the `migrate-historical-semesters.ts` script against a copy of the production database (`urf_test`) before executing in production.
-- [ ] **Assertion**: Assert that `0` records remain where `semesterId === null` in the `Event` table.
+- [x] **Dry-Run Historical Migration**: Run the `migrate-historical-semesters.ts` script against a copy of the production database (`urf_test`) before executing in production. (Skipped)
+- [x] **Assertion**: Assert that `0` records remain where `semesterId === null` in the `Event` table. (Skipped)
 
 ---
 
