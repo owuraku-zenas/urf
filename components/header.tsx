@@ -25,19 +25,21 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="w-full max-w-7xl mx-auto px-5 flex h-16 items-center relative">
+      <div className="w-full max-w-7xl mx-auto px-5 flex h-16 items-center justify-between gap-4">
         {/* Logo - left */}
-        <div className="flex items-center gap-4 min-w-[200px]">
+        <div className="flex items-center min-w-fit">
           <Link href="/">
             <img src="/church-logo.png" alt="Church Logo" className="h-12 w-auto object-contain" />
           </Link>
         </div>
+        
         {/* Nav - center */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div className="flex-1 flex justify-center">
           <MainNav isAdmin={isAdmin} />
         </div>
+        
         {/* User menu - right */}
-        <div className="flex items-center gap-4 min-w-[120px] ml-auto">
+        <div className="flex items-center min-w-fit ml-auto">
           {session?.user && (
             <DropdownMenu>
               <DropdownMenuTrigger className="focus:outline-none">

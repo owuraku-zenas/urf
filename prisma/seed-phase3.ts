@@ -17,6 +17,14 @@ const academicLevels = ["100", "200", "300", "400", "500", "Masters", "PhD"]
 async function main() {
   console.log("Starting bulk database seed (50 targets)...")
 
+  // 0. Wipe DB
+  await prisma.smsLog.deleteMany({})
+  await prisma.attendance.deleteMany({})
+  await prisma.semesterCommitment.deleteMany({})
+  await prisma.event.deleteMany({})
+  await prisma.member.deleteMany({})
+  await prisma.cellGroup.deleteMany({})
+
   // 1. Create Semesters
   const semestersData = [
     { name: "Fall 2024", academicYear: "2024/2025", startDate: new Date("2024-08-01"), endDate: new Date("2024-12-15"), status: "CLOSED" as const },
@@ -34,7 +42,7 @@ async function main() {
   }
 
   // 2. Create Cell Groups
-  const cellGroupsData = ["Alpha Cell", "Beta Fellowship", "Gamma Group", "Delta Network", "Epsilon Assembly", "Zeta Youth", "Omega House"]
+  const cellGroupsData = ["Diaspora", "Pent", "Volta Hall", "Main Campus"]
   const cellGroups = []
   for (const c of cellGroupsData) {
     const cg = await prisma.cellGroup.upsert({
@@ -107,12 +115,12 @@ async function main() {
   }
 
   // 5. Create Events
-  console.log("Seeding Events...")
+  console.log("Seeding Extensive Events...")
   const eventTypes = ["SUNDAY", "MIDWEEK", "PRAYER", "SPECIAL"] as const;
   const events = [];
   for (const sem of semesters) {
-    for (let i = 1; i <= 8; i++) { // 8 events per semester
-      const eventDate = new Date(sem.startDate.getTime() + (i * 7 * 24 * 60 * 60 * 1000))
+    for (let i = 1; i <= 15; i++) { // 15 events per semester
+      const eventDate = new Date(sem.startDate.getTime() + (i * 4 * 24 * 60 * 60 * 1000))
       events.push(await prisma.event.create({
         data: {
           name: `Week ${i} Service`,
@@ -173,7 +181,32 @@ async function main() {
     }
   }
 
-  console.log("✅ Successfully seeded 50 members, semesters, events, cell groups, and deep attendance logs!")
+  // 7. Generate SMS Logs
+  console.log("Seeding SMS History...")
+  for (const member of members) {
+    if (Math.random() > 0.4) {
+      await prisma.smsLog.create({
+        data: {
+          member: { connect: { id: member.id } },
+          phoneNumber: member.phone,
+          message: `Hello ${member.name.split(" ")[0]}, don't forget our meeting this Friday!`,
+          status: Math.random() > 0.1 ? "DELIVERED" : "FAILED",
+        }
+      })
+    }
+    if (Math.random() > 0.7) {
+      await prisma.smsLog.create({
+        data: {
+          member: { connect: { id: member.id } },
+          phoneNumber: member.phone,
+          message: `Happy Birthday ${member.name.split(" ")[0]}! We celebrate you today!`,
+          status: "DELIVERED",
+        }
+      })
+    }
+  }
+
+  console.log("✅ Successfully seeded 50 members, semesters, events, cell groups, deep attendance logs, and SMS history!")
 }
 
 main()

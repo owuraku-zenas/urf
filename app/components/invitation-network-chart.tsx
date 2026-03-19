@@ -58,6 +58,7 @@ export default function InvitationNetworkChart() {
   const [error, setError] = useState<string | null>(null)
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
+  const [dimensions, setDimensions] = useState({ width: 800, height: 400 })
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,6 +81,19 @@ export default function InvitationNetworkChart() {
 
     fetchData()
   }, [selectedSemester])
+
+  useEffect(() => {
+    const container = document.getElementById('graph-container');
+    if (container) {
+      const updateDimensions = () => {
+        setDimensions({ width: container.offsetWidth, height: container.offsetHeight });
+      };
+      
+      updateDimensions();
+      window.addEventListener('resize', updateDimensions);
+      return () => window.removeEventListener('resize', updateDimensions);
+    }
+  }, [members, startDate, endDate]); // Re-run when data changes in case it shifts layout
 
   const filteredMembers = members.map(member => ({
     ...member,
@@ -165,12 +179,12 @@ export default function InvitationNetworkChart() {
           </div>
         </div>
 
-        <div className="h-[400px] w-full border rounded-lg">
+        <div id="graph-container" className="h-[400px] w-full border rounded-lg overflow-hidden bg-white">
           {typeof window !== 'undefined' && (
-            <div className="w-full h-full">
+            <div className="w-full h-full pointer-events-auto">
               <ForceGraph2D
-                width={document.getElementById('graph-container')?.offsetWidth || 800}
-                height={400}
+                width={dimensions.width}
+                height={dimensions.height}
                 graphData={graphData}
                 nodeLabel="name"
                 nodeRelSize={6}

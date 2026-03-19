@@ -111,6 +111,7 @@ export default function CommitmentTrendsChart() {
             No commitment data logged yet.
           </div>
         ) : (
+          <div className="w-full">
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -133,6 +134,30 @@ export default function CommitmentTrendsChart() {
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="mt-6 space-y-3">
+            <h4 className="text-sm font-medium text-gray-700 border-b pb-2">Status Breakdown</h4>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="bg-green-50 p-3 rounded-lg border border-green-100">
+                <p className="text-2xl font-bold text-green-700">{activeSemesterData?.committed || 0}</p>
+                <p className="text-xs text-green-600 font-medium">Committed</p>
+                <p className="text-[10px] text-green-500 mt-1">≥75% Attendance</p>
+              </div>
+              <div className="bg-orange-50 p-3 rounded-lg border border-orange-100">
+                <p className="text-2xl font-bold text-orange-700">{activeSemesterData?.atRisk || 0}</p>
+                <p className="text-xs text-orange-600 font-medium">At Risk</p>
+                <p className="text-[10px] text-orange-500 mt-1">40-74% Attendance</p>
+              </div>
+              <div className="bg-red-50 p-3 rounded-lg border border-red-100">
+                <p className="text-2xl font-bold text-red-700">{activeSemesterData?.uncommitted || 0}</p>
+                <p className="text-xs text-red-600 font-medium">Uncommitted</p>
+                <p className="text-[10px] text-red-500 mt-1">&lt;40% Attendance</p>
+              </div>
+            </div>
+            <div className="text-xs text-gray-500 text-center mt-2 pt-2">
+              Total Tracked: {(activeSemesterData?.committed || 0) + (activeSemesterData?.atRisk || 0) + (activeSemesterData?.uncommitted || 0)} members
+            </div>
+          </div>
           </div>
         )}
       </CardContent>

@@ -43,7 +43,7 @@ export function MainNav({ isAdmin = false }: { isAdmin?: boolean }) {
   )
 
   return (
-    <div className="w-full max-w-7xl mx-auto">
+    <div className="flex items-center w-full">
       {/* Desktop Navigation */}
       <nav className="hidden md:flex justify-center w-full space-x-4 lg:space-x-6">
         {navItems.map((item) => (
