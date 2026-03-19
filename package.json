@@ -10,7 +10,8 @@
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "ts-node -T prisma/seed.ts",
-    "update-member-status": "ts-node -T scripts/update-member-status.ts"
+    "update-member-status": "ts-node -T scripts/update-member-status.ts",
+    "test:e2e": "playwright test"
   },
   "prisma": {
     "seed": "ts-node -T prisma/seed.ts"
@@ -78,6 +79,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^20",
