@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useSemester } from "../context/semester-context";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
+import { useSession } from "next-auth/react";
 
 interface Semester {
   id: string;
@@ -12,6 +13,8 @@ interface Semester {
 export function SemesterSelector() {
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const { selectedSemester, setSelectedSemester } = useSemester();
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === "ADMIN";
 
   useEffect(() => {
     async function fetchSemesters() {
@@ -21,14 +24,16 @@ export function SemesterSelector() {
     fetchSemesters();
   }, []);
 
+  const visibleSemesters = isAdmin ? semesters : semesters.filter(s => s.status === 'ACTIVE');
+
   return (
-    <Select value={selectedSemester || ""} onValueChange={setSelectedSemester}>
+    <Select value={selectedSemester || ""} onValueChange={setSelectedSemester} disabled={!isAdmin && visibleSemesters.length <= 1}>
       <SelectTrigger className="w-[220px]">
         <SelectValue placeholder="Select Semester" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="all">All Semesters</SelectItem>
-        {semesters.map(s => (
+        {isAdmin && <SelectItem value="all">All Semesters</SelectItem>}
+        {visibleSemesters.map(s => (
           <SelectItem key={s.id} value={s.id}>
             {s.name} {s.status === "ACTIVE" ? "(Active)" : "(Closed)"}
           </SelectItem>

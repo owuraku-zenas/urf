@@ -282,7 +282,7 @@ export const generateAttendanceTrendsPDF = (
 
 export const generateReportWithChartsPDF = async (
   title: string,
-  charts: { title: string; data: any[]; type: 'line' | 'bar' | 'pie' }[],
+  charts: { title: string; data: any[]; type: 'line' | 'bar' | 'pie'; insights?: string[] }[],
   options: ExportOptions
 ) => {
   try {
@@ -523,7 +523,21 @@ export const generateReportWithChartsPDF = async (
         // Add chart image to PDF
         const imgData = canvas.toDataURL('image/png')
         doc.addImage(imgData, 'PNG', 14, yOffset, 180, 100)
-        yOffset += 120
+        yOffset += 110
+
+        // Render textual insights if they exist
+        if (chart.insights && chart.insights.length > 0) {
+           doc.setFontSize(12)
+           doc.setTextColor(50, 50, 50)
+           for (const insight of chart.insights) {
+               const bullet = `• ${insight}`
+               const lines = doc.splitTextToSize(bullet, 180)
+               doc.text(lines, 14, yOffset)
+               yOffset += (lines.length * 6) + 2
+           }
+        }
+        
+        yOffset += 10
 
         // Add new page if we're running out of space
         if (yOffset > 250) {

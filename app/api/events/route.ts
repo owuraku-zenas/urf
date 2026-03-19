@@ -13,6 +13,9 @@ export async function GET(request: Request) {
       where: semesterId ? { semesterId } : undefined,
       include: {
         attendance: {
+          where: {
+            status: 'PRESENT'
+          },
           select: {
             id: true,
             memberId: true,

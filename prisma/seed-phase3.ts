@@ -134,77 +134,69 @@ async function main() {
   }
 
   // 6. Create Attendance & Commitments
-  console.log("Seeding Attendance and Commitments... (This may take a moment)")
+  console.log("Seeding Attendance and Commitments in batches... (Super fast!)")
+  
+  const attendancePayload = []
+  const commitmentPayload = []
+  
   for (const sem of semesters) {
     const semEvents = events.filter(e => e.semesterId === sem.id);
     if (semEvents.length === 0) continue;
 
     for (const member of members) {
-      // Not everyone attended before they joined
       if (sem.startDate < randomElement(semesters).startDate && Math.random() > 0.5) continue;
 
       let attendances = 0;
       for (const ev of semEvents) {
-        // Did they attend? Random chance, biased towards yes
-        const present = Math.random() > 0.3;
+        const present = Math.random() > 0.3; // Bias towards present
         if (present) {
-          attendances++;
-          await prisma.attendance.create({
-            data: {
-              eventId: ev.id,
-              memberId: member.id,
-              status: "PRESENT",
-            }
-          })
+           attendances++;
         }
+        attendancePayload.push({
+           eventId: ev.id,
+           memberId: member.id,
+           status: present ? "PRESENT" : "ABSENT",
+        })
       }
 
-      // Calculate commitment
       const attendanceRatio = attendances / semEvents.length;
       let status: 'COMMITTED' | 'UNCOMMITTED' | 'AT_RISK' = 'UNCOMMITTED';
       if (attendanceRatio >= 0.75) status = 'COMMITTED';
       else if (attendanceRatio >= 0.4) status = 'AT_RISK';
       
-      const existingComm = await prisma.semesterCommitment.findFirst({
-        where: { memberId: member.id, semesterId: sem.id }
+      commitmentPayload.push({
+         memberId: member.id,
+         semesterId: sem.id,
+         status
       })
-
-      if (!existingComm) {
-        await prisma.semesterCommitment.create({
-          data: {
-            memberId: member.id,
-            semesterId: sem.id,
-            status
-          }
-        })
-      }
     }
   }
+
+  await prisma.attendance.createMany({ data: attendancePayload as any })
+  await prisma.semesterCommitment.createMany({ data: commitmentPayload as any })
 
   // 7. Generate SMS Logs
   console.log("Seeding SMS History...")
+  const smsPayload = []
   for (const member of members) {
     if (Math.random() > 0.4) {
-      await prisma.smsLog.create({
-        data: {
-          member: { connect: { id: member.id } },
-          phoneNumber: member.phone,
-          message: `Hello ${member.name.split(" ")[0]}, don't forget our meeting this Friday!`,
-          status: Math.random() > 0.1 ? "DELIVERED" : "FAILED",
-        }
+      smsPayload.push({
+        recipientId: member.id,
+        phoneNumber: member.phone,
+        message: `Hello ${member.name.split(" ")[0]}, don't forget our meeting this Friday!`,
+        status: Math.random() > 0.1 ? "DELIVERED" : "FAILED",
       })
     }
     if (Math.random() > 0.7) {
-      await prisma.smsLog.create({
-        data: {
-          member: { connect: { id: member.id } },
-          phoneNumber: member.phone,
-          message: `Happy Birthday ${member.name.split(" ")[0]}! We celebrate you today!`,
-          status: "DELIVERED",
-        }
+      smsPayload.push({
+        recipientId: member.id,
+        phoneNumber: member.phone,
+        message: `Happy Birthday ${member.name.split(" ")[0]}! We celebrate you today!`,
+        status: "DELIVERED",
       })
     }
   }
+  await prisma.smsLog.createMany({ data: smsPayload as any })
 
   console.log("✅ Successfully seeded 50 members, semesters, events, cell groups, deep attendance logs, and SMS history!")
 }
