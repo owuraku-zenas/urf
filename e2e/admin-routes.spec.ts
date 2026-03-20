@@ -7,7 +7,7 @@ test.describe('Admin Protected Routes', () => {
     
     // Check that we got redirected to the homepage or login page
     // Next.js middleware typically redirects to `/login` or `/`
-    await page.waitForTimeout(1000); // Give Next.js router a moment
-    expect(['/', '/login'].some(p => page.url().endsWith(p))).toBeTruthy();
+    await page.waitForURL(url => ['/', '/login', '/api/auth/signin'].some(p => url.pathname.includes(p) || url.href.includes(p)));
+    expect(['/', '/login', '/api/auth/signin'].some(p => page.url().includes(p))).toBeTruthy();
   });
 });

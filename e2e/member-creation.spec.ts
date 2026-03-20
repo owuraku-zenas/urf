@@ -22,13 +22,19 @@ test.describe('Member Creation & Level Selection', () => {
       await admissionInput.fill('2024');
     }
     
-    const joinedSemesterSelect = page.getByLabel(/joined semester|semester joined/i);
+    // Select required Cell Group
+    const cellGroupSelect = page.locator('select#cellGroupId');
+    if (await cellGroupSelect.isVisible()) {
+      const optionCount = await cellGroupSelect.locator('option').count();
+      if (optionCount > 1) {
+        await cellGroupSelect.selectOption({ index: 1 });
+      }
+    }
+    
+    const joinedSemesterSelect = page.locator('select#joinedSemesterId');
     if (await joinedSemesterSelect.isVisible()) {
-      // Depending on if it's a native select or Radix UI select
-      try {
-        await joinedSemesterSelect.click();
-        await page.getByRole('option').nth(1).click();
-      } catch (e) {
+      const optionCount = await joinedSemesterSelect.locator('option').count();
+      if (optionCount > 1) {
         await joinedSemesterSelect.selectOption({ index: 1 });
       }
     }
@@ -37,7 +43,7 @@ test.describe('Member Creation & Level Selection', () => {
     await page.getByRole('button', { name: /save|create|submit/i }).click();
 
     // Verify redirect or success toast
-    await page.waitForURL(/\/members/);
+    await page.waitForURL(url => url.pathname.endsWith('/members'));
     await expect(page.getByText(/Test E2E Member/i).first()).toBeVisible();
   });
 });

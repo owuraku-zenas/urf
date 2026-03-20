@@ -58,9 +58,6 @@ export default function SmsDashboard({ initialMembers, initialLogs, activeSemest
     if (filterMode === "uncommitted") return !member.commitments || member.commitments.length === 0 || member.commitments.some((c: any) => c.status === "UNCOMMITTED")
     if (filterMode === "level100") return member.currentAcademicLevel === "100"
     if (filterMode === "active") return member.commitments?.some((c: any) => c.semesterId === activeSemesterId)
-    if (filterMode === "active") {
-      return member.commitments?.some((c: any) => c.semesterId === activeSemesterId)
-    }
 
     return true
   })
