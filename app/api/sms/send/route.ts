@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { sendSMS } from "@/lib/sms"
+import crypto from "crypto"
 
 export async function POST(request: Request) {
   try {
@@ -49,12 +50,15 @@ export async function POST(request: Request) {
     // In production, consider queuing heavy SMS blasts (using Redis/BullHQ) to avoid Vercel Function timeouts
     // For smaller church groups (< 500 members), Promise.all simulates this cleanly within Next.js
     
+    const batchId = crypto.randomUUID()
+    
     const results = await Promise.all(
       membersToMessage.map(member => 
         sendSMS({
           recipientId: member.id,
           phoneNumber: member.phone,
-          message: personalizeMessage(message, member.name)
+          message: personalizeMessage(message, member.name),
+          batchId
         })
       )
     )

@@ -36,7 +36,7 @@ export default async function SmsAdminPage() {
 
   // Fetch recent SMS logs
   const logs = await prisma.smsLog.findMany({
-    take: 50,
+    take: 500,
     orderBy: { createdAt: "desc" },
     include: {
       member: {

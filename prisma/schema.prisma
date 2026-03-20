@@ -200,11 +200,13 @@ model SmsLog {
   status         SmsStatus      @default(PENDING) 
   providerId     String?        
   errorMessage   String?        @db.Text
+  batchId        String?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
   @@index([recipientId])
   @@index([status])
+  @@index([batchId])
 }
 
 enum SmsStatus {

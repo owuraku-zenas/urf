@@ -149,8 +149,7 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
   - Create `/admin/sms` page.
   - Add Member Multi-Select table, with quick-filters for "All Commited", "All Level 100s", "All in active semester".
   - Text area for composition with character count formatting.
-- [x] **Logs Model**: Add an `SmsLog` model to prisma to track sent messages and statuses.
-- [x] **Show Logs UI**: Display delivery history.
+- [x] **Show Logs UI**: Display delivery history grouped by transactions (`batchId`) using an accordion interface to collapse and expand individual messages.
 
 ---
 

@@ -5,6 +5,7 @@ export interface SmsPayload {
   recipientId?: string // Optional if sending to a non-member number
   phoneNumber: string
   message: string
+  batchId?: string
 }
 
 export interface SmsProviderResponse {
@@ -28,6 +29,7 @@ export async function sendSMS(payload: SmsPayload): Promise<SmsProviderResponse>
         recipientId: payload.recipientId,
         phoneNumber: payload.phoneNumber,
         message: payload.message,
+        batchId: payload.batchId,
         status: response.success ? SmsStatus.SENT : SmsStatus.FAILED,
         providerId: response.providerId,
         errorMessage: response.error
@@ -45,6 +47,7 @@ export async function sendSMS(payload: SmsPayload): Promise<SmsProviderResponse>
         recipientId: payload.recipientId,
         phoneNumber: payload.phoneNumber,
         message: payload.message,
+        batchId: payload.batchId,
         status: SmsStatus.FAILED,
         errorMessage: error instanceof Error ? error.message : "Unknown critical error"
       }

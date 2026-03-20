@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
 
 interface SmsDashboardProps {
   initialMembers: any[]
@@ -117,6 +118,35 @@ export default function SmsDashboard({ initialMembers, initialLogs, activeSemest
       setIsSending(false)
     }
   }
+
+  // Group logs by batchId
+  const groupedLogs = initialLogs.reduce((acc: Record<string, any>, log) => {
+    const key = log.batchId || `legacy-${log.id}`
+    if (!acc[key]) {
+      acc[key] = {
+        batchId: key,
+        createdAt: log.createdAt,
+        isLegacy: !log.batchId,
+        logs: [],
+        total: 0,
+        sent: 0,
+        failed: 0,
+        delivered: 0,
+        previewMessage: log.message
+      }
+    }
+    acc[key].logs.push(log)
+    acc[key].total += 1
+    if (log.status === "SENT") acc[key].sent += 1
+    else if (log.status === "FAILED") acc[key].failed += 1
+    else if (log.status === "DELIVERED") acc[key].delivered += 1
+    
+    return acc
+  }, {})
+
+  const sortedGroups = Object.values(groupedLogs).sort(
+    (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
 
   return (
     <div className="space-y-6">
@@ -271,45 +301,69 @@ export default function SmsDashboard({ initialMembers, initialLogs, activeSemest
 
       {activeTab === "history" && (
         <div className="border rounded-lg overflow-hidden bg-white shadow-sm p-6">
-          <h3 className="font-semibold text-gray-700 mb-4">Recent Broadasts</h3>
-          {initialLogs.length === 0 ? (
+          <h3 className="font-semibold text-gray-700 mb-4">Recent Broadcasts</h3>
+          {sortedGroups.length === 0 ? (
             <p className="text-gray-500 text-sm">No SMS history recorded yet.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="text-xs text-gray-500 uppercase bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3">Date</th>
-                    <th className="px-6 py-3">Recipient</th>
-                    <th className="px-6 py-3">Phone</th>
-                    <th className="px-6 py-3">Status</th>
-                    <th className="px-6 py-3">Error</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {initialLogs.map(log => (
-                    <tr key={log.id} className="bg-white border-b">
-                      <td className="px-6 py-4 text-gray-500 whitespace-nowrap">
-                        {new Date(log.createdAt).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 font-medium text-gray-900">{log.member?.name || "Unknown"}</td>
-                      <td className="px-6 py-4 text-gray-500">{log.phoneNumber}</td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-1 text-xs rounded-full ${log.status === "SENT" || log.status === "DELIVERED" ? "bg-green-100 text-green-800" :
-                          log.status === "FAILED" ? "bg-red-100 text-red-800" :
-                            "bg-yellow-100 text-yellow-800"
-                          }`}>
-                          {log.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-xs text-red-500 max-w-[200px] truncate" title={log.errorMessage || ""}>
-                        {log.errorMessage || "-"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Accordion type="single" collapsible className="w-full">
+              {sortedGroups.map((group: any) => (
+                <AccordionItem key={group.batchId} value={group.batchId}>
+                  <AccordionTrigger className="hover:no-underline px-4 py-3 bg-gray-50 rounded-md mb-2 border border-gray-100 data-[state=open]:rounded-b-none data-[state=open]:mb-0">
+                    <div className="flex flex-col sm:flex-row justify-between w-full items-start sm:items-center gap-2 pr-4 text-left">
+                      <div>
+                         <span className="font-semibold text-sm">
+                           {new Date(group.createdAt).toLocaleString()}
+                         </span>
+                         <span className="ml-3 text-xs text-gray-500 font-medium">
+                           {group.isLegacy ? "Legacy Dispatch" : "Batch Broadcast"}
+                         </span>
+                         <p className="text-sm text-gray-600 mt-1 truncate max-w-[300px] md:max-w-[500px]">
+                           {group.previewMessage}
+                         </p>
+                      </div>
+                      <div className="flex gap-2 text-xs">
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{group.total} Total</span>
+                        {group.sent + group.delivered > 0 && <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">{group.sent + group.delivered} Success</span>}
+                        {group.failed > 0 && <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full">{group.failed} Failed</span>}
+                      </div>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="border border-t-0 p-0 rounded-b-md mb-2 overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm text-left">
+                        <thead className="text-xs text-gray-500 uppercase border-b bg-gray-50/50">
+                          <tr>
+                            <th className="px-6 py-2">Recipient</th>
+                            <th className="px-6 py-2">Phone</th>
+                            <th className="px-6 py-2">Status</th>
+                            <th className="px-6 py-2">Error</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {group.logs.map((log: any) => (
+                            <tr key={log.id} className="bg-white border-b last:border-0 hover:bg-gray-50">
+                              <td className="px-6 py-3 font-medium text-gray-900">{log.member?.name || "Unknown"}</td>
+                              <td className="px-6 py-3 text-gray-500">{log.phoneNumber}</td>
+                              <td className="px-6 py-3">
+                                <span className={`px-2 py-1 text-xs rounded-full ${log.status === "SENT" || log.status === "DELIVERED" ? "bg-green-100 text-green-800" :
+                                  log.status === "FAILED" ? "bg-red-100 text-red-800" :
+                                    "bg-yellow-100 text-yellow-800"
+                                  }`}>
+                                  {log.status}
+                                </span>
+                              </td>
+                              <td className="px-6 py-3 text-xs text-red-500 max-w-[200px] truncate" title={log.errorMessage || ""}>
+                                {log.errorMessage || "-"}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           )}
         </div>
       )}
