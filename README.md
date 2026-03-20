@@ -140,6 +140,7 @@ This README serves as a running log of all major changes, migrations, and featur
 - Integrated and configured `@playwright/test` to map End-to-End browser workflows for Semester context switching, Admin Protected Routes, and Member Creation.
 - **Note:** The automated Member Creation E2E test was abandoned/marked incomplete because it did not reliably work in headless environments. This issue occurred because Playwright struggled to deterministically await the React state hydration for the dependent `Cell Group` and `Semester` UI dropdowns. Additionally, the strict underlying `zod` regex schemas for empty strings on `email`, `phone`, `admissionYear`, and `startYear` created complex validation race conditions that were prone to timeouts. The form itself operates perfectly during manual QA.
 - **Delivery History Refactoring**: Upgraded the SMS Admin Dashboard to explicitly group database dispatches by bulk transactions (`batchId`). Replaced the flat generic log table with expanding Shadcn `Accordion` components so administrators can review broadcast performance incrementally per blast.
+- **SMS Broadcast Filtering & Tracking**: Added a dynamic "Filter by Cell Group" dropdown to the SMS recipient selection table to easily target specific community segments. Enhanced the Delivery History accordion logs with a new "Message" column to display the exact personalized snippet dispatched to each user. Updated `seed-mock-sms.ts` to procedurally enforce distinct batch sizing (1, 3, 4, 5, 10) for UI stress testing.
 
 ---
 

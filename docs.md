@@ -30,6 +30,7 @@ All data within the application is contextualized by Semesters.
 
 ### 6. SMS & Communication Automation
 - **Batch Messaging**: Dedicated administrative panels for mass SMS operations targeting dynamically filtered cell groups, commitment tiers, and demographic subsets.
+- **Delivery History**: Complete delivery transaction logs grouped dynamically by broadcast batch, containing recipient-specific tracking and personalized message preview snippets.
 - **Cron Automations**: Built-in scheduled logic executing fully automated Birthday dispatches mapped seamlessly against real-time membership birth-month arrays.
 - **Secure Invites**: Encrypted password-reset and secure platform invitation emails triggered universally upon initial User administrative creation.
 

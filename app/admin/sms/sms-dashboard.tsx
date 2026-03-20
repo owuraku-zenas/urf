@@ -24,6 +24,10 @@ export default function SmsDashboard({ initialMembers, initialLogs, activeSemest
   const [activeTab, setActiveTab] = useState<"compose" | "history">("compose")
   const [searchQuery, setSearchQuery] = useState("")
   const [filterMode, setFilterMode] = useState<"all" | "committed" | "at_risk" | "uncommitted" | "level100" | "active">("all")
+  const [selectedCell, setSelectedCell] = useState<string>("all")
+
+  // Extract unique cell groups for the dropdown
+  const uniqueCells = Array.from(new Set(members.map(m => m.cellGroup?.name).filter(Boolean))).sort()
 
   // On Mount Query Overrides
   useEffect(() => {
@@ -53,7 +57,12 @@ export default function SmsDashboard({ initialMembers, initialLogs, activeSemest
       return false
     }
 
-    // 2. Quick Filters
+    // 2. Cell Filter
+    if (selectedCell !== "all" && member.cellGroup?.name !== selectedCell) {
+      return false
+    }
+
+    // 3. Quick Filters
     if (filterMode === "committed") return member.commitments?.some((c: any) => c.status === "COMMITTED")
     if (filterMode === "at_risk") return member.commitments?.some((c: any) => c.status === "AT_RISK")
     if (filterMode === "uncommitted") return !member.commitments || member.commitments.length === 0 || member.commitments.some((c: any) => c.status === "UNCOMMITTED")
@@ -203,13 +212,25 @@ export default function SmsDashboard({ initialMembers, initialLogs, activeSemest
                   className={`px-3 py-1 text-xs rounded-full border ${filterMode === "active" ? "bg-primary text-primary-foreground border-primary" : "bg-white text-gray-600 hover:bg-gray-50"}`}
                 >Active Semester</button>
               </div>
-              <input
-                type="text"
-                placeholder="Search name or phone..."
-                className="text-sm border rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary w-full sm:w-auto"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+              <div className="flex gap-2 w-full sm:w-auto">
+                <select
+                  className="text-sm border rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary w-full sm:w-auto"
+                  value={selectedCell}
+                  onChange={(e) => setSelectedCell(e.target.value)}
+                >
+                  <option value="all">All Cell Groups</option>
+                  {uniqueCells.map(cell => (
+                    <option key={cell as string} value={cell as string}>{cell as string}</option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  placeholder="Search name or phone..."
+                  className="text-sm border rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary w-full sm:w-auto"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
             </div>
 
             <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
@@ -335,6 +356,7 @@ export default function SmsDashboard({ initialMembers, initialLogs, activeSemest
                           <tr>
                             <th className="px-6 py-2">Recipient</th>
                             <th className="px-6 py-2">Phone</th>
+                            <th className="px-6 py-2">Message</th>
                             <th className="px-6 py-2">Status</th>
                             <th className="px-6 py-2">Error</th>
                           </tr>
@@ -344,6 +366,9 @@ export default function SmsDashboard({ initialMembers, initialLogs, activeSemest
                             <tr key={log.id} className="bg-white border-b last:border-0 hover:bg-gray-50">
                               <td className="px-6 py-3 font-medium text-gray-900">{log.member?.name || "Unknown"}</td>
                               <td className="px-6 py-3 text-gray-500">{log.phoneNumber}</td>
+                              <td className="px-6 py-3 text-gray-500 max-w-[200px] truncate" title={log.message}>
+                                {log.message}
+                              </td>
                               <td className="px-6 py-3">
                                 <span className={`px-2 py-1 text-xs rounded-full ${log.status === "SENT" || log.status === "DELIVERED" ? "bg-green-100 text-green-800" :
                                   log.status === "FAILED" ? "bg-red-100 text-red-800" :

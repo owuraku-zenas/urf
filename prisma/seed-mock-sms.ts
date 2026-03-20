@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, SmsStatus } from "@prisma/client"
 import crypto from "crypto"
 
 const prisma = new PrismaClient()
@@ -9,28 +9,32 @@ async function main() {
   // Fetch some members to attach logs to
   const members = await prisma.member.findMany({ take: 15 })
 
-  if (members.length === 0) {
-    console.log("No members found. Add members first before seeding SMS logs.")
-    return
-  }
+  // We want specific batch sizes as requested: 1, 3, 4, 5, 10
+  const batchSizes = [1, 3, 4, 5, 10]
 
-  // Create 3 separate mock broadcast batches
-  for (let i = 0; i < 3; i++) {
+  // Create 5 separate mock broadcast batches
+  for (let i = 0; i < batchSizes.length; i++) {
     const batchId = crypto.randomUUID()
+    const batchSize = batchSizes[i]
     const message = `Mock Broadcast ${i + 1}: Important announcement for {{name}}!`
-    const batchSize = Math.floor(Math.random() * 10) + 5 // Between 5 to 15 recipients
 
-    const payload = members.slice(0, batchSize).map(m => ({
-      recipientId: m.id,
-      phoneNumber: m.phone,
-      batchId: batchId,
-      message: message.replace("{{name}}", m.name.split(" ")[0]),
-      status: Math.random() > 0.15 ? "SENT" : "FAILED", // 85% success simulation
-      errorMessage: Math.random() <= 0.15 ? "Simulated network timeout" : null,
-      createdAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000)) // Random past date within ~115 days
-    }))
+    const payload = Array.from({ length: batchSize }).map((_, idx) => {
+      // Use existing members if available, or fallback to mock phone numbers
+      const member = members.length > 0 ? members[idx % members.length] : null
+      const fakePhone = `024${Math.floor(1000000 + Math.random() * 9000000)}`
+      const name = member ? member.name.split(" ")[0] : `User${idx}`
 
-    // @ts-ignore
+      return {
+        recipientId: member?.id || null,
+        phoneNumber: member?.phone || fakePhone,
+        batchId: batchId,
+        message: message.replace("{{name}}", name),
+        status: Math.random() > 0.15 ? SmsStatus.SENT : SmsStatus.FAILED, // 85% success simulation
+        errorMessage: Math.random() <= 0.15 ? "Simulated network timeout" : null,
+        createdAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000)) // Random past date within ~115 days
+      }
+    })
+
     await prisma.smsLog.createMany({
       data: payload
     })
