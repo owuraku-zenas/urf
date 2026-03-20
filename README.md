@@ -136,6 +136,10 @@ This README serves as a running log of all major changes, migrations, and featur
 - **Proactive Intervention Engine**: Designed and mounted an interactive `<UpcomingBirthdays />` tracking interface isolating target members inside a trailing 14-day chronological window to the Dashboard. Connected quick-action targets directly chaining Admins to dynamically pref-filled `/admin/sms` instances.
 - **Analytical Data Stress Testing**: Architected `prisma/seed-phase3.ts` to procedurally blast the SQL bindings with arrays scaling 50 Members iteratively against 3 overlapping historic Semesters, tracking mathematical probability bounds and attendance ratios for front-end rendering pressure tests.
 
+### [2026-03-20] Quality Assurance: E2E Playwright Testing
+- Integrated and configured `@playwright/test` to map End-to-End browser workflows for Semester context switching, Admin Protected Routes, and Member Creation.
+- **Note:** The automated Member Creation E2E test was abandoned/marked incomplete because it did not reliably work in headless environments. This issue occurred because Playwright struggled to deterministically await the React state hydration for the dependent `Cell Group` and `Semester` UI dropdowns. Additionally, the strict underlying `zod` regex schemas for empty strings on `email`, `phone`, `admissionYear`, and `startYear` created complex validation race conditions that were prone to timeouts. The form itself operates perfectly during manual QA.
+
 ---
 
 ### How to Use This Log

@@ -14,7 +14,8 @@ test.describe('Member Creation & Level Selection', () => {
     
     // Fill out the required member details
     await page.getByLabel(/name/i).fill('Test E2E Member');
-    await page.getByLabel(/phone/i).fill('+233' + Math.floor(Math.random() * 1000000000));
+    await page.getByLabel(/email address/i).fill('test.e2e@example.com');
+    await page.getByLabel(/phone/i).fill('+23359' + Math.floor(1000000 + Math.random() * 9000000));
     
     // Fill the new semantic fields
     const admissionInput = page.getByLabel(/admission year/i);
@@ -22,20 +23,21 @@ test.describe('Member Creation & Level Selection', () => {
       await admissionInput.fill('2024');
     }
     
-    // Select required Cell Group
-    const cellGroupSelect = page.locator('select#cellGroupId');
-    if (await cellGroupSelect.isVisible()) {
-      const optionCount = await cellGroupSelect.locator('option').count();
-      if (optionCount > 1) {
-        await cellGroupSelect.selectOption({ index: 1 });
-      }
+    const startYearInput = page.getByLabel(/start year/i);
+    if (await startYearInput.isVisible()) {
+      await startYearInput.fill('2024');
     }
+    
+    // Wait for the async API responses to populate the required Cell Group select and select it
+    await page.locator('select#cellGroupId').selectOption({ index: 1 });
     
     const joinedSemesterSelect = page.locator('select#joinedSemesterId');
     if (await joinedSemesterSelect.isVisible()) {
-      const optionCount = await joinedSemesterSelect.locator('option').count();
-      if (optionCount > 1) {
-        await joinedSemesterSelect.selectOption({ index: 1 });
+      // Semester is optional, so we only select if options populate
+      try {
+         await joinedSemesterSelect.selectOption({ index: 1 }, { timeout: 2000 });
+      } catch (e) {
+         // Option didn't load or doesn't exist, moving on
       }
     }
 
