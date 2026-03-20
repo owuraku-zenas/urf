@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
 
@@ -14,13 +15,35 @@ export default function SmsDashboard({ initialMembers, initialLogs, activeSemest
   const { toast } = useToast()
 
   // State
+  const searchParams = useSearchParams()
   const [members, setMembers] = useState(initialMembers)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [message, setMessage] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [activeTab, setActiveTab] = useState<"compose" | "history">("compose")
   const [searchQuery, setSearchQuery] = useState("")
-  const [filterMode, setFilterMode] = useState<"all" | "committed" | "level100" | "active">("all")
+  const [filterMode, setFilterMode] = useState<"all" | "committed" | "at_risk" | "uncommitted" | "level100" | "active">("all")
+
+  // On Mount Query Overrides
+  useEffect(() => {
+    const filter = searchParams?.get("filter")
+    const ids = searchParams?.get("ids")
+
+    if (ids) {
+      setSelectedIds(ids.split(","))
+    } else if (filter) {
+      const mode = filter.toLowerCase() as any
+      setFilterMode(mode)
+      
+      const preFiltered = members.filter(member => {
+         if (mode === "committed") return member.commitments?.some((c: any) => c.status === "COMMITTED")
+         if (mode === "at_risk") return member.commitments?.some((c: any) => c.status === "AT_RISK")
+         if (mode === "uncommitted") return !member.commitments || member.commitments.length === 0 || member.commitments.some((c: any) => c.status === "UNCOMMITTED")
+         return true
+      })
+      setSelectedIds(preFiltered.map(m => m.id))
+    }
+  }, [searchParams, members])
 
   // Filter members based on search and quick filters
   const filteredMembers = members.filter(member => {
@@ -30,12 +53,11 @@ export default function SmsDashboard({ initialMembers, initialLogs, activeSemest
     }
 
     // 2. Quick Filters
-    if (filterMode === "committed") {
-      return member.commitments?.some((c: any) => c.semesterId === activeSemesterId && c.status === "COMMITTED")
-    }
-    if (filterMode === "level100") {
-      return member.currentAcademicLevel === "100"
-    }
+    if (filterMode === "committed") return member.commitments?.some((c: any) => c.status === "COMMITTED")
+    if (filterMode === "at_risk") return member.commitments?.some((c: any) => c.status === "AT_RISK")
+    if (filterMode === "uncommitted") return !member.commitments || member.commitments.length === 0 || member.commitments.some((c: any) => c.status === "UNCOMMITTED")
+    if (filterMode === "level100") return member.currentAcademicLevel === "100"
+    if (filterMode === "active") return member.commitments?.some((c: any) => c.semesterId === activeSemesterId)
     if (filterMode === "active") {
       return member.commitments?.some((c: any) => c.semesterId === activeSemesterId)
     }
@@ -136,7 +158,15 @@ export default function SmsDashboard({ initialMembers, initialLogs, activeSemest
                 <button
                   onClick={() => setFilterMode("committed")}
                   className={`px-3 py-1 text-xs rounded-full border ${filterMode === "committed" ? "bg-primary text-primary-foreground border-primary" : "bg-white text-gray-600 hover:bg-gray-50"}`}
-                >Committed Only</button>
+                >Committed</button>
+                <button
+                  onClick={() => setFilterMode("at_risk")}
+                  className={`px-3 py-1 text-xs rounded-full border ${filterMode === "at_risk" ? "bg-yellow-500 text-white border-yellow-500" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                >At Risk</button>
+                <button
+                  onClick={() => setFilterMode("uncommitted")}
+                  className={`px-3 py-1 text-xs rounded-full border ${filterMode === "uncommitted" ? "bg-red-500 text-white border-red-500" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                >Uncommitted</button>
                 <button
                   onClick={() => setFilterMode("level100")}
                   className={`px-3 py-1 text-xs rounded-full border ${filterMode === "level100" ? "bg-primary text-primary-foreground border-primary" : "bg-white text-gray-600 hover:bg-gray-50"}`}

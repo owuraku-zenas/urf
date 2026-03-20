@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Eye, Download } from "lucide-react"
+import { Plus, Eye, Download, MessageSquare } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { format } from "date-fns"
 import { generateMemberListPDF } from "@/lib/pdf-utils"
 import { useUser } from "@/context/user-context"
@@ -50,6 +51,7 @@ interface CellGroup {
 export default function MembersPage() {
   const { user } = useUser()
   const { selectedSemester } = useSemester()
+  const router = useRouter()
   // Debug log to help diagnose user context issues
   console.log("user from useUser:", user)
   const isAdmin = user?.role === "admin" || !user // fallback to true if user is missing (for testing)
@@ -61,6 +63,7 @@ export default function MembersPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCellGroup, setSelectedCellGroup] = useState("all")
   const [selectedStatus, setSelectedStatus] = useState("all")
+  const [selectedCommitment, setSelectedCommitment] = useState("all")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
 
@@ -104,6 +107,11 @@ export default function MembersPage() {
     fetchData()
   }, [selectedSemester])
 
+  const getCommitmentStatus = (member: any) => {
+    if (!member.commitments || member.commitments.length === 0) return 'UNCOMMITTED'
+    return member.commitments[0].status
+  }
+
   const filteredMembers = members.filter(member => {
     const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -112,14 +120,20 @@ export default function MembersPage() {
     const matchesStatus = selectedStatus === 'all' || 
       (selectedStatus === 'active' && member.isActive) ||
       (selectedStatus === 'inactive' && !member.isActive)
+    const matchesCommitment = selectedCommitment === 'all' || getCommitmentStatus(member) === selectedCommitment.toUpperCase()
     
     // Date range filtering
     const memberDate = new Date(member.createdAt)
     const matchesDateRange = (!startDate || memberDate >= new Date(startDate)) &&
       (!endDate || memberDate <= new Date(endDate + 'T23:59:59'))
 
-    return matchesSearch && matchesCellGroup && matchesStatus && matchesDateRange
+    return matchesSearch && matchesCellGroup && matchesStatus && matchesCommitment && matchesDateRange
   })
+
+  // KPI Calculations
+  const committedCount = members.filter(m => getCommitmentStatus(m) === 'COMMITTED').length
+  const atRiskCount = members.filter(m => getCommitmentStatus(m) === 'AT_RISK').length
+  const uncommittedCount = members.filter(m => getCommitmentStatus(m) === 'UNCOMMITTED').length
 
   const handleExportPDF = () => {
     generateMemberListPDF(
@@ -201,6 +215,36 @@ export default function MembersPage() {
         </div>
       </div>
 
+      <div className="grid gap-4 md:grid-cols-3 mb-6">
+        <Card className="bg-green-50/50 border-green-200">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-green-800">Committed Members</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{committedCount}</div>
+            <p className="text-xs text-green-600/80 mt-1">High attendance track</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-yellow-50/50 border-yellow-200">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-yellow-800">At Risk Members</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-yellow-600">{atRiskCount}</div>
+            <p className="text-xs text-yellow-600/80 mt-1">40-74% attendance track</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-red-50/50 border-red-200">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-red-800">Uncommitted Members</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">{uncommittedCount}</div>
+            <p className="text-xs text-red-600/80 mt-1">Below standard tracking</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Member List</CardTitle>
@@ -246,34 +290,70 @@ export default function MembersPage() {
                   <SelectItem value="inactive">Inactive</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-                <Input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full sm:w-[180px]"
-                  placeholder="Start date"
-                />
-                <Input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full sm:w-[180px]"
-                  placeholder="End date"
-                />
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setStartDate("")
-                  setEndDate("")
-                }}
-                className="w-full sm:w-auto"
+              <Select
+                value={selectedCommitment}
+                onValueChange={setSelectedCommitment}
               >
-                Clear Dates
-              </Button>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Commitment Level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Levels</SelectItem>
+                  <SelectItem value="committed">Committed</SelectItem>
+                  <SelectItem value="at_risk">At Risk</SelectItem>
+                  <SelectItem value="uncommitted">Uncommitted</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-4 sm:flex-row justify-between">
+              <div className="flex flex-col gap-4 sm:flex-row">
+                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                  <Input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full sm:w-[180px]"
+                    placeholder="Start date"
+                  />
+                  <Input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full sm:w-[180px]"
+                    placeholder="End date"
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setStartDate("")
+                    setEndDate("")
+                  }}
+                  className="w-full sm:w-auto"
+                >
+                  Clear Dates
+                </Button>
+              </div>
+              
+              {isAdmin && (
+                <Button
+                  onClick={() => {
+                    // Extract exactly what we filtered currently and send their IDs to the SMS dashboard
+                    const memberIds = filteredMembers.map(m => m.id).join(",")
+                    // We can either pass specific IDs or abstract "filter=AT_RISK" bounds if they chose one explicitly. 
+                    // To be safe and precise across ALL random filter combos, we just map out exactly the derived IDs.
+                    const payload = new URLSearchParams()
+                    if (selectedCommitment !== 'all') payload.set("filter", selectedCommitment)
+                    else payload.set("ids", memberIds) // fallback to explicit subset targeting
+                    
+                    router.push(`/admin/sms?${payload.toString()}`)
+                  }}
+                  className="w-full sm:w-auto"
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Mass SMS Filtered
+                </Button>
+              )}
             </div>
           </div>
 
@@ -282,11 +362,11 @@ export default function MembersPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>System State</TableHead>
+                  <TableHead>Commitment</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead className="hidden sm:table-cell">Email</TableHead>
                   <TableHead className="hidden sm:table-cell">Cell Group</TableHead>
-                  <TableHead className="hidden sm:table-cell">Invited By</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -316,13 +396,21 @@ export default function MembersPage() {
                       </TableCell>
                       <TableCell>
                         <span className={member.isActive ? 'text-green-600 font-medium' : 'text-gray-400 font-medium'}>
-                          {member.isActive ? 'Active' : 'Not Active'}
+                          {member.isActive ? 'Active' : 'Offline'}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          getCommitmentStatus(member) === 'COMMITTED' ? 'bg-green-100 text-green-800' :
+                          getCommitmentStatus(member) === 'AT_RISK' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {getCommitmentStatus(member).replace('_', ' ')}
                         </span>
                       </TableCell>
                       <TableCell>{member.phone}</TableCell>
                       <TableCell className="hidden sm:table-cell">{member.email || 'N/A'}</TableCell>
-                      <TableCell className="hidden sm:table-cell">{member.cellGroup?.name || 'No Cell Group'}</TableCell>
-                      <TableCell className="hidden sm:table-cell">{member.invitedBy?.name || 'Not invited by anyone'}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{member.cellGroup?.name || '-'}</TableCell>
                       <TableCell className="text-right">
                         <Link href={`/members/${member.id}`}>
                           <Button variant="outline" size="sm" className="w-full sm:w-auto">

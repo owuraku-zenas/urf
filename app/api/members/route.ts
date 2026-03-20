@@ -12,6 +12,13 @@ export async function GET(request: Request) {
     const members = await prisma.member.findMany({
       where: semesterId ? { joinedSemesterId: semesterId } : undefined,
       include: {
+        commitments: {
+          where: semesterId ? { semesterId } : undefined,
+          select: {
+            status: true,
+            semesterId: true
+          }
+        },
         cellGroup: {
           select: {
             id: true,
