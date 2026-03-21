@@ -32,15 +32,26 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: "No birthdays today.", count: 0 })
     }
 
+    // Fetch the automated birthday template
+    const template = await prisma.smsTemplate.findFirst({
+      where: { type: 'BIRTHDAY' }
+    })
+    
+    // Fallback to hardcoded defaults if a template wasn't seeded or created yet
+    const baseMessage = template?.content || "Happy Birthday, {{name}}! May God bless your new age. Have a wonderful day! - From URF Leadership."
+
     // 4. Dispatch SMS using the integrated provider
     const results = await Promise.all(
-      birthdayMembers.map((member) =>
-        sendSMS({
+      birthdayMembers.map((member) => {
+        const firstName = member.name.split(" ")[0]
+        const personalizedMessage = baseMessage.replace(/\{\{name\}\}/g, firstName)
+        
+        return sendSMS({
           recipientId: member.id,
           phoneNumber: member.phone,
-          message: `Happy Birthday, ${member.name}! May God bless your new age. Have a wonderful day! - From URF Leadership.`,
+          message: personalizedMessage,
         })
-      )
+      })
     )
 
     const successCount = results.filter((res) => res.success).length

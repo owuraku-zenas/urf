@@ -58,31 +58,41 @@ export async function sendSMS(payload: SmsPayload): Promise<SmsProviderResponse>
 }
 
 /**
- * Replace this mock function with the actual API Call to your Ghanaian SMS provider.
+ * Dispatch function using Hubtel SMS API
  */
 async function dispatchToProvider(phone: string, message: string): Promise<SmsProviderResponse> {
-  // --- EXAMPLE HUBTEL IMPLEMENTATION ---
-  // const apiUrl = "https://smsc.hubtel.com/v1/messages/send"
-  // const res = await fetch(`${apiUrl}?clientsecret=${process.env.SMS_SECRET}&clientid=${process.env.SMS_CLIENT_ID}&from=URF&to=${phone}&content=${encodeURIComponent(message)}`)
-  // const data = await res.json()
-  // if (data.status === 'success') return { success: true, providerId: data.messageId }
-  // return { success: false, error: data.message }
+  const clientId = process.env.SMS_CLIENT_ID;
+  const clientSecret = process.env.SMS_SECRET;
+  const senderId = process.env.SMS_SENDER_ID || "URF";
 
-  console.log(`[MOCK SMS] Sending to ${phone}: ${message}`)
-  
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 500))
+  if (!clientId || !clientSecret) {
+    console.error("SMS Provider credentials are not configured in .env");
+    return { success: false, error: "SMS Provider credentials missing" };
+  }
 
-  // Simulate 95% success rate
-  if (Math.random() > 0.05) {
-    return { 
-      success: true, 
-      providerId: `mock-id-${Math.random().toString(36).substring(7)}` 
+  const apiUrl = "https://smsc.hubtel.com/v1/messages/send";
+  const url = `${apiUrl}?clientsecret=${clientSecret}&clientid=${clientId}&from=${senderId}&to=${phone}&content=${encodeURIComponent(message)}`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    
+    // Hubtel often returns status field or MessageId on success
+    if (res.ok && (data.status === '0000' || data.status === 'success' || data.MessageId)) {
+      return { 
+        success: true, 
+        providerId: data.MessageId || data.messageId || `hubtel-${Date.now()}`
+      };
     }
-  } else {
+    
     return { 
       success: false, 
-      error: "Simulated Provider Timeout" 
-    }
+      error: data.message || data.Message || "Failed to send SMS" 
+    };
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Network error" 
+    };
   }
 }

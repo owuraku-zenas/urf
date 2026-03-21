@@ -9,19 +9,21 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 interface SmsDashboardProps {
   initialMembers: any[]
   initialLogs: any[]
+  initialTemplates: any[]
   activeSemesterId: string | null
 }
 
-export default function SmsDashboard({ initialMembers, initialLogs, activeSemesterId }: SmsDashboardProps) {
+export default function SmsDashboard({ initialMembers, initialLogs, initialTemplates, activeSemesterId }: SmsDashboardProps) {
   const { toast } = useToast()
 
   // State
   const searchParams = useSearchParams()
   const [members, setMembers] = useState(initialMembers)
+  const [templates, setTemplates] = useState<any[]>(initialTemplates || [])
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [message, setMessage] = useState("")
   const [isSending, setIsSending] = useState(false)
-  const [activeTab, setActiveTab] = useState<"compose" | "history">("compose")
+  const [activeTab, setActiveTab] = useState<"compose" | "history" | "templates">("compose")
   const [searchQuery, setSearchQuery] = useState("")
   const [filterMode, setFilterMode] = useState<"all" | "committed" | "at_risk" | "uncommitted" | "level100" | "active">("all")
   const [selectedCell, setSelectedCell] = useState<string>("all")
@@ -173,6 +175,12 @@ export default function SmsDashboard({ initialMembers, initialLogs, activeSemest
         >
           Delivery History
         </button>
+        <button
+          onClick={() => setActiveTab("templates")}
+          className={`pb-2 font-medium text-sm transition-colors ${activeTab === "templates" ? "border-b-2 border-primary text-primary" : "text-gray-500 hover:text-gray-900"}`}
+        >
+          Message Templates
+        </button>
       </div>
 
       {activeTab === "compose" && (
@@ -289,9 +297,24 @@ export default function SmsDashboard({ initialMembers, initialLogs, activeSemest
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Message Body
-                </label>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Message Body
+                  </label>
+                  <select
+                    className="text-xs border border-gray-300 rounded p-1 focus:outline-none focus:ring-1 focus:ring-primary text-gray-700 max-w-[150px]"
+                    onChange={(e) => {
+                      const tmpl = templates.find(t => t.id === e.target.value)
+                      if (tmpl) setMessage(tmpl.content)
+                    }}
+                    value="" // Always reset so the same template can be picked again
+                  >
+                    <option value="" disabled>-- Load Template --</option>
+                    {templates.map((t: any) => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                </div>
                 <textarea
                   className="w-full min-h-[200px] rounded-md border border-gray-300 shadow-sm px-4 py-3 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm"
                   placeholder="Type your announcement here... Use {{name}} to personalize."
@@ -390,6 +413,88 @@ export default function SmsDashboard({ initialMembers, initialLogs, activeSemest
               ))}
             </Accordion>
           )}
+        </div>
+      )}
+
+      {activeTab === "templates" && (
+        <div className="border rounded-lg bg-white shadow-sm p-6 max-w-4xl">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-semibold text-gray-700">Message Templates</h3>
+            <Button size="sm" onClick={() => {
+              const name = prompt("Enter Template Name:")
+              if (!name) return
+              const content = prompt("Enter Message Content:\n(Use {{name}} for personalization)")
+              if (!content) return
+              
+              fetch("/api/sms/templates", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, content })
+              }).then(r => r.json()).then(data => {
+                if (data.id) setTemplates([...templates, data].sort((a,b) => a.name.localeCompare(b.name)))
+                toast({ title: "Template created successfully" })
+              }).catch(err => {
+                toast({ title: "Failed to create", variant: "destructive" })
+              })
+            }}>+ New Template</Button>
+          </div>
+          
+          <div className="space-y-4">
+            {templates.map((tmpl: any) => (
+              <div key={tmpl.id} className="border rounded-lg p-4 bg-gray-50 flex flex-col gap-2">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="font-semibold text-sm flex items-center gap-2">
+                      {tmpl.name}
+                      {tmpl.isSystem && <span className="bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded-full inline-block">System</span>}
+                      {tmpl.type === 'BIRTHDAY' && <span className="bg-purple-100 text-purple-800 text-[10px] px-2 py-0.5 rounded-full inline-block">Birthday Cron</span>}
+                    </h4>
+                  </div>
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={() => {
+                        const newName = prompt("Edit Name:", tmpl.name)
+                        if (!newName) return
+                        const newContent = prompt("Edit Content:\n(Use {{name}} for personalization)", tmpl.content)
+                        if (!newContent) return
+                        
+                        fetch(`/api/sms/templates/${tmpl.id}`, {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ name: newName, content: newContent })
+                        }).then(r => r.json()).then(data => {
+                          if (data.id) {
+                            setTemplates(templates.map((t: any) => t.id === data.id ? data : t).sort((a,b) => a.name.localeCompare(b.name)))
+                            toast({ title: "Template saved" })
+                          }
+                        })
+                      }}
+                      className="text-xs font-medium text-blue-600 hover:underline"
+                    >
+                      Edit
+                    </button>
+                    {!tmpl.isSystem && (
+                      <button 
+                        onClick={() => {
+                          if (!confirm(`Are you sure you want to delete '${tmpl.name}'?`)) return
+                          fetch(`/api/sms/templates/${tmpl.id}`, { method: "DELETE" })
+                            .then(() => {
+                              setTemplates(templates.filter((t: any) => t.id !== tmpl.id))
+                              toast({ title: "Template deleted" })
+                            })
+                        }}
+                        className="text-xs font-medium text-red-600 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <p className="text-sm text-gray-600 whitespace-pre-wrap">{tmpl.content}</p>
+              </div>
+            ))}
+            {templates.length === 0 && <p className="text-sm text-gray-500 text-center py-8">No templates created yet. Click New Template to start.</p>}
+          </div>
         </div>
       )}
     </div>

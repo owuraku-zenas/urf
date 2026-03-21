@@ -45,8 +45,8 @@ export async function GET(request: Request) {
     })
     console.log(`Found ${members.length} members:`, JSON.stringify(members, null, 2))
     return NextResponse.json(members)
-  } catch (error) {
-    console.error("Error fetching members:", error)
+  } catch (error: any) {
+    console.log("DB ERROR members GET ->", error?.message || String(error));
     return NextResponse.json(
       { error: "Failed to fetch members" },
       { status: 500 }
@@ -84,7 +84,9 @@ export async function POST(request: Request) {
         birthMonth: birthMonth ? parseInt(birthMonth.toString()) : null,
         birthDay: birthDay ? parseInt(birthDay.toString()) : null,
         joinDate: data.joinDate ? new Date(data.joinDate) : new Date(),
-        joinedSemesterId: joinedSemesterId === "" ? null : joinedSemesterId,
+        joinedSemester: joinedSemesterId ? {
+          connect: { id: joinedSemesterId }
+        } : undefined,
         admissionYear: admissionYear === "" ? null : admissionYear,
         currentAcademicLevel: currentAcademicLevel === "" ? null : currentAcademicLevel,
         cellGroup: {
@@ -102,22 +104,31 @@ export async function POST(request: Request) {
 
     console.log("Created new member:", member)
     return NextResponse.json(member)
-  } catch (error) {
-    console.error("Error creating member:", error)
-    
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2002') {
-        const field = (error.meta?.target as string[])?.[0] ?? 'field'
-        return NextResponse.json(
-          { error: `A member with this ${field} already exists` },
-          { status: 400 }
-        )
-      }
+  } catch (error: any) {
+    console.log(">>>>>>>> DB ERROR ENCOUNTERED <<<<<<<<");
+    console.log(error?.message || String(error));
+    console.log(">>>>>>>> =================== <<<<<<<<");
+
+    // Bypass Next.js console.error overrides which are crashing
+    const errorMessage = error?.message || String(error);
+    const errorCode = error?.code || 'UNKNOWN';
+
+    if (error?.code === 'P2002') {
+      const field = (error?.meta?.target as string[])?.[0] ?? 'field';
+      return NextResponse.json(
+        { error: `A member with this ${field} already exists` },
+        { status: 400 }
+      );
     }
 
     return NextResponse.json(
-      { error: "Failed to create member" },
+      { 
+        error: "Failed to create member", 
+        details: errorMessage,
+        code: errorCode,
+        stack: error?.stack 
+      },
       { status: 500 }
-    )
+    );
   }
 }

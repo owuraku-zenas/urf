@@ -142,6 +142,17 @@ This README serves as a running log of all major changes, migrations, and featur
 - **Delivery History Refactoring**: Upgraded the SMS Admin Dashboard to explicitly group database dispatches by bulk transactions (`batchId`). Replaced the flat generic log table with expanding Shadcn `Accordion` components so administrators can review broadcast performance incrementally per blast.
 - **SMS Broadcast Filtering & Tracking**: Added a dynamic "Filter by Cell Group" dropdown to the SMS recipient selection table to easily target specific community segments. Enhanced the Delivery History accordion logs with a new "Message" column to display the exact personalized snippet dispatched to each user. Updated `seed-mock-sms.ts` to procedurally enforce distinct batch sizing (1, 3, 4, 5, 10) for UI stress testing.
 
+### [2026-03-20] Dynamic SMS Templates Integration
+- **Database Schema Expansion**: Introduced the `SmsTemplate` schema model via Prisma to store custom strings and `BIRTHDAY` system identifiers. Added supporting CRUD functionality at `/api/sms/templates`.
+- **Reusable Broadcast Templates**: Reconstructed the SMS Administrative Dashboard to support a dedicated "Message Templates" UI where users can manage generic reusable snippets. Added a "Load Template" dropdown next to the text composer that instantly injects selected text fields constraints and character counts.
+- **Decoupled Cron Automations**: Refactored the `/api/cron/birthdays` API to fetch the active daily message text securely from the `SmsTemplate` relational queries instead of relying on a hard-coded developer string. This allows complete editorial independence for administrators.
+
+### [2026-03-21] Production Bug Fixes & Hubtel SMS Integration
+- **Hubtel Live Integration**: Replaced the local simulated SMS Provider mockup in `lib/sms.ts` with a fully operational production Hubtel HTTP integration map. Added local environment variables for Client IDs and Secrets securely to `.env`.
+- **API Route Hardening**: Fixed a critical Next.js `500` error overlay bug across `/api/members` and `/api/cell-groups` by discarding unstable `console.error` logs and returning native Prisma database errors as JSON for frontend debugging.
+- **Database Schema Strictness**: Stripped isolated remnants of the legacy `dateOfBirth` property from form data to prevent strict Prisma validation rejections. Re-architected `joinedSemesterId` logic in `app/api/members/route.ts` to utilize robust `connect: { id }` structural mapping.
+- **System Stability**: Resolved aggressive local Prisma Client instance caching issues and connection pool exhaustion caused by Next.js hot-reloads over long sessions.
+
 ---
 
 ### How to Use This Log

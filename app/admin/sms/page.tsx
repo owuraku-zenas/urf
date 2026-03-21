@@ -45,6 +45,11 @@ export default async function SmsAdminPage() {
     }
   })
 
+  // Fetch SMS templates
+  const templates = await prisma.smsTemplate.findMany({
+    orderBy: { name: "asc" }
+  })
+
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="mb-8">
@@ -57,6 +62,7 @@ export default async function SmsAdminPage() {
       <SmsDashboard 
         initialMembers={members} 
         initialLogs={logs} 
+        initialTemplates={templates}
         activeSemesterId={activeSemester?.id || null} 
       />
     </div>

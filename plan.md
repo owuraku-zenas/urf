@@ -230,3 +230,11 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 ### D. Workflow & Documentation Enforcement
 - **Continuous Integration**: Ensure that periodic `git commit` operations are executed granularly after every major feature transition (UI separation, chart development, endpoint relaxing).
 - **Living Documentation**: The `README.md` changelog and `docs.md` feature summaries must be updated synchronously alongside functional code pushes to prevent documentation debt.
+
+---
+
+## 15. Phase 4: Dynamic Communication Templates
+- [x] **Schema Definitions**: Integrate Prisma `SmsTemplate` model mapping `name`, `content`, and protected `isSystem`/`type` markers.
+- [x] **API Endpoints**: Provision explicit CRUD endpoints (`GET/POST /api/sms/templates` and `PATCH/DELETE /api/sms/templates/[id]`) for UI consumption.
+- [x] **Administrative UI Panels**: Extend `sms-dashboard.tsx` with a tertiary "Message Templates" interactive pane mapping generic templates for quick modifications alongside a direct integration into the Message composer text area.
+- [x] **Cron Hooking**: Overhaul `app/api/cron/birthdays/route.ts` to natively query and serialize the protected 'BIRTHDAY' template text seamlessly preventing hard-coded bottlenecks.

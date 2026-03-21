@@ -111,8 +111,8 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
         // Format dates for input fields
         const formattedData = {
           ...memberData,
-          birthMonth: memberData.dateOfBirth ? String(new Date(memberData.dateOfBirth).getUTCMonth() + 1) : "",
-          birthDay: memberData.dateOfBirth ? String(new Date(memberData.dateOfBirth).getUTCDate()) : "",
+          birthMonth: memberData.birthMonth ? String(memberData.birthMonth) : "",
+          birthDay: memberData.birthDay ? String(memberData.birthDay) : "",
           joinDate: memberData.joinDate ? new Date(memberData.joinDate).toISOString().split('T')[0] : "",
           isActive: memberData.isActive ?? false,
           admissionYear: memberData.admissionYear ?? "",
@@ -200,15 +200,9 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
         throw new Error("Please fix the form errors")
       }
 
-      // Mock the year to 1970 for privacy (only storing month and day)
-      let finalDateOfBirth = null;
-      if (formData.birthMonth && formData.birthDay) {
-        finalDateOfBirth = `1970-${formData.birthMonth.padStart(2, '0')}-${formData.birthDay.padStart(2, '0')}T00:00:00.000Z`
-      }
-
-      // Strip UI-only fields and inject database model constraints
+      // Include month and day in payload
       const { birthMonth, birthDay, ...submitData } = formData;
-      const apiPayload = { ...submitData, dateOfBirth: finalDateOfBirth };
+      const apiPayload = { ...submitData, birthMonth, birthDay };
 
       const response = await fetch(`/api/members/${id}`, {
         method: "PUT",

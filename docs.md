@@ -29,10 +29,13 @@ All data within the application is contextualized by Semesters.
 - **PDF Export Engine**: Generate formal aesthetic offline PDF reports of member directories, global attendance trends, and analytical charts with one click.
 
 ### 6. SMS & Communication Automation
+- **Message Templates**: Integrated a reusable template management system directly into the SMS dashboard. Administrators can create, edit, and quickly populate the SMS composer area using saved templates to prevent repetitive manual entry.
+- **Dynamic Birthday Templates**: The automated daily chron job queries the core database for the specific `BIRTHDAY` template identifier, allowing end-users to change the system-wide birthday message at any time without developer assistance.
 - **Batch Messaging**: Dedicated administrative panels for mass SMS operations targeting dynamically filtered cell groups, commitment tiers, and demographic subsets.
 - **Delivery History**: Complete delivery transaction logs grouped dynamically by broadcast batch, containing recipient-specific tracking and personalized message preview snippets.
 - **Cron Automations**: Built-in scheduled logic executing fully automated Birthday dispatches mapped seamlessly against real-time membership birth-month arrays.
 - **Secure Invites**: Encrypted password-reset and secure platform invitation emails triggered universally upon initial User administrative creation.
+- **Provider Gateway**: Active HTTP bindings mapping local payload executions transparently to the Hubtel SMS network API.
 
 ### 7. Role-Based Access Control (RBAC)
 - **Admin Isolation**: Strict middleware and UI rendering lockouts keeping sensitive operations (like Semester configuration, User Management, and SMS blasts) gated solely to verified Admin credentials.

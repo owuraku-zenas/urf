@@ -216,3 +216,13 @@ enum SmsStatus {
   FAILED
 }
 
+model SmsTemplate {
+  id        String   @id @default(cuid())
+  name      String
+  content   String   @db.Text
+  isSystem  Boolean  @default(false)
+  type      String?  @unique // e.g., 'BIRTHDAY', null for custom
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

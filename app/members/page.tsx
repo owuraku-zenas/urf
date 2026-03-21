@@ -20,7 +20,6 @@ interface Member {
   name: string
   email: string
   phone: string
-  dateOfBirth: string
   university: string
   program: string
   startYear: string
