@@ -14,7 +14,7 @@ test.describe('Member Creation & Level Selection', () => {
     
     // Fill out the required member details
     await page.getByLabel(/name/i).fill('Test E2E Member');
-    await page.getByLabel(/email address/i).fill('test.e2e@example.com');
+    await page.getByLabel(/email address/i).fill(`test.e2e${Date.now()}@example.com`);
     await page.getByLabel(/phone/i).fill('+23359' + Math.floor(1000000 + Math.random() * 9000000));
     
     // Fill the new semantic fields

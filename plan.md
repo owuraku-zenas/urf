@@ -280,17 +280,17 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 
 ### A. API Unit Tests (Jest + Prisma Mocking)
 *Focuses purely on application logic, algorithm validations, and auth boundary checks without hitting a real database.*
-- [ ] **Member Profile Validation**: Test Zod payload rejection (missing names, malformed connections).
-- [ ] **Commitment Algorithms (`lib/commitment.ts`)**: Test grading percentages transitioning statuses logically across simulated Event logs.
-- [ ] **RBAC Isolation**: Unit test API handlers explicitly dropping simulated generic `USER` roles from accessing `/api/semesters` or `/api/sms/send`.
+- [x] **Member Profile Validation**: Test Zod payload rejection (missing names, malformed connections).
+- [x] **Commitment Algorithms (`lib/commitment.ts`)**: Test grading percentages transitioning statuses logically across simulated Event logs.
+- [x] **RBAC Isolation**: Unit test API handlers explicitly dropping simulated generic `USER` roles from accessing `/api/semesters` or `/api/sms/send`.
 - [x] **SMS Providers & Billing Calculations**: Test batch array creation processes, system constraints preventing `BIRTHDAY` template deletion, and correctly summing Hubtel numerical rates.
 
 ### B. Deep E2E Functional Constraints (Playwright)
 *Validates real-world relational constraints natively simulating a user interacting with the UI against the local `npm run dev` database loop.*
-- [ ] **Member CRUD**: E2E browser tests generating, editing, reading, and deleting Members against valid payload scalar formatting.
-- [ ] **Cell Group CRUD**: E2E tests generating, editing, reading, and deleting Cell Groups, assuring aggregate member counts persist correctly.
-- [ ] **Semester CRUD**: E2E tests generating, editing, reading, and deleting Semesters, enforcing boundary locks preventing multiple `ACTIVE` flags simultaneously.
-- [ ] **Event CRUD**: E2E tests generating, editing, reading, and deleting Events natively bound to active Semester contexts.
-- [ ] **Attendance CRUD**: E2E tests simulating `PRESENT`/`ABSENT` data entry workflows and confirming subsequent Pie Chart commitment ratio updates.
-- [ ] **SMS Templates CRUD**: E2E tests generating, editing, reading, and deleting custom templates while testing protection bounds around standard `BIRTHDAY` assets.
-- [ ] **SMS Spend Analytics**: E2E tests validating the analytical dashboard renders correct SUM aggregation for transaction `.rate` costs filtered strictly by specific Academic Semesters.
+- [x] **Member CRUD**: E2E browser tests generating, editing, reading, and deleting Members against valid payload scalar formatting.
+- [x] **Cell Group CRUD**: E2E tests generating, editing, reading, and deleting Cell Groups, assuring aggregate member counts persist correctly.
+- [x] **Semester CRUD**: E2E tests generating, editing, reading, and deleting Semesters, enforcing boundary locks preventing multiple `ACTIVE` flags simultaneously.
+- [x] **Event CRUD**: E2E tests generating, editing, reading, and deleting Events natively bound to active Semester contexts.
+- [x] **Attendance CRUD**: E2E tests simulating `PRESENT`/`ABSENT` data entry workflows and confirming subsequent Pie Chart commitment ratio updates.
+- [x] **SMS Templates CRUD**: E2E tests generating, editing, reading, and deleting custom templates while testing protection bounds around standard `BIRTHDAY` assets.
+- [x] **SMS Spend Analytics**: E2E tests validating the analytical dashboard renders correct SUM aggregation for transaction `.rate` costs filtered strictly by specific Academic Semesters.

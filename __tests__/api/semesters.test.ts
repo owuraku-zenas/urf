@@ -40,26 +40,9 @@ describe('POST /api/semesters', () => {
     expect(res.status).toBe(401);
   });
 
-  it('returns 409 if trying to create an ACTIVE semester when one already exists', async () => {
-    mockAuth.mockResolvedValue({ user: { role: 'ADMIN' } });
-    
-    // Mock that an active semester already exists
-    dbMock.semester.findFirst.mockResolvedValueOnce({
-      id: 'existing-1',
-      name: 'Spring 2026',
-      academicYear: '2025/2026',
-      startDate: new Date(),
-      endDate: new Date(),
-      status: 'ACTIVE',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
-
-    const res = await POST(createRequest(validBody));
-    expect(res.status).toBe(409);
-    expect(await res.text()).toContain("An active semester already exists");
-  });
-
+  // The 'returns 409 if trying to create an ACTIVE semester' test is removed.
+  // The backend now securely auto-closes the active semester with `updateMany`
+  // mapping implicitly preventing overlaps.
   it('returns 409 if dates overlap with an existing semester', async () => {
     mockAuth.mockResolvedValue({ user: { role: 'ADMIN' } });
     
@@ -92,12 +75,12 @@ describe('POST /api/semesters', () => {
     dbMock.semester.create.mockResolvedValue({
       id: 'new-sem',
       ...validBody,
-      startDate: new Date(validBody.startDate),
-      endDate: new Date(validBody.endDate),
+      startDate: new Date(validBody.startDate).toISOString(),
+      endDate: new Date(validBody.endDate).toISOString(),
       status: 'ACTIVE',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    } as any);
 
     const res = await POST(createRequest(validBody));
     expect(res.status).toBe(200);
