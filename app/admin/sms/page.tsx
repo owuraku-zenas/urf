@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma"
 import SmsDashboard from "./sms-dashboard"
 
+export const dynamic = "force-dynamic"
+
 export const metadata = {
   title: "SMS Broadcast | Admin",
   description: "Send and track bulk SMS announcements",

@@ -45,7 +45,7 @@ test.describe('Member Creation & Level Selection', () => {
     await page.getByRole('button', { name: /save|create|submit/i }).click();
 
     // Verify redirect or success toast
-    await page.waitForURL(url => url.pathname.endsWith('/members'));
+    await expect(page).toHaveURL(/.*\/members/);
     await expect(page.getByText(/Test E2E Member/i).first()).toBeVisible();
   });
 });
