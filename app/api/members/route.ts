@@ -111,11 +111,18 @@ export async function POST(request: Request) {
         },
         invitedBy: invitedById ? {
           connect: { id: invitedById }
+        } : undefined,
+        commitments: joinedSemesterId ? {
+          create: {
+            semesterId: joinedSemesterId,
+            status: 'NEW_MEMBER'
+          }
         } : undefined
       },
       include: {
         cellGroup: true,
-        invitedBy: true
+        invitedBy: true,
+        commitments: true
       }
     })
 

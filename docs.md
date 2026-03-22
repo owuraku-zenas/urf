@@ -15,6 +15,7 @@ All data within the application is contextualized by Semesters.
 ### 2. Member Management & Tracking
 - **Profiles & Progression**: Full registry of church members tracking complex details like `admissionYear`, `joinedSemesterId`, and computed semantic `academicLevel`.
 - **Commitment Algorithms**: The system dynamically grades members as `COMMITTED`, `AT_RISK`, or `UNCOMMITTED` automatically based on calculated semester attendance ratios.
+- **Grace Period (New Members)**: Freshly registered members are securely bound to a `NEW_MEMBER` grace status to ensure they aren't visually penalized prior to engaging in their first available semester event.
 
 ### 3. Attendance & Event Logging
 - **Event Scoping**: Create typed events (Sunday Service, Mid-week, etc.) strictly bound to the active academic semester.

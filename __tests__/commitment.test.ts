@@ -5,14 +5,18 @@ describe('calculateMemberCommitment', () => {
   const memberId = 'member-1';
   const semesterId = 'semester-1';
 
-  it('sets UNCOMMITTED if there are no events', async () => {
+  beforeEach(() => {
+    prismaMock.member.findUnique.mockResolvedValue({ joinDate: new Date('2024-01-01') } as any);
+  });
+
+  it('sets NEW_MEMBER if there are no events', async () => {
     prismaMock.event.count.mockResolvedValue(0);
     prismaMock.semesterCommitment.findUnique.mockResolvedValue(null);
 
     await calculateMemberCommitment(memberId, semesterId);
 
     expect(prismaMock.semesterCommitment.upsert).toHaveBeenCalledWith(expect.objectContaining({
-      update: { status: 'UNCOMMITTED' }
+      update: { status: 'NEW_MEMBER' } 
     }));
   });
 

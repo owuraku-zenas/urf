@@ -114,7 +114,7 @@ export default function MembersPage() {
   }, [selectedSemester])
 
   const getCommitmentStatus = (member: any) => {
-    if (!member.commitments || member.commitments.length === 0) return 'UNCOMMITTED'
+    if (!member.commitments || member.commitments.length === 0) return 'NEW_MEMBER'
     return member.commitments[0].status
   }
 

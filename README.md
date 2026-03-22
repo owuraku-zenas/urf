@@ -14,6 +14,14 @@ This README serves as a running log of all major changes, migrations, and featur
 
 ---
 
+### [2026-03-22] New Member Attendance Grace Period
+- Repaired a logical bug where newly registered members were immediately visually classified as `UNCOMMITTED`.
+- Upgraded the DB pipeline (`POST /api/members`) to strictly attach a `NEW_MEMBER` grace period status to their profile upon creation.
+- Ripped out hard-coded UI fallbacks aggressively mapping un-evaluated profiles, relying purely on the strict backend algorithm.
+- Fortified `lib/commitment.ts` and automated Jest validation pipelines to securely assert `NEW_MEMBER` timelines natively.
+
+---
+
 ### [2026-03-22] SMS Financial Analytics & Cost Tracking
 - Upgraded the Hubtel SMS integration, securely fetching and parsing numerical `.Rate` billing data asynchronously.
 - Expanded the `SmsLog` PostgreSQL schema to map dynamic `cost` parameters alongside `semesterId` associations.

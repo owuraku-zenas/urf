@@ -55,7 +55,7 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
       const preFiltered = members.filter(member => {
         if (mode === "committed") return member.commitments?.some((c: any) => c.status === "COMMITTED")
         if (mode === "at_risk") return member.commitments?.some((c: any) => c.status === "AT_RISK")
-        if (mode === "uncommitted") return !member.commitments || member.commitments.length === 0 || member.commitments.some((c: any) => c.status === "UNCOMMITTED")
+        if (mode === "uncommitted") return member.commitments?.some((c: any) => c.status === "UNCOMMITTED")
         return true
       })
       setSelectedIds(preFiltered.map(m => m.id))
@@ -77,7 +77,7 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
     // 3. Quick Filters
     if (filterMode === "committed") return member.commitments?.some((c: any) => c.status === "COMMITTED")
     if (filterMode === "at_risk") return member.commitments?.some((c: any) => c.status === "AT_RISK")
-    if (filterMode === "uncommitted") return !member.commitments || member.commitments.length === 0 || member.commitments.some((c: any) => c.status === "UNCOMMITTED")
+    if (filterMode === "uncommitted") return member.commitments?.some((c: any) => c.status === "UNCOMMITTED")
     if (filterMode === "level100") return member.currentAcademicLevel === "100"
     if (filterMode === "active") return member.commitments?.some((c: any) => c.semesterId === activeSemesterId)
 
