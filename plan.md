@@ -1,24 +1,9 @@
 # Church Membership & Attendance Tracking App: Exhaustive Feature Extension Plan
 
-## 0. Environment & Database Separation (Complete)
-- [x] **Set up dedicated development and testing databases** (e.g., `urf_dev`, `urf_test`) to avoid impacting production data.
-- [x] **Configure environment variables** (`.env.local`, `.env.test`, `.env.production`) for separate database URLs.
-- [x] **Document how to switch between databases** for development, testing, and production.
-- [x] **Test your local/dev environment with the new database before making any schema or code changes.**
-- [x] **Schedule regular database backups** (especially before migrations).
-- [x] **Test backup and restore procedures** to ensure you can recover from migration errors.
 
----
 
 ## Purpose
 This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current church management system with robust semester-based tracking, analytics, and SMS automation. Every single model relationship, API route, and frontend component adjustment required for full CRUD compatibility is detailed below.
-
----
-
-## 1. Preparation & Safety
-- **Review current codebase**: Audit models, API routes, and UI for member, attendance, and reporting logic.
-- **Set up a feature branch**: Work in a new git branch (e.g., `feature/semester-tracking`) to avoid breaking production.
-- **Back up the database**: Export current data before making schema changes.
 
 ---
 
