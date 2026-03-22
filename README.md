@@ -14,6 +14,15 @@ This README serves as a running log of all major changes, migrations, and featur
 
 ---
 
+### [2026-03-22] SMS Financial Analytics & Cost Tracking
+- Upgraded the Hubtel SMS integration, securely fetching and parsing numerical `.Rate` billing data asynchronously.
+- Expanded the `SmsLog` PostgreSQL schema to map dynamic `cost` parameters alongside `semesterId` associations.
+- Bound global Semester Contexts implicitly into background SMS cron dispatches and live UI broadcast payloads.
+- Deployed a highly visible "Total Spend" dynamic financial metric tile directly embedded over the Delivery History logs internally.
+- Bootstrapped explicit Jest unit test pipelines mocking third-party fetches guaranteeing isolated calculations.
+
+---
+
 ### [2026-03-17] Added Semester Model
 - Added `Semester` model and `SemesterStatus` enum to `prisma/schema.prisma` for semester-based tracking.
 - Ran `npx prisma migrate dev --name add-semester-model` to apply migration.

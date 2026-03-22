@@ -32,6 +32,7 @@ All data within the application is contextualized by Semesters.
 - **Message Templates**: Integrated a reusable template management system directly into the SMS dashboard. Administrators can create, edit, and quickly populate the SMS composer area using saved templates to prevent repetitive manual entry.
 - **Dynamic Birthday Templates**: The automated daily chron job queries the core database for the specific `BIRTHDAY` template identifier, allowing end-users to change the system-wide birthday message at any time without developer assistance.
 - **Batch Messaging**: Dedicated administrative panels for mass SMS operations targeting dynamically filtered cell groups, commitment tiers, and demographic subsets.
+- **Financial Analytics**: Tracks individual SMS broadcast costs generated natively from Hubtel transmissions. Administrators can view a global "Total Spend" metric aggregated and filtered cleanly by specific Academic Semesters.
 - **Delivery History**: Complete delivery transaction logs grouped dynamically by broadcast batch, containing recipient-specific tracking and personalized message preview snippets.
 - **Cron Automations**: Built-in scheduled logic executing fully automated Birthday dispatches mapped seamlessly against real-time membership birth-month arrays.
 - **Secure Invites**: Encrypted password-reset and secure platform invitation emails triggered universally upon initial User administrative creation.
