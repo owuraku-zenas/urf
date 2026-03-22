@@ -1,0 +1,474 @@
+
+> my-v0-project@0.1.0 start
+> next start
+
+   ▲ Next.js 15.0.7
+   - Local:        http://localhost:3005
+
+ ✓ Starting...
+ ✓ Ready in 356ms
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:53946
+    at iZ (/home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:56621)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async te.do (/home/owuraku-zenas/projects/urf/urf/node_modules/.pnpm/next@15.0.7_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:18:17826)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:53946
+    at iZ (/home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:56621)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async te.do (/home/owuraku-zenas/projects/urf/urf/node_modules/.pnpm/next@15.0.7_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:18:17826)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:53946
+    at iZ (/home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:56621)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async te.do (/home/owuraku-zenas/projects/urf/urf/node_modules/.pnpm/next@15.0.7_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:18:17826)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:53946
+    at iZ (/home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:56621)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async te.do (/home/owuraku-zenas/projects/urf/urf/node_modules/.pnpm/next@15.0.7_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:18:17826)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:53946
+    at iZ (/home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:56621)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async te.do (/home/owuraku-zenas/projects/urf/urf/node_modules/.pnpm/next@15.0.7_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:18:17826)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:53946
+    at iZ (/home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:56621)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async te.do (/home/owuraku-zenas/projects/urf/urf/node_modules/.pnpm/next@15.0.7_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:18:17826)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:53946
+    at iZ (/home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:56621)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async te.do (/home/owuraku-zenas/projects/urf/urf/node_modules/.pnpm/next@15.0.7_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:18:17826)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:53946
+    at iZ (/home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:56621)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async te.do (/home/owuraku-zenas/projects/urf/urf/node_modules/.pnpm/next@15.0.7_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:18:17826)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:53946
+    at iZ (/home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:56621)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async te.do (/home/owuraku-zenas/projects/urf/urf/node_modules/.pnpm/next@15.0.7_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:18:17826)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:53946
+    at iZ (/home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:56621)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async te.do (/home/owuraku-zenas/projects/urf/urf/node_modules/.pnpm/next@15.0.7_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:18:17826)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:53946
+    at iZ (/home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:56621)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async te.do (/home/owuraku-zenas/projects/urf/urf/node_modules/.pnpm/next@15.0.7_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:18:17826)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:53946
+    at iZ (/home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:56621)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async te.do (/home/owuraku-zenas/projects/urf/urf/node_modules/.pnpm/next@15.0.7_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:18:17826)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:53946
+    at iZ (/home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:56621)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async te.do (/home/owuraku-zenas/projects/urf/urf/node_modules/.pnpm/next@15.0.7_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:18:17826)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:53946
+    at iZ (/home/owuraku-zenas/projects/urf/urf/.next/server/chunks/7342.js:404:56621)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async te.do (/home/owuraku-zenas/projects/urf/urf/node_modules/.pnpm/next@15.0.7_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:18:17826)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3005/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at /home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:54001
+    at sD (/home/owuraku-zenas/projects/urf/urf/.next/server/middleware.js:432:56701)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+prisma:query SELECT "public"."Semester"."id" FROM "public"."Semester" WHERE "public"."Semester"."status" = CAST($1::text AS "public"."SemesterStatus") LIMIT $2 OFFSET $3
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."CellGroup"."id" FROM "public"."CellGroup" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Attendance"."id" FROM "public"."Attendance" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Attendance"."id" FROM "public"."Attendance" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."CellGroup"."id" FROM "public"."CellGroup" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."CellGroup"."id" FROM "public"."CellGroup" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE ("public"."Event"."id") IN (SELECT "t1"."eventId" FROM "public"."Attendance" AS "t1" WHERE (1=1 AND "t1"."eventId" IS NOT NULL)) OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE ("public"."Event"."id") IN (SELECT "t1"."eventId" FROM "public"."Attendance" AS "t1" WHERE (1=1 AND "t1"."eventId" IS NOT NULL)) OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Attendance"."id" FROM "public"."Attendance" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE ("public"."Event"."id") IN (SELECT "t1"."eventId" FROM "public"."Attendance" AS "t1" WHERE (1=1 AND "t1"."eventId" IS NOT NULL)) OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."CellGroup"."id" FROM "public"."CellGroup" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."CellGroup"."id" FROM "public"."CellGroup" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Attendance"."id" FROM "public"."Attendance" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Attendance"."id" FROM "public"."Attendance" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE ("public"."Event"."id") IN (SELECT "t1"."eventId" FROM "public"."Attendance" AS "t1" WHERE (1=1 AND "t1"."eventId" IS NOT NULL)) OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE ("public"."Event"."id") IN (SELECT "t1"."eventId" FROM "public"."Attendance" AS "t1" WHERE (1=1 AND "t1"."eventId" IS NOT NULL)) OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE ("public"."Event"."id") IN (SELECT "t1"."eventId" FROM "public"."Attendance" AS "t1" WHERE (1=1 AND "t1"."eventId" IS NOT NULL)) OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Attendance"."id" FROM "public"."Attendance" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Attendance"."id" FROM "public"."Attendance" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."CellGroup"."id" FROM "public"."CellGroup" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE ("public"."Event"."id") IN (SELECT "t1"."eventId" FROM "public"."Attendance" AS "t1" WHERE (1=1 AND "t1"."eventId" IS NOT NULL)) OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."CellGroup"."id" FROM "public"."CellGroup" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."status" = CAST($1::text AS "public"."CommitmentStatus") OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Semester"."id", "public"."Semester"."name", "public"."Semester"."startDate", "public"."Semester"."endDate", "public"."Semester"."academicYear", "public"."Semester"."status"::text, "public"."Semester"."createdAt", "public"."Semester"."updatedAt" FROM "public"."Semester" WHERE ("public"."Semester"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."Semester"."id", "public"."Semester"."name", "public"."Semester"."startDate", "public"."Semester"."endDate", "public"."Semester"."academicYear", "public"."Semester"."status"::text, "public"."Semester"."createdAt", "public"."Semester"."updatedAt" FROM "public"."Semester" WHERE ("public"."Semester"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."Semester"."id", "public"."Semester"."name", "public"."Semester"."startDate", "public"."Semester"."endDate", "public"."Semester"."academicYear", "public"."Semester"."status"::text, "public"."Semester"."createdAt", "public"."Semester"."updatedAt" FROM "public"."Semester" WHERE ("public"."Semester"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Semester"."id", "public"."Semester"."name", "public"."Semester"."startDate", "public"."Semester"."endDate", "public"."Semester"."academicYear", "public"."Semester"."status"::text, "public"."Semester"."createdAt", "public"."Semester"."updatedAt" FROM "public"."Semester" WHERE ("public"."Semester"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."Semester"."id", "public"."Semester"."name", "public"."Semester"."startDate", "public"."Semester"."endDate", "public"."Semester"."academicYear", "public"."Semester"."status"::text, "public"."Semester"."createdAt", "public"."Semester"."updatedAt" FROM "public"."Semester" WHERE ("public"."Semester"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."Semester"."id", "public"."Semester"."name", "public"."Semester"."startDate", "public"."Semester"."endDate", "public"."Semester"."academicYear", "public"."Semester"."status"::text, "public"."Semester"."createdAt", "public"."Semester"."updatedAt" FROM "public"."Semester" WHERE ("public"."Semester"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."CellGroup"."id" FROM "public"."CellGroup" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT "public"."Semester"."id", "public"."Semester"."name", "public"."Semester"."startDate", "public"."Semester"."endDate", "public"."Semester"."academicYear", "public"."Semester"."status"::text, "public"."Semester"."createdAt", "public"."Semester"."updatedAt" FROM "public"."Semester" WHERE ("public"."Semester"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT "public"."Member"."id", "public"."Member"."name", "public"."Member"."phone", "public"."Member"."isActive", "public"."Member"."currentAcademicLevel", "public"."Member"."cellGroupId", "public"."Member"."joinedSemesterId" FROM "public"."Member" WHERE "public"."Member"."phone" <> $1 ORDER BY "public"."Member"."name" ASC OFFSET $2
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE "public"."Event"."semesterId" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Attendance"."id" FROM "public"."Attendance" LEFT JOIN "public"."Event" AS "j1" ON ("j1"."id") = ("public"."Attendance"."eventId") WHERE ("j1"."semesterId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."CellGroup"."id" FROM "public"."CellGroup" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE ("public"."Event"."semesterId" = $1 AND ("public"."Event"."id") IN (SELECT "t1"."eventId" FROM "public"."Attendance" AS "t1" WHERE (1=1 AND "t1"."eventId" IS NOT NULL))) OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE ("public"."Event"."semesterId" = $1 AND ("public"."Event"."id") IN (SELECT "t1"."eventId" FROM "public"."Attendance" AS "t1" WHERE (1=1 AND "t1"."eventId" IS NOT NULL))) OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."CellGroup"."id" FROM "public"."CellGroup" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE "public"."Event"."semesterId" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Attendance"."id" FROM "public"."Attendance" LEFT JOIN "public"."Event" AS "j1" ON ("j1"."id") = ("public"."Attendance"."eventId") WHERE ("j1"."semesterId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Attendance"."id" FROM "public"."Attendance" LEFT JOIN "public"."Event" AS "j1" ON ("j1"."id") = ("public"."Attendance"."eventId") WHERE ("j1"."semesterId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE ("public"."Event"."semesterId" = $1 AND ("public"."Event"."id") IN (SELECT "t1"."eventId" FROM "public"."Attendance" AS "t1" WHERE (1=1 AND "t1"."eventId" IS NOT NULL))) OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE ("public"."Event"."semesterId" = $1 AND ("public"."Event"."id") IN (SELECT "t1"."eventId" FROM "public"."Attendance" AS "t1" WHERE (1=1 AND "t1"."eventId" IS NOT NULL))) OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."CellGroup"."id" FROM "public"."CellGroup" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT "public"."CellGroup"."id", "public"."CellGroup"."name" FROM "public"."CellGroup" WHERE "public"."CellGroup"."id" IN ($1,$2,$3,$4) OFFSET $5
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE "public"."Event"."semesterId" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."CellGroup"."id" FROM "public"."CellGroup" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE "public"."Event"."semesterId" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Attendance"."id" FROM "public"."Attendance" LEFT JOIN "public"."Event" AS "j1" ON ("j1"."id") = ("public"."Attendance"."eventId") WHERE ("j1"."semesterId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Attendance"."id" FROM "public"."Attendance" LEFT JOIN "public"."Event" AS "j1" ON ("j1"."id") = ("public"."Attendance"."eventId") WHERE ("j1"."semesterId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE "public"."Event"."semesterId" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE "public"."Event"."semesterId" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Attendance"."id" FROM "public"."Attendance" LEFT JOIN "public"."Event" AS "j1" ON ("j1"."id") = ("public"."Attendance"."eventId") WHERE ("j1"."semesterId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."CellGroup"."id" FROM "public"."CellGroup" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE "public"."Member"."isActive" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE ("public"."Event"."semesterId" = $1 AND ("public"."Event"."id") IN (SELECT "t1"."eventId" FROM "public"."Attendance" AS "t1" WHERE (1=1 AND "t1"."eventId" IS NOT NULL))) OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE "public"."Event"."semesterId" = $1 OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Member"."id" FROM "public"."Member" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Attendance"."id" FROM "public"."Attendance" LEFT JOIN "public"."Event" AS "j1" ON ("j1"."id") = ("public"."Attendance"."eventId") WHERE ("j1"."semesterId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE ("public"."Event"."semesterId" = $1 AND ("public"."Event"."id") IN (SELECT "t1"."eventId" FROM "public"."Attendance" AS "t1" WHERE (1=1 AND "t1"."eventId" IS NOT NULL))) OFFSET $2) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."CellGroup"."id" FROM "public"."CellGroup" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT "public"."SemesterCommitment"."id", "public"."SemesterCommitment"."status"::text, "public"."SemesterCommitment"."semesterId", "public"."SemesterCommitment"."memberId" FROM "public"."SemesterCommitment" WHERE "public"."SemesterCommitment"."memberId" IN ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,$54,$55,$56) OFFSET $57
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."SemesterCommitment"."id" FROM "public"."SemesterCommitment" WHERE ("public"."SemesterCommitment"."semesterId" = $1 AND "public"."SemesterCommitment"."status" = CAST($2::text AS "public"."CommitmentStatus")) OFFSET $3) AS "sub"
+prisma:query SELECT COUNT(*) FROM (SELECT "public"."Event"."id" FROM "public"."Event" WHERE ("public"."Event"."semesterId" = $1 AND ("public"."Event"."id") IN (SELECT "t1"."eventId" FROM "public"."Attendance" AS "t1" WHERE (1=1 AND "t1"."eventId" IS NOT NULL))) OFFSET $2) AS "sub"
+prisma:query SELECT "public"."SmsLog"."id", "public"."SmsLog"."recipientId", "public"."SmsLog"."phoneNumber", "public"."SmsLog"."message", "public"."SmsLog"."status"::text, "public"."SmsLog"."providerId", "public"."SmsLog"."errorMessage", "public"."SmsLog"."batchId", "public"."SmsLog"."cost", "public"."SmsLog"."semesterId", "public"."SmsLog"."createdAt", "public"."SmsLog"."updatedAt" FROM "public"."SmsLog" WHERE 1=1 ORDER BY "public"."SmsLog"."createdAt" DESC LIMIT $1 OFFSET $2
+prisma:query SELECT "public"."Member"."id", "public"."Member"."name" FROM "public"."Member" WHERE "public"."Member"."id" IN ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43) OFFSET $44
+prisma:query SELECT "public"."SmsTemplate"."id", "public"."SmsTemplate"."name", "public"."SmsTemplate"."content", "public"."SmsTemplate"."isSystem", "public"."SmsTemplate"."type", "public"."SmsTemplate"."createdAt", "public"."SmsTemplate"."updatedAt" FROM "public"."SmsTemplate" WHERE 1=1 ORDER BY "public"."SmsTemplate"."name" ASC OFFSET $1
+prisma:query SELECT "public"."Semester"."id", "public"."Semester"."name", "public"."Semester"."status"::text FROM "public"."Semester" WHERE 1=1 ORDER BY "public"."Semester"."startDate" DESC OFFSET $1

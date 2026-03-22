@@ -1,0 +1,97 @@
+
+> my-v0-project@0.1.0 build
+> prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client in 161ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want real-time updates to your database without manual polling? Discover how with Pulse: https://pris.ly/tip-0-pulse
+
+   ▲ Next.js 15.0.7
+   - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/39) ...
+   Generating static pages (9/39) 
+   Generating static pages (19/39) 
+   Generating static pages (29/39) 
+ ✓ Generating static pages (39/39)
+user from useUser: null
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    3.74 kB         151 kB
+├ ○ /_not-found                          228 B           101 kB
+├ ƒ /admin/sms                           9.95 kB         130 kB
+├ ƒ /api/attendance                      228 B           101 kB
+├ ƒ /api/attendance/bulk                 228 B           101 kB
+├ ƒ /api/auth/[...nextauth]              228 B           101 kB
+├ ƒ /api/cell-groups                     228 B           101 kB
+├ ƒ /api/cell-groups/[id]                228 B           101 kB
+├ ƒ /api/cron/birthdays                  228 B           101 kB
+├ ƒ /api/events                          228 B           101 kB
+├ ƒ /api/events/[eventId]                228 B           101 kB
+├ ƒ /api/events/[eventId]/attendance     228 B           101 kB
+├ ƒ /api/members                         228 B           101 kB
+├ ƒ /api/members/[id]                    228 B           101 kB
+├ ƒ /api/members/[id]/attendance         228 B           101 kB
+├ ƒ /api/members/birthdays               228 B           101 kB
+├ ƒ /api/reports/attendance-trends       228 B           101 kB
+├ ƒ /api/reports/member-growth           228 B           101 kB
+├ ƒ /api/reports/semester-comparison     228 B           101 kB
+├ ƒ /api/semesters                       228 B           101 kB
+├ ƒ /api/semesters/[id]                  228 B           101 kB
+├ ƒ /api/sms/send                        228 B           101 kB
+├ ƒ /api/sms/templates                   228 B           101 kB
+├ ƒ /api/sms/templates/[id]              228 B           101 kB
+├ ƒ /api/stats                           228 B           101 kB
+├ ƒ /api/users                           228 B           101 kB
+├ ƒ /api/users/[id]                      228 B           101 kB
+├ ƒ /api/users/[id]/reset-password       228 B           101 kB
+├ ƒ /api/users/change-password           228 B           101 kB
+├ ƒ /api/users/invite                    228 B           101 kB
+├ ƒ /api/users/me                        228 B           101 kB
+├ ƒ /api/users/set-password              228 B           101 kB
+├ ○ /attendance                          5.1 kB          152 kB
+├ ƒ /attendance/[id]                     6.23 kB         141 kB
+├ ƒ /cell-groups                         180 B           110 kB
+├ ƒ /cell-groups/[id]                    3.05 kB         256 kB
+├ ƒ /cell-groups/[id]/edit               2.42 kB         125 kB
+├ ○ /cell-groups/new                     4.23 kB         121 kB
+├ ○ /events                              5.01 kB         152 kB
+├ ƒ /events/[id]                         5.07 kB         270 kB
+├ ƒ /events/[id]/edit                    21.1 kB         178 kB
+├ ○ /events/new                          2.18 kB         103 kB
+├ ○ /login                               13.9 kB         153 kB
+├ ○ /members                             6.43 kB         295 kB
+├ ƒ /members/[id]                        6.29 kB         238 kB
+├ ƒ /members/[id]/edit                   4.11 kB         127 kB
+├ ○ /members/new                         3.8 kB          126 kB
+├ ○ /reports                             9.11 kB         399 kB
+├ ○ /reports/attendance-trends           4.21 kB         251 kB
+├ ○ /reports/member-growth               3.58 kB         223 kB
+├ ○ /semesters                           10.6 kB         161 kB
+├ ○ /set-password                        2.39 kB         118 kB
+├ ○ /users                               5.49 kB         165 kB
+├ ○ /users/new                           3.71 kB         147 kB
+└ ○ /users/profile                       2.45 kB         115 kB
++ First Load JS shared by all            100 kB
+  ├ chunks/7815-2745f0b79bb12240.js      45.9 kB
+  ├ chunks/ac89447a-99e969eba3998504.js  52.5 kB
+  └ other shared chunks (total)          2.12 kB
+
+
+ƒ Middleware                             110 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
