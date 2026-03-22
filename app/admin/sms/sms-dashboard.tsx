@@ -13,10 +13,11 @@ interface SmsDashboardProps {
   initialMembers: any[]
   initialLogs: any[]
   initialTemplates: any[]
+  initialSemesters?: any[]
   activeSemesterId: string | null
 }
 
-export default function SmsDashboard({ initialMembers, initialLogs, initialTemplates, activeSemesterId }: SmsDashboardProps) {
+export default function SmsDashboard({ initialMembers, initialLogs, initialTemplates, initialSemesters, activeSemesterId }: SmsDashboardProps) {
   const { toast } = useToast()
 
   // State
@@ -31,7 +32,8 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
   const [searchQuery, setSearchQuery] = useState("")
   const [filterMode, setFilterMode] = useState<"all" | "committed" | "at_risk" | "uncommitted" | "level100" | "active">("all")
   const [selectedCell, setSelectedCell] = useState<string>("all")
-  
+  const [historySemesterFilter, setHistorySemesterFilter] = useState<string>("all")
+
   const [showTemplateModal, setShowTemplateModal] = useState(false)
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null)
   const [templateForm, setTemplateForm] = useState({ name: "", content: "" })
@@ -49,12 +51,12 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
     } else if (filter) {
       const mode = filter.toLowerCase() as any
       setFilterMode(mode)
-      
+
       const preFiltered = members.filter(member => {
-         if (mode === "committed") return member.commitments?.some((c: any) => c.status === "COMMITTED")
-         if (mode === "at_risk") return member.commitments?.some((c: any) => c.status === "AT_RISK")
-         if (mode === "uncommitted") return !member.commitments || member.commitments.length === 0 || member.commitments.some((c: any) => c.status === "UNCOMMITTED")
-         return true
+        if (mode === "committed") return member.commitments?.some((c: any) => c.status === "COMMITTED")
+        if (mode === "at_risk") return member.commitments?.some((c: any) => c.status === "AT_RISK")
+        if (mode === "uncommitted") return !member.commitments || member.commitments.length === 0 || member.commitments.some((c: any) => c.status === "UNCOMMITTED")
+        return true
       })
       setSelectedIds(preFiltered.map(m => m.id))
     }
@@ -153,7 +155,7 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
         })
         const data = await res.json()
         if (data.id) {
-          setTemplates(templates.map((t: any) => t.id === data.id ? data : t).sort((a,b) => a.name.localeCompare(b.name)))
+          setTemplates(templates.map((t: any) => t.id === data.id ? data : t).sort((a, b) => a.name.localeCompare(b.name)))
           toast({ title: "Template saved" })
         }
       } else {
@@ -164,7 +166,7 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
         })
         const data = await res.json()
         if (data.id) {
-          setTemplates([...templates, data].sort((a,b) => a.name.localeCompare(b.name)))
+          setTemplates([...templates, data].sort((a, b) => a.name.localeCompare(b.name)))
           toast({ title: "Template created successfully" })
         }
       }
@@ -174,8 +176,16 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
     }
   }
 
+  // Filter logs contextually by the selected Semester
+  const filteredHistoryLogs = historySemesterFilter === "all"
+    ? initialLogs
+    : initialLogs.filter((log: any) => log.semesterId === historySemesterFilter)
+
+  // Derive total physical spend footprint
+  const totalSpend = filteredHistoryLogs.reduce((acc: number, log: any) => acc + (log.cost || 0), 0)
+
   // Group logs by batchId
-  const groupedLogs = initialLogs.reduce((acc: Record<string, any>, log) => {
+  const groupedLogs = filteredHistoryLogs.reduce((acc: Record<string, any>, log) => {
     const key = log.batchId || `legacy-${log.id}`
     if (!acc[key]) {
       acc[key] = {
@@ -187,15 +197,17 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
         sent: 0,
         failed: 0,
         delivered: 0,
+        cost: 0,
         previewMessage: log.message
       }
     }
     acc[key].logs.push(log)
     acc[key].total += 1
+    acc[key].cost += (log.cost || 0)
     if (log.status === "SENT") acc[key].sent += 1
     else if (log.status === "FAILED") acc[key].failed += 1
     else if (log.status === "DELIVERED") acc[key].delivered += 1
-    
+
     return acc
   }, {})
 
@@ -389,7 +401,34 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
 
       {activeTab === "history" && (
         <div className="border rounded-lg overflow-hidden bg-white shadow-sm p-6">
-          <h3 className="font-semibold text-gray-700 mb-4">Recent Broadcasts</h3>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4">
+            <div>
+              <h3 className="font-semibold text-gray-700">Recent Broadcasts</h3>
+              <p className="text-sm text-gray-500 hidden sm:block">Track delivery status and financial metrics for your SMS campaigns.</p>
+            </div>
+            
+            <div className="mt-4 sm:mt-0 flex gap-4 items-center">
+              <div className="bg-green-50 text-green-800 px-4 py-2 rounded-md border border-green-200 shadow-sm flex flex-col justify-center items-end">
+                <span className="text-xs font-medium uppercase tracking-wider text-green-600">Total Spend</span>
+                <span className="text-xl font-bold font-mono tracking-tight">Ghc {totalSpend.toFixed(2)}</span>
+              </div>
+              
+              <div className="flex flex-col space-y-1">
+                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Academic Term</label>
+                <select 
+                  className="text-sm border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary shadow-sm min-w-[150px]"
+                  value={historySemesterFilter}
+                  onChange={(e) => setHistorySemesterFilter(e.target.value)}
+                >
+                  <option value="all">All Time History</option>
+                  {initialSemesters?.map((sem: any) => (
+                    <option key={sem.id} value={sem.id}>{sem.name}{sem.status === 'ACTIVE' ? ' (Active)' : ''}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+          
           {sortedGroups.length === 0 ? (
             <p className="text-gray-500 text-sm">No SMS history recorded yet.</p>
           ) : (
@@ -399,18 +438,19 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
                   <AccordionTrigger className="hover:no-underline px-4 py-3 bg-gray-50 rounded-md mb-2 border border-gray-100 data-[state=open]:rounded-b-none data-[state=open]:mb-0">
                     <div className="flex flex-col sm:flex-row justify-between w-full items-start sm:items-center gap-2 pr-4 text-left">
                       <div>
-                         <span className="font-semibold text-sm">
-                           {new Date(group.createdAt).toLocaleString()}
-                         </span>
-                         <span className="ml-3 text-xs text-gray-500 font-medium">
-                           {group.isLegacy ? "Legacy Dispatch" : "Batch Broadcast"}
-                         </span>
-                         <p className="text-sm text-gray-600 mt-1 truncate max-w-[300px] md:max-w-[500px]">
-                           {group.previewMessage}
-                         </p>
+                        <span className="font-semibold text-sm">
+                          {new Date(group.createdAt).toLocaleString()}
+                        </span>
+                        <span className="ml-3 text-xs text-gray-500 font-medium">
+                          {group.isLegacy ? "Legacy Dispatch" : "Batch Broadcast"}
+                        </span>
+                        <p className="text-sm text-gray-600 mt-1 truncate max-w-[300px] md:max-w-[500px]">
+                          {group.previewMessage}
+                        </p>
                       </div>
                       <div className="flex gap-2 text-xs">
                         <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{group.total} Total</span>
+                        <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full font-mono">Ghc {group.cost.toFixed(2)}</span>
                         {group.sent + group.delivered > 0 && <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">{group.sent + group.delivered} Success</span>}
                         {group.failed > 0 && <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full">{group.failed} Failed</span>}
                       </div>
@@ -461,7 +501,7 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
       )}
 
       {activeTab === "templates" && (
-        <div className="border rounded-lg bg-white shadow-sm p-6 max-w-4xl">
+        <div className="border rounded-lg bg-white shadow-sm p-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-semibold text-gray-700">Message Templates</h3>
             <Button size="sm" onClick={() => {
@@ -470,7 +510,7 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
               setShowTemplateModal(true)
             }}>+ New Template</Button>
           </div>
-          
+
           <div className="space-y-4">
             {templates.map((tmpl: any) => (
               <div key={tmpl.id} className="border rounded-lg p-4 bg-gray-50 flex flex-col gap-2">
@@ -483,7 +523,7 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
                     </h4>
                   </div>
                   <div className="flex gap-3">
-                    <button 
+                    <button
                       onClick={() => {
                         setEditingTemplateId(tmpl.id)
                         setTemplateForm({ name: tmpl.name, content: tmpl.content })
@@ -494,7 +534,7 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
                       Edit
                     </button>
                     {!tmpl.isSystem && (
-                      <button 
+                      <button
                         onClick={() => {
                           if (!confirm(`Are you sure you want to delete '${tmpl.name}'?`)) return
                           fetch(`/api/sms/templates/${tmpl.id}`, { method: "DELETE" })
@@ -525,10 +565,10 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
               <form onSubmit={handleSaveTemplate} className="space-y-4 mt-4">
                 <div>
                   <label className="text-sm font-medium mb-1 block">Template Name</label>
-                  <Input 
-                    required 
-                    value={templateForm.name} 
-                    onChange={e => setTemplateForm({...templateForm, name: e.target.value})} 
+                  <Input
+                    required
+                    value={templateForm.name}
+                    onChange={e => setTemplateForm({ ...templateForm, name: e.target.value })}
                     placeholder="E.g. Sunday Service Reminder"
                   />
                 </div>
@@ -537,10 +577,10 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
                     <span>Message Content</span>
                     <span className="text-xs text-gray-500 font-mono">Use {"{{name}}"}</span>
                   </label>
-                  <Textarea 
-                    required 
-                    value={templateForm.content} 
-                    onChange={e => setTemplateForm({...templateForm, content: e.target.value})}
+                  <Textarea
+                    required
+                    value={templateForm.content}
+                    onChange={e => setTemplateForm({ ...templateForm, content: e.target.value })}
                     placeholder="Hello {{name}}, join us this Sunday..."
                     rows={6}
                   />

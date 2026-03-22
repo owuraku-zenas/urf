@@ -46,7 +46,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "The provided filters matched no valid recipients." }, { status: 404 })
     }
 
-    // 3. Batch Dispatch
+    // 3. Obtain Active Semester for Financial Tracking
+    const activeSemester = await prisma.semester.findFirst({
+      where: { status: 'ACTIVE' },
+      select: { id: true }
+    })
+    const semesterId = activeSemester?.id
+
+    // 4. Batch Dispatch
     // In production, consider queuing heavy SMS blasts (using Redis/BullHQ) to avoid Vercel Function timeouts
     // For smaller church groups (< 500 members), Promise.all simulates this cleanly within Next.js
     
@@ -58,7 +65,8 @@ export async function POST(request: Request) {
           recipientId: member.id,
           phoneNumber: member.phone,
           message: personalizeMessage(message, member.name),
-          batchId
+          batchId,
+          semesterId
         })
       )
     )

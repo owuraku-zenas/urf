@@ -40,7 +40,14 @@ export async function GET(request: Request) {
     // Fallback to hardcoded defaults if a template wasn't seeded or created yet
     const baseMessage = template?.content || "Happy Birthday, {{name}}! May God bless your new age. Have a wonderful day! - From URF Leadership."
 
-    // 4. Dispatch SMS using the integrated provider
+    // 4. Obtain Active Semester for Financial Tracking
+    const activeSemester = await prisma.semester.findFirst({
+      where: { status: 'ACTIVE' },
+      select: { id: true }
+    })
+    const semesterId = activeSemester?.id
+
+    // 5. Dispatch SMS using the integrated provider
     const results = await Promise.all(
       birthdayMembers.map((member) => {
         const firstName = member.name.split(" ")[0]
@@ -50,6 +57,7 @@ export async function GET(request: Request) {
           recipientId: member.id,
           phoneNumber: member.phone,
           message: personalizedMessage,
+          semesterId
         })
       })
     )

@@ -227,7 +227,11 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 - **Dashboard Quick-Glance**: Implement an `<UpcomingBirthdays />` card natively on the main `app/page.tsx` Dashboard. By querying `birthMonth` and `birthDay` against the current UTC date, the system will highlight members whose birthdays fall within the upcoming 7-14 days.
 - **Actionable UI**: Provide a direct 1-click CTA inside the widget to route the admin to the `/admin/sms` composer, automatically pre-filling the birthday member's contact block for quick celebratory outreach.
 
-### D. Workflow & Documentation Enforcement
+### D. SMS Spend Tracking & Analytics
+- **Hubtel Rate Capture**: Expand the `SmsLog` Prisma model to capture `cost` (Float) and `semesterId`. Modify `lib/sms.ts` to natively extract the `rate` payload returned by Hubtel and persist it.
+- **Semester Filtered Billing**: Implement a financial dashboard tab natively in `/admin/sms` summing the total `Ghc` spent on SMS transactions, dynamically filterable by the active Academic Semester.
+
+### E. Workflow & Documentation Enforcement
 - **Continuous Integration**: Ensure that periodic `git commit` operations are executed granularly after every major feature transition (UI separation, chart development, endpoint relaxing).
 - **Living Documentation**: The `README.md` changelog and `docs.md` feature summaries must be updated synchronously alongside functional code pushes to prevent documentation debt.
 
@@ -245,29 +249,29 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 *Goal: Address logical edge cases in attendance scoring and streamline the administrative dashboards.*
 
 ### A. Dynamic Attendance Baselines
-- [ ] **Algorithm Update (`lib/commitment.ts`)**: Refactor the attendance scoring algorithm. Automatically exclude any `Event` whose `date` occurred prior to a user's explicit `joinDate` when calculating their total expected events. This ensures new members aren't penalized for events they mathematically couldn't attend.
+- [x] **Algorithm Update (`lib/commitment.ts`)**: Refactor the attendance scoring algorithm. Automatically exclude any `Event` whose `date` occurred prior to a user's explicit `joinDate` when calculating their total expected events. This ensures new members aren't penalized for events they mathematically couldn't attend.
 
 ### B. Dashboard Re-structuring
-- [ ] **Widget Migration**: Extract the `<UpcomingBirthdays />` widget from `app/page.tsx` and remount it on `app/members/page.tsx`. Per recent updates, it must be placed full-width *underneath* the Member List component, constrained to 5 tracking days instead of 14, and made vertically scrollable to preserve layout space.
-- [ ] **Redundant CTA Removal**: Strip the manual "Send SMS" CTA button from the `<UpcomingBirthdays />` component, as the newly integrated cron job (`/api/cron/birthdays`) now handles these dispatches autonomously.
-- [ ] **Member Attendance Context**: Integrate the `SemesterSelector` filter natively onto the Member page/attendance history so that an individual member's attendance can be dynamically filtered by academic semester.
+- [x] **Widget Migration**: Extract the `<UpcomingBirthdays />` widget from `app/page.tsx` and remount it on `app/members/page.tsx`. Per recent updates, it must be placed full-width *underneath* the Member List component, constrained to 5 tracking days instead of 14, and made vertically scrollable to preserve layout space.
+- [x] **Redundant CTA Removal**: Strip the manual "Send SMS" CTA button from the `<UpcomingBirthdays />` component, as the newly integrated cron job (`/api/cron/birthdays`) now handles these dispatches autonomously.
+- [x] **Member Attendance Context**: Integrate the `SemesterSelector` filter natively onto the Member page/attendance history so that an individual member's attendance can be dynamically filtered by academic semester.
 
 ### C. Bug Fixes & API Repairs
-- [ ] **Event Filtering Breakdown**: Investigate and fix the broken event filters on the frontend.
-- [ ] **Semester CRUD Fixes**: Repair the non-functional Edit and Delete buttons on the Semester management page.
-- [ ] **SMS Log Hydration**: Ensure the SMS Delivery Logs table correctly live-reloads/updates immediately after a new broadcast dispatch is submitted.
-- [ ] **Hubtel Status Desync**: Debug `lib/sms.ts` resolving the false-negative where Hubtel's native `status: 0` (success code) or `0000` is being incorrectly parsed by our backend as a native failure inside `SmsLog`.
+- [x] **Event Filtering Breakdown**: Investigate and fix the broken event filters on the frontend.
+- [x] **Semester CRUD Fixes**: Repair the non-functional Edit and Delete buttons on the Semester management page.
+- [x] **SMS Log Hydration**: Ensure the SMS Delivery Logs table correctly live-reloads/updates immediately after a new broadcast dispatch is submitted.
+- [x] **Hubtel Status Desync**: Debug `lib/sms.ts` resolving the false-negative where Hubtel's native `status: 0` (success code) or `0000` is being incorrectly parsed by our backend as a native failure inside `SmsLog`.
 
 ### D. Advanced RBAC & Constraints
-- [ ] **Strict Active Semester Logic**: Enforce a rigid database or state checking mechanism ensuring only the *latest* semester holds the `ACTIVE` flag, systematically marking all others as `CLOSED`. 
-- [ ] **Super-Admin Deletion Locks**: Restrict the ability to `DELETE` a Semester exclusively to the Super Admin account (`urfzone4@gmail.com`). Generic admins will be visually locked out of this action.
+- [x] **Strict Active Semester Logic**: Enforce a rigid database or state checking mechanism ensuring only the *latest* semester holds the `ACTIVE` flag, systematically marking all others as `CLOSED`. 
+- [x] **Super-Admin Deletion Locks**: Restrict the ability to `DELETE` a Semester exclusively to the Super Admin account (`urfzone4@gmail.com`). Generic admins will be visually locked out of this action.
 
 ### E. UI/UX Modernization & Simplification
-- [ ] **Universal Toasters**: Traverse all new, modified, or extended CRUD boundaries (`/api/members`, `/api/semesters`, `/api/sms`) ensuring standard UI implementation of the library "Toaster" successfully notifies users of form success/failures globally across all action responses.
-- [ ] **Template Modals**: Rip out the native JavaScript `prompt()`/`confirm()` dialogs currently used for SMS Template creation and replace them with modern, accessible React Modals (Shadcn UI).
-- [ ] **New Member Form Simplification**: Remove the manual `currentAcademicLevel` input field entirely. Set `admissionYear` and `startYear` to optional. Build a backend mapping utility to automatically infer their academic level strictly based on the provided admission year.
-- [ ] **New Member Grading Strategy**: Introduce a `NEW_MEMBER` status or temporary grace period to prevent newly joined individuals from immediately defaulting to an `UNCOMMITTED` classification before they've had a chance to attend events.
-- [ ] **Member List Pagination**: Introduce dynamic array-slicing pagination to the main Member List. Embed a user-selectable "rows-per-page" dropdown (10, 20, 50, All) natively integrated into the filter pane, avoiding monolithic DOM rendering delays.
+- [x] **Universal Toasters**: Traverse all new, modified, or extended CRUD boundaries (`/api/members`, `/api/semesters`, `/api/sms`) ensuring standard UI implementation of the library "Toaster" successfully notifies users of form success/failures globally across all action responses.
+- [x] **Template Modals**: Rip out the native JavaScript `prompt()`/`confirm()` dialogs currently used for SMS Template creation and replace them with modern, accessible React Modals (Shadcn UI).
+- [x] **New Member Form Simplification**: Remove the manual `currentAcademicLevel` input field entirely. Set `admissionYear` and `startYear` to optional. Build a backend mapping utility to automatically infer their academic level strictly based on the provided admission year.
+- [x] **New Member Grading Strategy**: Introduce a `NEW_MEMBER` status or temporary grace period to prevent newly joined individuals from immediately defaulting to an `UNCOMMITTED` classification before they've had a chance to attend events.
+- [x] **Member List Pagination**: Introduce dynamic array-slicing pagination to the main Member List. Embed a user-selectable "rows-per-page" dropdown (10, 20, 50, All) natively integrated into the filter pane, avoiding monolithic DOM rendering delays.
 
 ---
 
@@ -279,7 +283,7 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 - [ ] **Member Profile Validation**: Test Zod payload rejection (missing names, malformed connections).
 - [ ] **Commitment Algorithms (`lib/commitment.ts`)**: Test grading percentages transitioning statuses logically across simulated Event logs.
 - [ ] **RBAC Isolation**: Unit test API handlers explicitly dropping simulated generic `USER` roles from accessing `/api/semesters` or `/api/sms/send`.
-- [ ] **SMS Providers**: Test batch array creation processes and system constraints preventing `BIRTHDAY` template deletion.
+- [x] **SMS Providers & Billing Calculations**: Test batch array creation processes, system constraints preventing `BIRTHDAY` template deletion, and correctly summing Hubtel numerical rates.
 
 ### B. Deep E2E Functional Constraints (Playwright)
 *Validates real-world relational constraints natively simulating a user interacting with the UI against the local `npm run dev` database loop.*
@@ -289,3 +293,4 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 - [ ] **Event CRUD**: E2E tests generating, editing, reading, and deleting Events natively bound to active Semester contexts.
 - [ ] **Attendance CRUD**: E2E tests simulating `PRESENT`/`ABSENT` data entry workflows and confirming subsequent Pie Chart commitment ratio updates.
 - [ ] **SMS Templates CRUD**: E2E tests generating, editing, reading, and deleting custom templates while testing protection bounds around standard `BIRTHDAY` assets.
+- [ ] **SMS Spend Analytics**: E2E tests validating the analytical dashboard renders correct SUM aggregation for transaction `.rate` costs filtered strictly by specific Academic Semesters.

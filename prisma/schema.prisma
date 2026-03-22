@@ -149,6 +149,7 @@ model Semester {
   events       Event[]
   joinedMembers Member[] @relation("MemberJoinedSemester")
   commitments  SemesterCommitment[]
+  smsLogs      SmsLog[]
 }
 
 enum SemesterStatus {
@@ -202,12 +203,17 @@ model SmsLog {
   providerId     String?        
   errorMessage   String?        @db.Text
   batchId        String?
+  cost           Float?
+  semesterId     String?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
+
+  semester       Semester?      @relation(fields: [semesterId], references: [id], onDelete: SetNull)
 
   @@index([recipientId])
   @@index([status])
   @@index([batchId])
+  @@index([semesterId])
 }
 
 enum SmsStatus {

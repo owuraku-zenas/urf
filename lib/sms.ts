@@ -6,12 +6,14 @@ export interface SmsPayload {
   phoneNumber: string
   message: string
   batchId?: string
+  semesterId?: string
 }
 
 export interface SmsProviderResponse {
   success: boolean
   providerId?: string
   error?: string
+  rate?: number
 }
 
 /**
@@ -30,6 +32,8 @@ export async function sendSMS(payload: SmsPayload): Promise<SmsProviderResponse>
         phoneNumber: payload.phoneNumber,
         message: payload.message,
         batchId: payload.batchId,
+        semesterId: payload.semesterId,
+        cost: response.rate,
         status: response.success ? SmsStatus.SENT : SmsStatus.FAILED,
         providerId: response.providerId,
         errorMessage: response.error
@@ -42,16 +46,21 @@ export async function sendSMS(payload: SmsPayload): Promise<SmsProviderResponse>
     console.error("Critical failure during SMS Dispatch:", error)
     
     // Fallback log
-    await prisma.smsLog.create({
-      data: {
-        recipientId: payload.recipientId,
-        phoneNumber: payload.phoneNumber,
-        message: payload.message,
-        batchId: payload.batchId,
-        status: SmsStatus.FAILED,
-        errorMessage: error instanceof Error ? error.message : "Unknown critical error"
-      }
-    })
+    try {
+      await prisma.smsLog.create({
+        data: {
+          recipientId: payload.recipientId,
+          phoneNumber: payload.phoneNumber,
+          message: payload.message,
+          batchId: payload.batchId,
+          semesterId: payload.semesterId,
+          status: SmsStatus.FAILED,
+          errorMessage: error instanceof Error ? error.message : "Unknown critical error"
+        }
+      })
+    } catch (fallbackError) {
+      console.error("CRITICAL: Fallback logger also crashed. Usually means Prisma Client needs a restart.", fallbackError)
+    }
 
     return { success: false, error: "Critical dispatch failure" }
   }
@@ -81,7 +90,8 @@ async function dispatchToProvider(phone: string, message: string): Promise<SmsPr
     if (res.ok && (data.status === '0000' || data.status === '0' || data.status === 0 || data.status === 'success' || data.MessageId || data.messageId)) {
       return { 
         success: true, 
-        providerId: data.MessageId || data.messageId || `hubtel-${Date.now()}`
+        providerId: data.MessageId || data.messageId || `hubtel-${Date.now()}`,
+        rate: data.Rate || data.rate ? Number(data.Rate || data.rate) : undefined
       };
     }
     

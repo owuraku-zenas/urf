@@ -50,6 +50,12 @@ export default async function SmsAdminPage() {
     orderBy: { name: "asc" }
   })
 
+  // Fetch all existing semesters for analytical filtering
+  const semesters = await prisma.semester.findMany({
+    orderBy: { startDate: "desc" },
+    select: { id: true, name: true, status: true }
+  })
+
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="mb-8">
@@ -63,6 +69,7 @@ export default async function SmsAdminPage() {
         initialMembers={members} 
         initialLogs={logs} 
         initialTemplates={templates}
+        initialSemesters={semesters}
         activeSemesterId={activeSemester?.id || null} 
       />
     </div>
