@@ -2,6 +2,23 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
 
+function calculateAcademicLevel(admissionYear: string | undefined | null): string | null {
+  if (!admissionYear) return null;
+  const year = parseInt(admissionYear, 10);
+  if (isNaN(year)) return null;
+
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth(); // 0-based, August = 7
+  let level = (currentYear - year) * 100;
+  if (currentMonth >= 7) {
+    level += 100; // Passed August, so they advanced to the next level
+  }
+  
+  if (level <= 0) return "100";
+  if (level > 400) return null; // Over 400 is atypical for explicit mapping
+  return level.toString();
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
@@ -67,15 +84,15 @@ export async function POST(request: Request) {
     }
 
     // Extract IDs and remove them from the data object
-    const { 
-      cellGroupId, 
-      invitedById, 
+    const {
+      cellGroupId,
+      invitedById,
       joinedSemesterId,
       admissionYear,
       currentAcademicLevel,
       birthMonth,
       birthDay,
-      ...restData 
+      ...restData
     } = data
 
     const member = await prisma.member.create({
@@ -88,7 +105,7 @@ export async function POST(request: Request) {
           connect: { id: joinedSemesterId }
         } : undefined,
         admissionYear: admissionYear === "" ? null : admissionYear,
-        currentAcademicLevel: currentAcademicLevel === "" ? null : currentAcademicLevel,
+        currentAcademicLevel: calculateAcademicLevel(admissionYear === "" ? null : admissionYear),
         cellGroup: {
           connect: { id: cellGroupId }
         },
@@ -122,11 +139,11 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { 
-        error: "Failed to create member", 
+      {
+        error: "Failed to create member",
         details: errorMessage,
         code: errorCode,
-        stack: error?.stack 
+        stack: error?.stack
       },
       { status: 500 }
     );

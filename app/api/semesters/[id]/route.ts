@@ -49,12 +49,10 @@ export async function PATCH(
     if (status) updateData.status = status;
 
     if (status === "ACTIVE") {
-      const activeSemester = await db.semester.findFirst({
+      await db.semester.updateMany({
         where: { status: "ACTIVE", id: { not: id } },
+        data: { status: "CLOSED" }
       });
-      if (activeSemester) {
-        return new NextResponse("An active semester already exists. Please close it before activating a new one.", { status: 409 });
-      }
     }
 
     // In a production app, we would re-run overlap checks here for updated dates
@@ -83,6 +81,10 @@ export async function DELETE(
 
     if (!session?.user || session.user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    if (session.user.email !== "urfzone4@gmail.com") {
+      return new NextResponse("Forbidden: Only the Super Admin can randomly delete Semesters. Please mark it as CLOSED instead.", { status: 403 });
     }
 
     const { id } = await params;

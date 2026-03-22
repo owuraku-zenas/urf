@@ -13,6 +13,8 @@ import Link from "next/link"
 import { toast } from "sonner"
 import { z } from "zod"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts'
+import { useSemester } from "@/context/semester-context"
+import { SemesterSelector } from "@/components/semester-selector"
 
 interface MemberWithRelations extends Member {
   isActive: boolean;
@@ -55,9 +57,10 @@ interface Attendance {
   status: 'PRESENT' | 'ABSENT'
 }
 
-export default function MemberDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  export default function MemberDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
+  const { selectedSemester } = useSemester()
   const [member, setMember] = useState<MemberWithRelations | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -83,7 +86,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
 
     const fetchAttendance = async () => {
       try {
-        const response = await fetch(`/api/members/${id}/attendance`)
+        const response = await fetch(`/api/members/${id}/attendance?semesterId=${selectedSemester || ""}`)
         if (!response.ok) {
           throw new Error('Failed to fetch attendance')
         }
@@ -97,7 +100,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
 
     fetchMember()
     fetchAttendance()
-  }, [id])
+  }, [id, selectedSemester])
 
   const filteredInvitees = member?.invitees.filter(invitee => {
     const inviteeDate = new Date(invitee.createdAt)
@@ -385,8 +388,8 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
-              {/* Date Range Filter */}
-              <div className="flex flex-col sm:flex-row gap-4">
+              {/* Filters */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
                 <div className="flex gap-2 w-full sm:w-auto">
                   <Input
                     type="date"

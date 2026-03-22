@@ -238,3 +238,54 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 - [x] **API Endpoints**: Provision explicit CRUD endpoints (`GET/POST /api/sms/templates` and `PATCH/DELETE /api/sms/templates/[id]`) for UI consumption.
 - [x] **Administrative UI Panels**: Extend `sms-dashboard.tsx` with a tertiary "Message Templates" interactive pane mapping generic templates for quick modifications alongside a direct integration into the Message composer text area.
 - [x] **Cron Hooking**: Overhaul `app/api/cron/birthdays/route.ts` to natively query and serialize the protected 'BIRTHDAY' template text seamlessly preventing hard-coded bottlenecks.
+
+---
+
+## 16. Phase 5: Logic Refinements & Layout Adjustments
+*Goal: Address logical edge cases in attendance scoring and streamline the administrative dashboards.*
+
+### A. Dynamic Attendance Baselines
+- [ ] **Algorithm Update (`lib/commitment.ts`)**: Refactor the attendance scoring algorithm. Automatically exclude any `Event` whose `date` occurred prior to a user's explicit `joinDate` when calculating their total expected events. This ensures new members aren't penalized for events they mathematically couldn't attend.
+
+### B. Dashboard Re-structuring
+- [ ] **Widget Migration**: Extract the `<UpcomingBirthdays />` widget from `app/page.tsx` and remount it on `app/members/page.tsx`. Per recent updates, it must be placed full-width *underneath* the Member List component, constrained to 5 tracking days instead of 14, and made vertically scrollable to preserve layout space.
+- [ ] **Redundant CTA Removal**: Strip the manual "Send SMS" CTA button from the `<UpcomingBirthdays />` component, as the newly integrated cron job (`/api/cron/birthdays`) now handles these dispatches autonomously.
+- [ ] **Member Attendance Context**: Integrate the `SemesterSelector` filter natively onto the Member page/attendance history so that an individual member's attendance can be dynamically filtered by academic semester.
+
+### C. Bug Fixes & API Repairs
+- [ ] **Event Filtering Breakdown**: Investigate and fix the broken event filters on the frontend.
+- [ ] **Semester CRUD Fixes**: Repair the non-functional Edit and Delete buttons on the Semester management page.
+- [ ] **SMS Log Hydration**: Ensure the SMS Delivery Logs table correctly live-reloads/updates immediately after a new broadcast dispatch is submitted.
+- [ ] **Hubtel Status Desync**: Debug `lib/sms.ts` resolving the false-negative where Hubtel's native `status: 0` (success code) or `0000` is being incorrectly parsed by our backend as a native failure inside `SmsLog`.
+
+### D. Advanced RBAC & Constraints
+- [ ] **Strict Active Semester Logic**: Enforce a rigid database or state checking mechanism ensuring only the *latest* semester holds the `ACTIVE` flag, systematically marking all others as `CLOSED`. 
+- [ ] **Super-Admin Deletion Locks**: Restrict the ability to `DELETE` a Semester exclusively to the Super Admin account (`urfzone4@gmail.com`). Generic admins will be visually locked out of this action.
+
+### E. UI/UX Modernization & Simplification
+- [ ] **Universal Toasters**: Traverse all new, modified, or extended CRUD boundaries (`/api/members`, `/api/semesters`, `/api/sms`) ensuring standard UI implementation of the library "Toaster" successfully notifies users of form success/failures globally across all action responses.
+- [ ] **Template Modals**: Rip out the native JavaScript `prompt()`/`confirm()` dialogs currently used for SMS Template creation and replace them with modern, accessible React Modals (Shadcn UI).
+- [ ] **New Member Form Simplification**: Remove the manual `currentAcademicLevel` input field entirely. Set `admissionYear` and `startYear` to optional. Build a backend mapping utility to automatically infer their academic level strictly based on the provided admission year.
+- [ ] **New Member Grading Strategy**: Introduce a `NEW_MEMBER` status or temporary grace period to prevent newly joined individuals from immediately defaulting to an `UNCOMMITTED` classification before they've had a chance to attend events.
+- [ ] **Member List Pagination**: Introduce dynamic array-slicing pagination to the main Member List. Embed a user-selectable "rows-per-page" dropdown (10, 20, 50, All) natively integrated into the filter pane, avoiding monolithic DOM rendering delays.
+
+---
+
+## 17. Phase 6: Zero-Infra Comprehensive Testing Suite
+*Goal: Ensure no feature regressions occur during schema changes by writing robust, exhaustive tests for ALL functionalities using a dual-layer approach (Jest Mocks + Playwright), requiring zero external testing DB infrastructure.*
+
+### A. API Unit Tests (Jest + Prisma Mocking)
+*Focuses purely on application logic, algorithm validations, and auth boundary checks without hitting a real database.*
+- [ ] **Member Profile Validation**: Test Zod payload rejection (missing names, malformed connections).
+- [ ] **Commitment Algorithms (`lib/commitment.ts`)**: Test grading percentages transitioning statuses logically across simulated Event logs.
+- [ ] **RBAC Isolation**: Unit test API handlers explicitly dropping simulated generic `USER` roles from accessing `/api/semesters` or `/api/sms/send`.
+- [ ] **SMS Providers**: Test batch array creation processes and system constraints preventing `BIRTHDAY` template deletion.
+
+### B. Deep E2E Functional Constraints (Playwright)
+*Validates real-world relational constraints natively simulating a user interacting with the UI against the local `npm run dev` database loop.*
+- [ ] **Member CRUD**: E2E browser tests generating, editing, reading, and deleting Members against valid payload scalar formatting.
+- [ ] **Cell Group CRUD**: E2E tests generating, editing, reading, and deleting Cell Groups, assuring aggregate member counts persist correctly.
+- [ ] **Semester CRUD**: E2E tests generating, editing, reading, and deleting Semesters, enforcing boundary locks preventing multiple `ACTIVE` flags simultaneously.
+- [ ] **Event CRUD**: E2E tests generating, editing, reading, and deleting Events natively bound to active Semester contexts.
+- [ ] **Attendance CRUD**: E2E tests simulating `PRESENT`/`ABSENT` data entry workflows and confirming subsequent Pie Chart commitment ratio updates.
+- [ ] **SMS Templates CRUD**: E2E tests generating, editing, reading, and deleting custom templates while testing protection bounds around standard `BIRTHDAY` assets.

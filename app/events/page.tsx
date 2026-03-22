@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Plus, Eye } from "lucide-react"
 import { useSession } from "next-auth/react"
+import { useSemester } from "@/context/semester-context"
 
 interface Event {
   id: string
@@ -35,10 +36,12 @@ export default function EventsPage() {
   const { data: session } = useSession()
   const isAdmin = session?.user?.role === 'ADMIN'
 
+  const { selectedSemester } = useSemester()
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch('/api/events')
+        const response = await fetch(`/api/events?semesterId=${selectedSemester || ""}`)
         if (!response.ok) {
           throw new Error('Failed to fetch events')
         }
@@ -52,7 +55,7 @@ export default function EventsPage() {
     }
 
     fetchEvents()
-  }, [])
+  }, [selectedSemester])
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)

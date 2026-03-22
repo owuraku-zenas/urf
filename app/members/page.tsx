@@ -14,6 +14,7 @@ import { generateMemberListPDF } from "@/lib/pdf-utils"
 import { useUser } from "@/context/user-context"
 import { useSemester } from "../../context/semester-context"
 import { SemesterSelector } from "@/components/semester-selector"
+import UpcomingBirthdays from "@/components/upcoming-birthdays"
 
 interface Member {
   id: string
@@ -65,6 +66,12 @@ export default function MembersPage() {
   const [selectedCommitment, setSelectedCommitment] = useState("all")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery, selectedCellGroup, selectedStatus, selectedCommitment, startDate, endDate, itemsPerPage])
 
   const handleDeleteMember = async (memberId: string) => {
     if (!window.confirm("Are you sure you want to delete this member?")) return;
@@ -128,6 +135,12 @@ export default function MembersPage() {
 
     return matchesSearch && matchesCellGroup && matchesStatus && matchesCommitment && matchesDateRange
   })
+
+  // Pagination Logic
+  const totalPages = Math.ceil(filteredMembers.length / itemsPerPage)
+  const paginatedMembers = itemsPerPage > 0 
+    ? filteredMembers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+    : filteredMembers
 
   // KPI Calculations
   const committedCount = members.filter(m => getCommitmentStatus(m) === 'COMMITTED').length
@@ -215,34 +228,34 @@ export default function MembersPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3 mb-6">
-        <Card className="bg-green-50/50 border-green-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-800">Committed Members</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{committedCount}</div>
-            <p className="text-xs text-green-600/80 mt-1">High attendance track</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-yellow-50/50 border-yellow-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-yellow-800">At Risk Members</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{atRiskCount}</div>
-            <p className="text-xs text-yellow-600/80 mt-1">40-74% attendance track</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-red-50/50 border-red-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-red-800">Uncommitted Members</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{uncommittedCount}</div>
-            <p className="text-xs text-red-600/80 mt-1">Below standard tracking</p>
-          </CardContent>
-        </Card>
-      </div>
+          <Card className="bg-green-50/50 border-green-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-green-800">Committed Members</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">{committedCount}</div>
+              <p className="text-xs text-green-600/80 mt-1">High attendance track</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-yellow-50/50 border-yellow-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-yellow-800">At Risk Members</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-yellow-600">{atRiskCount}</div>
+              <p className="text-xs text-yellow-600/80 mt-1">40-74% attendance track</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-red-50/50 border-red-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-red-800">Uncommitted Members</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-600">{uncommittedCount}</div>
+              <p className="text-xs text-red-600/80 mt-1">Below standard tracking</p>
+            </CardContent>
+          </Card>
+        </div>
 
       <Card className="mb-6">
         <CardHeader>
@@ -301,6 +314,20 @@ export default function MembersPage() {
                   <SelectItem value="committed">Committed</SelectItem>
                   <SelectItem value="at_risk">At Risk</SelectItem>
                   <SelectItem value="uncommitted">Uncommitted</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select
+                value={itemsPerPage.toString()}
+                onValueChange={(val) => setItemsPerPage(Number(val))}
+              >
+                <SelectTrigger className="w-full sm:w-[130px]">
+                  <SelectValue placeholder="Per page" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10 per page</SelectItem>
+                  <SelectItem value="20">20 per page</SelectItem>
+                  <SelectItem value="50">50 per page</SelectItem>
+                  <SelectItem value="1000000">All</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -370,14 +397,14 @@ export default function MembersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredMembers.length === 0 ? (
+                {paginatedMembers.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center">
                       No members found
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredMembers.map((member) => (
+                  paginatedMembers.map((member) => (
                     <TableRow key={member.id}>
                       <TableCell className="font-medium">
                         <div>
@@ -435,8 +462,42 @@ export default function MembersPage() {
               </TableBody>
             </Table>
           </div>
+
+          {/* Pagination Controls */}
+          {filteredMembers.length > 0 && (
+            <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-sm text-gray-500">
+                Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredMembers.length)} of {filteredMembers.length} members
+              </div>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                <div className="text-sm font-medium px-2">
+                  Page {currentPage} of {Math.max(1, totalPages)}
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage >= totalPages || totalPages === 0}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      <div className="w-full">
+        <UpcomingBirthdays />
+      </div>
     </div>
   )
 }

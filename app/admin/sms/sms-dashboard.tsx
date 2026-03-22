@@ -1,10 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 
 interface SmsDashboardProps {
   initialMembers: any[]
@@ -18,6 +21,7 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
 
   // State
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [members, setMembers] = useState(initialMembers)
   const [templates, setTemplates] = useState<any[]>(initialTemplates || [])
   const [selectedIds, setSelectedIds] = useState<string[]>([])
@@ -27,6 +31,10 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
   const [searchQuery, setSearchQuery] = useState("")
   const [filterMode, setFilterMode] = useState<"all" | "committed" | "at_risk" | "uncommitted" | "level100" | "active">("all")
   const [selectedCell, setSelectedCell] = useState<string>("all")
+  
+  const [showTemplateModal, setShowTemplateModal] = useState(false)
+  const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null)
+  const [templateForm, setTemplateForm] = useState({ name: "", content: "" })
 
   // Extract unique cell groups for the dropdown
   const uniqueCells = Array.from(new Set(members.map(m => m.cellGroup?.name).filter(Boolean))).sort()
@@ -116,9 +124,11 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
 
       if (!res.ok) throw new Error(data.error || "Failed to send broadcast")
 
-      toast({ title: "Broadcast Queued", description: data.message })
+      toast({ title: "Broadcast Sent Successfully", description: data.message })
       setMessage("") // Clear the composer
       setSelectedIds([]) // Clear selection
+      router.refresh()
+      setActiveTab("history")
     } catch (error) {
       toast({
         title: "Broadcast Failed",
@@ -127,6 +137,40 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
       })
     } finally {
       setIsSending(false)
+    }
+  }
+
+  const handleSaveTemplate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!templateForm.name || !templateForm.content) return
+
+    try {
+      if (editingTemplateId) {
+        const res = await fetch(`/api/sms/templates/${editingTemplateId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(templateForm)
+        })
+        const data = await res.json()
+        if (data.id) {
+          setTemplates(templates.map((t: any) => t.id === data.id ? data : t).sort((a,b) => a.name.localeCompare(b.name)))
+          toast({ title: "Template saved" })
+        }
+      } else {
+        const res = await fetch("/api/sms/templates", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(templateForm)
+        })
+        const data = await res.json()
+        if (data.id) {
+          setTemplates([...templates, data].sort((a,b) => a.name.localeCompare(b.name)))
+          toast({ title: "Template created successfully" })
+        }
+      }
+      setShowTemplateModal(false)
+    } catch (err) {
+      toast({ title: "Operation failed", variant: "destructive" })
     }
   }
 
@@ -421,21 +465,9 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-semibold text-gray-700">Message Templates</h3>
             <Button size="sm" onClick={() => {
-              const name = prompt("Enter Template Name:")
-              if (!name) return
-              const content = prompt("Enter Message Content:\n(Use {{name}} for personalization)")
-              if (!content) return
-              
-              fetch("/api/sms/templates", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, content })
-              }).then(r => r.json()).then(data => {
-                if (data.id) setTemplates([...templates, data].sort((a,b) => a.name.localeCompare(b.name)))
-                toast({ title: "Template created successfully" })
-              }).catch(err => {
-                toast({ title: "Failed to create", variant: "destructive" })
-              })
+              setEditingTemplateId(null)
+              setTemplateForm({ name: "", content: "" })
+              setShowTemplateModal(true)
             }}>+ New Template</Button>
           </div>
           
@@ -453,21 +485,9 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
                   <div className="flex gap-3">
                     <button 
                       onClick={() => {
-                        const newName = prompt("Edit Name:", tmpl.name)
-                        if (!newName) return
-                        const newContent = prompt("Edit Content:\n(Use {{name}} for personalization)", tmpl.content)
-                        if (!newContent) return
-                        
-                        fetch(`/api/sms/templates/${tmpl.id}`, {
-                          method: "PATCH",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ name: newName, content: newContent })
-                        }).then(r => r.json()).then(data => {
-                          if (data.id) {
-                            setTemplates(templates.map((t: any) => t.id === data.id ? data : t).sort((a,b) => a.name.localeCompare(b.name)))
-                            toast({ title: "Template saved" })
-                          }
-                        })
+                        setEditingTemplateId(tmpl.id)
+                        setTemplateForm({ name: tmpl.name, content: tmpl.content })
+                        setShowTemplateModal(true)
                       }}
                       className="text-xs font-medium text-blue-600 hover:underline"
                     >
@@ -495,6 +515,42 @@ export default function SmsDashboard({ initialMembers, initialLogs, initialTempl
             ))}
             {templates.length === 0 && <p className="text-sm text-gray-500 text-center py-8">No templates created yet. Click New Template to start.</p>}
           </div>
+
+          {/* Template Modal */}
+          <Dialog open={showTemplateModal} onOpenChange={setShowTemplateModal}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{editingTemplateId ? "Edit Template" : "New Template"}</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSaveTemplate} className="space-y-4 mt-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Template Name</label>
+                  <Input 
+                    required 
+                    value={templateForm.name} 
+                    onChange={e => setTemplateForm({...templateForm, name: e.target.value})} 
+                    placeholder="E.g. Sunday Service Reminder"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block flex justify-between">
+                    <span>Message Content</span>
+                    <span className="text-xs text-gray-500 font-mono">Use {"{{name}}"}</span>
+                  </label>
+                  <Textarea 
+                    required 
+                    value={templateForm.content} 
+                    onChange={e => setTemplateForm({...templateForm, content: e.target.value})}
+                    placeholder="Hello {{name}}, join us this Sunday..."
+                    rows={6}
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  {editingTemplateId ? "Save Changes" : "Create Template"}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       )}
     </div>

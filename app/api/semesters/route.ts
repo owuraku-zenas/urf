@@ -46,14 +46,12 @@ export async function POST(req: Request) {
       return new NextResponse("End date must be after start date", { status: 400 });
     }
 
-    // Enforce only one active semester
+    // Enforce only one active semester by auto-closing others
     if (status === "ACTIVE") {
-      const activeSemester = await db.semester.findFirst({
+      await db.semester.updateMany({
         where: { status: "ACTIVE" },
+        data: { status: "CLOSED" }
       });
-      if (activeSemester) {
-        return new NextResponse("An active semester already exists. Please close it before activating a new one.", { status: 409 });
-      }
     }
 
     // Prevent overlapping dates

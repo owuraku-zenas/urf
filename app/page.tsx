@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useSemester } from "@/context/semester-context"
 import { SemesterSelector } from "@/components/semester-selector"
-import UpcomingBirthdays from "@/components/upcoming-birthdays"
 
 interface Stats {
   memberCount: number
@@ -291,12 +290,6 @@ export default function Home() {
                 View Analytics
               </Link>
             </div>
-          </div>
-        </div>
-
-        <div className="mt-8 grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
-          <div className="lg:col-span-1">
-            <UpcomingBirthdays />
           </div>
         </div>
       </div>

@@ -7,33 +7,45 @@ const AT_RISK_THRESHOLD = 0.4;
 
 export async function calculateMemberCommitment(memberId: string, semesterId: string) {
   try {
-    // 1. Get the total number of events in this semester
+    const member = await prisma.member.findUnique({
+      where: { id: memberId },
+      select: { joinDate: true }
+    });
+
+    if (!member) {
+      console.warn(`Member ${memberId} not found when calculating commitment`);
+      return;
+    }
+
+    // 1. Get the total number of events in this semester that occurred ON OR AFTER the member joined
     const totalEvents = await prisma.event.count({
-      where: { semesterId },
+      where: { 
+        semesterId,
+        date: { gte: member.joinDate }
+      },
     })
 
     if (totalEvents === 0) {
-      // No events yet in this semester, so we can't calculate a meaningful percentage.
-      // Default them to UNCOMMITTED for now, but don't overwrite manual overrides.
+      // No events yet in this semester since they joined. Don't penalize them.
       const existingCommitment = await prisma.semesterCommitment.findUnique({
          where: {
             memberId_semesterId: { memberId, semesterId }
          }
       });
       if (!existingCommitment?.overrideReason) {
-          await upsertCommitment(memberId, semesterId, 'UNCOMMITTED');
+          await upsertCommitment(memberId, semesterId, 'NEW_MEMBER');
       }
       return;
     }
 
     // 2. Count how many times this specific member attended an event in this semester
-    // (Assuming AttendanceStatus.PRESENT is the only status tracked, or we only count PRESENT rows)
     const memberAttendances = await prisma.attendance.count({
       where: {
         memberId,
         status: 'PRESENT',
         event: {
           semesterId,
+          date: { gte: member.joinDate }
         },
       },
     })
@@ -42,7 +54,7 @@ export async function calculateMemberCommitment(memberId: string, semesterId: st
     const attendancePercentage = memberAttendances / totalEvents;
 
     // 4. Determine Status
-    let newStatus: 'COMMITTED' | 'UNCOMMITTED' | 'AT_RISK' = 'UNCOMMITTED';
+    let newStatus: 'COMMITTED' | 'UNCOMMITTED' | 'AT_RISK' | 'NEW_MEMBER' = 'UNCOMMITTED';
     
     if (attendancePercentage >= COMMITTED_THRESHOLD) {
       newStatus = 'COMMITTED';
@@ -59,14 +71,14 @@ export async function calculateMemberCommitment(memberId: string, semesterId: st
 }
 
 // Helper to handle the actual database upsert, respecting manual overrides
-async function upsertCommitment(memberId: string, semesterId: string, calculatedStatus: 'COMMITTED' | 'UNCOMMITTED' | 'AT_RISK') {
+async function upsertCommitment(memberId: string, semesterId: string, calculatedStatus: 'COMMITTED' | 'UNCOMMITTED' | 'AT_RISK' | 'NEW_MEMBER') {
     const existing = await prisma.semesterCommitment.findUnique({
         where: {
             memberId_semesterId: { memberId, semesterId }
         }
     });
 
-    // If an Admin has manually overridden the status, do not overwrite it with the automated calculation.
+    // If an Admin has manually overridden the status, do not overwrite it.
     if (existing?.overrideReason) {
         return existing;
     }
@@ -79,12 +91,12 @@ async function upsertCommitment(memberId: string, semesterId: string, calculated
             }
         },
         update: {
-            status: calculatedStatus,
+            status: calculatedStatus as any,
         },
         create: {
             memberId,
             semesterId,
-            status: calculatedStatus,
+            status: calculatedStatus as any,
         }
     });
 }

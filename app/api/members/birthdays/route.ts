@@ -38,10 +38,10 @@ export async function GET(request: Request) {
         const nextYearDate = new Date(today.getFullYear() + 1, member.birthMonth - 1, member.birthDay);
         const nextDiffTime = nextYearDate.getTime() - today.getTime();
         const nextDiffDays = Math.ceil(nextDiffTime / (1000 * 60 * 60 * 24));
-        return nextDiffDays <= 14; 
+        return nextDiffDays <= 5; 
       }
       
-      return diffDays <= 14; // upcoming within 14 days
+      return diffDays <= 5; // upcoming within 5 days
     }).sort((a, b) => {
         // sort by nearest
         const aDate = new Date(today.getFullYear(), a.birthMonth! - 1, a.birthDay!);

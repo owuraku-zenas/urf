@@ -172,7 +172,7 @@ model SemesterCommitment {
   id             String           @id @default(cuid())
   memberId       String
   semesterId     String
-  status         CommitmentStatus @default(UNCOMMITTED)
+  status         CommitmentStatus @default(NEW_MEMBER)
   overrideReason String?
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
@@ -189,6 +189,7 @@ enum CommitmentStatus {
   COMMITTED
   UNCOMMITTED
   AT_RISK
+  NEW_MEMBER
 }
 
 model SmsLog {

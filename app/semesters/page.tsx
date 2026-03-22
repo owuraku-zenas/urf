@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { format } from "date-fns"
+import { useSession } from "next-auth/react"
+import { toast } from "sonner"
 
 interface Semester {
   id: string
@@ -19,9 +21,11 @@ interface Semester {
 }
 
 export default function SemestersPage() {
+  const { data: session } = useSession()
   const [semesters, setSemesters] = useState<Semester[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState({
     name: "",
     startDate: "",
@@ -47,18 +51,60 @@ export default function SemestersPage() {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  async function handleCreateSemester(e: React.FormEvent) {
+  function handleEditClick(semester: Semester) {
+    setForm({
+      name: semester.name,
+      startDate: format(new Date(semester.startDate), "yyyy-MM-dd"),
+      endDate: format(new Date(semester.endDate), "yyyy-MM-dd"),
+      academicYear: semester.academicYear,
+      status: semester.status,
+    })
+    setEditingId(semester.id)
+    setShowModal(true)
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("Are you sure you want to delete this semester?")) return
+    const res = await fetch(`/api/semesters/${id}`, { method: "DELETE" })
+    if (res.ok) {
+      toast.success("Semester deleted")
+      setSemesters(semesters.filter(s => s.id !== id))
+    } else {
+      toast.error(await res.text())
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const res = await fetch("/api/semesters", {
-      method: "POST",
+    const url = editingId ? `/api/semesters/${editingId}` : "/api/semesters"
+    const method = editingId ? "PATCH" : "POST"
+    
+    const res = await fetch(url, {
+      method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form)
     })
+    
     if (res.ok) {
       setShowModal(false)
-      setForm({ name: "", startDate: "", endDate: "", academicYear: "", status: "ACTIVE" })
-      const newSemester = await res.json()
-      setSemesters(prev => [newSemester, ...prev])
+      const savedSemester = await res.json()
+      if (editingId) {
+        if (savedSemester.status === "ACTIVE") {
+           setSemesters(prev => prev.map(s => s.id === editingId ? savedSemester : { ...s, status: "CLOSED" }))
+        } else {
+           setSemesters(prev => prev.map(s => s.id === editingId ? savedSemester : s))
+        }
+      } else {
+        if (savedSemester.status === "ACTIVE") {
+           setSemesters(prev => [savedSemester, ...prev.map(s => ({ ...s, status: "CLOSED" as const }))])
+        } else {
+           setSemesters(prev => [savedSemester, ...prev])
+        }
+      }
+      toast.success(editingId ? "Semester updated successfully" : "Semester created successfully")
+      setEditingId(null)
+    } else {
+      toast.error(await res.text())
     }
   }
 
@@ -72,13 +118,16 @@ export default function SemestersPage() {
           <div className="mb-4 flex justify-end">
             <Dialog open={showModal} onOpenChange={setShowModal}>
               <DialogTrigger asChild>
-                <Button variant="default">Create Semester</Button>
+                <Button variant="default" onClick={() => {
+                  setEditingId(null)
+                  setForm({ name: "", startDate: "", endDate: "", academicYear: "", status: "ACTIVE" })
+                }}>Create Semester</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Create Semester</DialogTitle>
+                  <DialogTitle>{editingId ? "Edit Semester" : "Create Semester"}</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleCreateSemester} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <Input name="name" value={form.name} onChange={handleInputChange} placeholder="Semester Name" required />
                   <Input name="academicYear" value={form.academicYear} onChange={handleInputChange} placeholder="Academic Year" required />
                   <Input name="startDate" type="date" value={form.startDate} onChange={handleInputChange} placeholder="Start Date" required />
@@ -92,7 +141,7 @@ export default function SemestersPage() {
                       <SelectItem value="CLOSED">Closed</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button type="submit" variant="default">Create</Button>
+                  <Button type="submit" variant="default">{editingId ? "Save Changes" : "Create"}</Button>
                 </form>
               </DialogContent>
             </Dialog>
@@ -127,8 +176,10 @@ export default function SemestersPage() {
                       <TableCell>{format(new Date(semester.endDate), "yyyy-MM-dd")}</TableCell>
                       <TableCell>{semester.status === "ACTIVE" ? <span className="font-medium text-green-600">Active</span> : <span className="font-medium text-gray-400">Closed</span>}</TableCell>
                       <TableCell>
-                        <Button variant="outline" size="sm">Edit</Button>
-                        <Button variant="destructive" size="sm" className="ml-2">Delete</Button>
+                        <Button variant="outline" size="sm" onClick={() => handleEditClick(semester)}>Edit</Button>
+                        {session?.user?.email === "urfzone4@gmail.com" && (
+                           <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDelete(semester.id)}>Delete</Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))

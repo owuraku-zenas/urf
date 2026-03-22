@@ -39,14 +39,13 @@ const MemberFormSchema = z.object({
   joinDate: z.string().min(1, "Join date is required"),
   university: z.string().max(100, "University name is too long").nullable().optional(),
   program: z.string().max(100, "Program name is too long").nullable().optional(),
-  startYear: z.string().regex(/^\d{4}$/, "Start year must be a 4-digit number").nullable().optional(),
+  startYear: z.string().refine(val => !val || /^\d{4}$/.test(val), "Must be a 4-digit number").nullable().optional(),
   hostel: z.string().max(50, "Hostel name is too long").nullable().optional(),
   roomNumber: z.string().max(20, "Room number is too long").nullable().optional(),
   cellGroupId: z.string().min(1, "Cell group is required"),
   invitedById: z.string().nullable().optional(),
   isActive: z.boolean().optional(),
-  admissionYear: z.string().regex(/^\d{4}$/, "Admission year must be a 4-digit number").nullable().optional(),
-  currentAcademicLevel: z.string().nullable().optional(),
+  admissionYear: z.string().refine(val => !val || /^\d{4}$/.test(val), "Must be a 4-digit number").nullable().optional(),
   joinedSemesterId: z.string().nullable().optional(),
 })
 
@@ -94,7 +93,6 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
     invitedById: "",
     isActive: false,
     admissionYear: "",
-    currentAcademicLevel: "",
     joinedSemesterId: "",
   })
 
@@ -116,7 +114,6 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
           joinDate: memberData.joinDate ? new Date(memberData.joinDate).toISOString().split('T')[0] : "",
           isActive: memberData.isActive ?? false,
           admissionYear: memberData.admissionYear ?? "",
-          currentAcademicLevel: memberData.currentAcademicLevel ?? "",
           joinedSemesterId: memberData.joinedSemesterId ?? "",
         }
         
@@ -527,32 +524,6 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
                 )}
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="currentAcademicLevel" className="block text-sm font-medium">
-                  Current Academic Level
-                </label>
-                <select
-                  id="currentAcademicLevel"
-                  name="currentAcademicLevel"
-                  value={formData.currentAcademicLevel ?? ""}
-                  onChange={handleChange}
-                  className={`w-full rounded-md border ${errors.currentAcademicLevel ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
-                >
-                  <option value="">Select level...</option>
-                  <option value="100">Level 100</option>
-                  <option value="200">Level 200</option>
-                  <option value="300">Level 300</option>
-                  <option value="400">Level 400</option>
-                  <option value="500">Level 500</option>
-                  <option value="600">Level 600</option>
-                  <option value="POSTGRAD">Postgraduate</option>
-                  <option value="ALUMNI">Alumni</option>
-                  <option value="OTHER">Other</option>
-                </select>
-                {errors.currentAcademicLevel && (
-                  <p className="text-sm text-red-500">{errors.currentAcademicLevel}</p>
-                )}
-              </div>
 
               <div className="space-y-2">
                 <label htmlFor="joinedSemesterId" className="block text-sm font-medium">

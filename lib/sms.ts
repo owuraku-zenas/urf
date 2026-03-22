@@ -78,7 +78,7 @@ async function dispatchToProvider(phone: string, message: string): Promise<SmsPr
     const data = await res.json();
     
     // Hubtel often returns status field or MessageId on success
-    if (res.ok && (data.status === '0000' || data.status === 'success' || data.MessageId)) {
+    if (res.ok && (data.status === '0000' || data.status === '0' || data.status === 0 || data.status === 'success' || data.MessageId || data.messageId)) {
       return { 
         success: true, 
         providerId: data.MessageId || data.messageId || `hubtel-${Date.now()}`

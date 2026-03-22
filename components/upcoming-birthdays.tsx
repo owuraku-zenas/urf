@@ -2,10 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Gift, MessageSquare } from "lucide-react"
-import Link from "next/link"
-import { useSession } from "next-auth/react"
+import { Gift } from "lucide-react"
 
 interface BirthdayMember {
   id: string
@@ -21,8 +18,6 @@ interface BirthdayMember {
 export default function UpcomingBirthdays() {
   const [birthdays, setBirthdays] = useState<BirthdayMember[]>([])
   const [loading, setLoading] = useState(true)
-  const { data: session } = useSession()
-  const isAdmin = session?.user?.role === "ADMIN"
 
   useEffect(() => {
     const fetchBirthdays = async () => {
@@ -65,7 +60,7 @@ export default function UpcomingBirthdays() {
         <CardTitle className="flex items-center gap-2">
           <Gift className="h-5 w-5 text-blue-500" /> Upcoming Birthdays
         </CardTitle>
-        <CardDescription>Members celebrating in the next 14 days</CardDescription>
+        <CardDescription>Members celebrating in the next 5 days</CardDescription>
       </CardHeader>
       <CardContent>
         {birthdays.length === 0 ? (
@@ -74,7 +69,7 @@ export default function UpcomingBirthdays() {
             <p>No upcoming birthdays found.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
             {birthdays.map((member) => (
               <div key={member.id} className="flex items-center justify-between rounded-lg border p-3 shadow-sm transition-all hover:bg-gray-50">
                 <div>
@@ -84,14 +79,6 @@ export default function UpcomingBirthdays() {
                     {member.cellGroup?.name && ` • ${member.cellGroup.name}`}
                   </p>
                 </div>
-                {isAdmin && (
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={`/admin/sms?preselect=${member.id}&message=Happy%20Birthday%20${encodeURIComponent(member.name)}!`}>
-                      <MessageSquare className="h-4 w-4 mr-2" />
-                      Send SMS
-                    </Link>
-                  </Button>
-                )}
               </div>
             ))}
           </div>
