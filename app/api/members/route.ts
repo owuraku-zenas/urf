@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     const {
       cellGroupId,
       invitedById,
-      joinedSemesterId,
+      joinedSemesterId, // Ignore what the client sends
       admissionYear,
       currentAcademicLevel,
       birthMonth,
@@ -95,14 +95,40 @@ export async function POST(request: Request) {
       ...restData
     } = data
 
+    const joinDateObj = data.joinDate ? new Date(data.joinDate) : new Date();
+
+    // Auto-calculate joinedSemester based on joinDate
+    let finalJoinedSemesterId = null;
+    const matchingSemester = await prisma.semester.findFirst({
+      where: {
+        startDate: { lte: joinDateObj },
+        endDate: { gte: joinDateObj }
+      }
+    });
+
+    if (matchingSemester) {
+      finalJoinedSemesterId = matchingSemester.id;
+    } else {
+      // Fallback to active semester or most recent
+      const fallbackSemester = await prisma.semester.findFirst({
+        where: { status: 'ACTIVE' },
+      }) || await prisma.semester.findFirst({
+        orderBy: { startDate: 'desc' }
+      });
+      
+      if (fallbackSemester) {
+        finalJoinedSemesterId = fallbackSemester.id;
+      }
+    }
+
     const member = await prisma.member.create({
       data: {
         ...restData,
         birthMonth: birthMonth ? parseInt(birthMonth.toString()) : null,
         birthDay: birthDay ? parseInt(birthDay.toString()) : null,
-        joinDate: data.joinDate ? new Date(data.joinDate) : new Date(),
-        joinedSemester: joinedSemesterId ? {
-          connect: { id: joinedSemesterId }
+        joinDate: joinDateObj,
+        joinedSemester: finalJoinedSemesterId ? {
+          connect: { id: finalJoinedSemesterId }
         } : undefined,
         admissionYear: admissionYear === "" ? null : admissionYear,
         currentAcademicLevel: calculateAcademicLevel(admissionYear === "" ? null : admissionYear),
@@ -112,9 +138,9 @@ export async function POST(request: Request) {
         invitedBy: invitedById ? {
           connect: { id: invitedById }
         } : undefined,
-        commitments: joinedSemesterId ? {
+        commitments: finalJoinedSemesterId ? {
           create: {
-            semesterId: joinedSemesterId,
+            semesterId: finalJoinedSemesterId,
             status: 'NEW_MEMBER'
           }
         } : undefined

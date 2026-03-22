@@ -104,6 +104,32 @@ export async function PUT(
       )
     }
 
+    const joinDateObj = body.joinDate ? new Date(body.joinDate) : new Date();
+
+    // Auto-calculate joinedSemester based on updated joinDate
+    let finalJoinedSemesterId = null;
+    const matchingSemester = await prisma.semester.findFirst({
+      where: {
+        startDate: { lte: joinDateObj },
+        endDate: { gte: joinDateObj }
+      }
+    });
+
+    if (matchingSemester) {
+      finalJoinedSemesterId = matchingSemester.id;
+    } else {
+      // Fallback to active semester or most recent
+      const fallbackSemester = await prisma.semester.findFirst({
+        where: { status: 'ACTIVE' },
+      }) || await prisma.semester.findFirst({
+        orderBy: { startDate: 'desc' }
+      });
+      
+      if (fallbackSemester) {
+        finalJoinedSemesterId = fallbackSemester.id;
+      }
+    }
+
     // Update member
     const member = await prisma.member.update({
       where: {
@@ -113,6 +139,7 @@ export async function PUT(
         name: body.name,
         email: body.email,
         phone: body.phone,
+        joinDate: joinDateObj,
         birthMonth: body.birthMonth ? parseInt(body.birthMonth.toString()) : null,
         birthDay: body.birthDay ? parseInt(body.birthDay.toString()) : null,
         university: body.university,
@@ -125,7 +152,7 @@ export async function PUT(
         isActive: body.isActive !== undefined ? body.isActive : false,
         admissionYear: body.admissionYear === "" ? null : body.admissionYear,
         currentAcademicLevel: calculateAcademicLevel(body.admissionYear === "" ? null : body.admissionYear),
-        joinedSemesterId: body.joinedSemesterId === "" ? null : body.joinedSemesterId,
+        joinedSemesterId: finalJoinedSemesterId,
       },
       include: {
         cellGroup: {

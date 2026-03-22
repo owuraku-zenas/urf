@@ -12,8 +12,8 @@ test.describe('Member Creation & Level Selection', () => {
     // Navigate to Member Creation
     await page.goto('/members/new');
     
-    // Fill out the required member details
-    await page.getByLabel(/name/i).fill('Test E2E Member');
+    const uniqueName = `Test Member ${Date.now()}`;
+    await page.getByLabel(/name/i).fill(uniqueName);
     await page.getByLabel(/email address/i).fill(`test.e2e${Date.now()}@example.com`);
     await page.getByLabel(/phone/i).fill('+23359' + Math.floor(1000000 + Math.random() * 9000000));
     
@@ -30,22 +30,12 @@ test.describe('Member Creation & Level Selection', () => {
     
     // Wait for the async API responses to populate the required Cell Group select and select it
     await page.locator('select#cellGroupId').selectOption({ index: 1 });
-    
-    const joinedSemesterSelect = page.locator('select#joinedSemesterId');
-    if (await joinedSemesterSelect.isVisible()) {
-      // Semester is optional, so we only select if options populate
-      try {
-         await joinedSemesterSelect.selectOption({ index: 1 }, { timeout: 2000 });
-      } catch (e) {
-         // Option didn't load or doesn't exist, moving on
-      }
-    }
 
     // Submit
     await page.getByRole('button', { name: /save|create|submit/i }).click();
 
     // Verify redirect or success toast
     await expect(page).toHaveURL(/.*\/members/);
-    await expect(page.getByText(/Test E2E Member/i).first()).toBeVisible();
+    await expect(page.getByRole('cell', { name: uniqueName }).first()).toBeVisible();
   });
 });

@@ -46,7 +46,6 @@ const MemberFormSchema = z.object({
   invitedById: z.string().nullable().optional(),
   isActive: z.boolean().optional(),
   admissionYear: z.string().refine(val => !val || /^\d{4}$/.test(val), "Must be a 4-digit number").nullable().optional(),
-  joinedSemesterId: z.string().nullable().optional(),
 })
 
 type MemberFormData = z.infer<typeof MemberFormSchema>
@@ -61,7 +60,7 @@ interface Member {
   name: string
 }
 
-interface Semester {
+interface Member {
   id: string
   name: string
 }
@@ -74,7 +73,6 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
   const [loading, setLoading] = useState(true)
   const [cellGroups, setCellGroups] = useState<CellGroup[]>([])
   const [members, setMembers] = useState<Member[]>([])
-  const [semesters, setSemesters] = useState<Semester[]>([])
   const [errors, setErrors] = useState<Partial<Record<keyof MemberFormData, string>>>({})
 
   const [formData, setFormData] = useState<MemberFormData>({
@@ -93,7 +91,6 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
     invitedById: "",
     isActive: false,
     admissionYear: "",
-    joinedSemesterId: "",
   })
 
   useEffect(() => {
@@ -114,7 +111,6 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
           joinDate: memberData.joinDate ? new Date(memberData.joinDate).toISOString().split('T')[0] : "",
           isActive: memberData.isActive ?? false,
           admissionYear: memberData.admissionYear ?? "",
-          joinedSemesterId: memberData.joinedSemesterId ?? "",
         }
         
         setFormData(formattedData)
@@ -134,13 +130,6 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
         }
         const membersData = await membersResponse.json()
         setMembers(membersData)
-
-        // Fetch semesters for join selection
-        const semestersResponse = await fetch("/api/semesters")
-        if (semestersResponse.ok) {
-          const semestersData = await semestersResponse.json()
-          setSemesters(semestersData)
-        }
       } catch (error) {
         console.error("Error fetching data:", error)
         toast({
@@ -521,30 +510,6 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
                 />
                 {errors.admissionYear && (
                   <p className="text-sm text-red-500">{errors.admissionYear}</p>
-                )}
-              </div>
-
-
-              <div className="space-y-2">
-                <label htmlFor="joinedSemesterId" className="block text-sm font-medium">
-                  Joined Semester
-                </label>
-                <select
-                  id="joinedSemesterId"
-                  name="joinedSemesterId"
-                  value={formData.joinedSemesterId ?? ""}
-                  onChange={handleChange}
-                  className={`w-full rounded-md border ${errors.joinedSemesterId ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
-                >
-                  <option value="">Select a semester...</option>
-                  {semesters.map((semester) => (
-                    <option key={semester.id} value={semester.id}>
-                      {semester.name}
-                    </option>
-                  ))}
-                </select>
-                {errors.joinedSemesterId && (
-                  <p className="text-sm text-red-500">{errors.joinedSemesterId}</p>
                 )}
               </div>
 
