@@ -10,11 +10,12 @@
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "ts-node -T prisma/seed.ts",
+    "db:seed:prod": "ts-node -T prisma/seed-prod.ts",
     "update-member-status": "ts-node -T scripts/update-member-status.ts",
     "test:e2e": "playwright test"
   },
   "prisma": {
-    "seed": "ts-node -T prisma/seed.ts"
+    "seed": "ts-node -T prisma/seed-prod.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",
