@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session || !session.user) {
+  if (!session || !session.user || !session.user.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { currentPassword, newPassword } = await req.json();

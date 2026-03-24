@@ -69,7 +69,7 @@ export async function PUT(
 
     const { eventId } = await context.params
     const body = await request.json()
-    const { name, type, date, description, preparations, feedback } = body
+    const { name, type, date, description, preparations, feedback, semesterId } = body
 
     if (!name || !type || !date) {
       return NextResponse.json(
@@ -86,6 +86,7 @@ export async function PUT(
         name,
         type,
         date: new Date(date),
+        semesterId,
         description,
         preparations,
         feedback,

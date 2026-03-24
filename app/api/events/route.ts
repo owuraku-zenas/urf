@@ -3,11 +3,19 @@ import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
 import { auth } from "@/auth"
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const rawSemesterId = searchParams.get("semesterId")
+    const semesterId = rawSemesterId === 'all' ? null : rawSemesterId;
+
     const events = await prisma.event.findMany({
+      where: semesterId ? { semesterId } : undefined,
       include: {
         attendance: {
+          where: {
+            status: 'PRESENT'
+          },
           select: {
             id: true,
             memberId: true,
@@ -47,9 +55,9 @@ export async function POST(request: Request) {
     console.log("Creating event with data:", body)
 
     // Validate required fields
-    if (!body.name || !body.type || !body.date) {
+    if (!body.name || !body.type || !body.date || !body.semesterId) {
       return NextResponse.json(
-        { error: "Name, type, and date are required" },
+        { error: "Name, type, date, and semesterId are required" },
         { status: 400 }
       )
     }
@@ -60,6 +68,7 @@ export async function POST(request: Request) {
         name: body.name,
         type: body.type,
         date: new Date(body.date),
+        semesterId: body.semesterId,
         description: body.description || null,
         preparations: body.preparations || null,
         feedback: body.feedback || null,

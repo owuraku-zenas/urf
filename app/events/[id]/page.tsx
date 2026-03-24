@@ -27,6 +27,7 @@ interface Event {
   name: string
   type: EventType
   date: Date
+  semesterId: string | null
   description: string | null
   preparations: string | null
   feedback: string | null
@@ -106,12 +107,14 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     // Map attendances to ensure all member fields are strings
     const mappedEvent = {
       ...event,
+      semesterId: typeof (event as any).semesterId === 'string' ? (event as any).semesterId : '',
       attendance: event.attendance.map(attendance => ({
         ...attendance,
         member: {
           ...attendance.member,
           email: attendance.member?.email || '',
-          dateOfBirth: attendance.member?.dateOfBirth ? new Date(attendance.member.dateOfBirth).toISOString() : '',
+          birthMonth: attendance.member?.birthMonth ?? null,
+          birthDay: attendance.member?.birthDay ?? null,
           university: attendance.member?.university || '',
           program: attendance.member?.program || '',
           startYear: attendance.member?.startYear || '',
@@ -119,6 +122,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
           roomNumber: attendance.member?.roomNumber || '',
           createdAt: attendance.member?.createdAt ? new Date(attendance.member.createdAt).toISOString() : '',
           updatedAt: attendance.member?.updatedAt ? new Date(attendance.member.updatedAt).toISOString() : '',
+          joinDate: attendance.member?.joinDate ? new Date(attendance.member.joinDate).toISOString() : '',
         }
       }))
     }

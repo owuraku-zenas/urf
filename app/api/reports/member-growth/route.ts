@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    // Get all members ordered by creation date
+    const { searchParams } = new URL(request.url)
+    const rawSemesterId = searchParams.get("semesterId")
+    const semesterId = rawSemesterId === 'all' ? null : rawSemesterId;
+
+    // Get all members ordered by creation date, optionally filtered by semester
     const members = await prisma.member.findMany({
+      where: semesterId ? { joinedSemesterId: semesterId } : undefined,
       orderBy: {
         createdAt: 'asc'
       }

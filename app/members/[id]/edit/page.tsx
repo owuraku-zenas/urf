@@ -34,21 +34,28 @@ const MemberFormSchema = z.object({
       }
       return val;
     }),
-  dateOfBirth: z.string().nullable().optional().transform(val => val === "" ? null : val),
+  birthMonth: z.string().optional(),
+  birthDay: z.string().optional(),
   joinDate: z.string().min(1, "Join date is required"),
   university: z.string().max(100, "University name is too long").nullable().optional(),
   program: z.string().max(100, "Program name is too long").nullable().optional(),
-  startYear: z.string().regex(/^\d{4}$/, "Start year must be a 4-digit number").nullable().optional(),
+  startYear: z.string().refine(val => !val || /^\d{4}$/.test(val), "Must be a 4-digit number").nullable().optional(),
   hostel: z.string().max(50, "Hostel name is too long").nullable().optional(),
   roomNumber: z.string().max(20, "Room number is too long").nullable().optional(),
   cellGroupId: z.string().min(1, "Cell group is required"),
   invitedById: z.string().nullable().optional(),
   isActive: z.boolean().optional(),
+  admissionYear: z.string().refine(val => !val || /^\d{4}$/.test(val), "Must be a 4-digit number").nullable().optional(),
 })
 
 type MemberFormData = z.infer<typeof MemberFormSchema>
 
 interface CellGroup {
+  id: string
+  name: string
+}
+
+interface Member {
   id: string
   name: string
 }
@@ -72,7 +79,8 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
     name: "",
     email: "",
     phone: "",
-    dateOfBirth: "",
+    birthMonth: "",
+    birthDay: "",
     joinDate: "",
     university: "",
     program: "",
@@ -82,6 +90,7 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
     cellGroupId: "",
     invitedById: "",
     isActive: false,
+    admissionYear: "",
   })
 
   useEffect(() => {
@@ -97,9 +106,11 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
         // Format dates for input fields
         const formattedData = {
           ...memberData,
-          dateOfBirth: memberData.dateOfBirth ? new Date(memberData.dateOfBirth).toISOString().split('T')[0] : "",
+          birthMonth: memberData.birthMonth ? String(memberData.birthMonth) : "",
+          birthDay: memberData.birthDay ? String(memberData.birthDay) : "",
           joinDate: memberData.joinDate ? new Date(memberData.joinDate).toISOString().split('T')[0] : "",
           isActive: memberData.isActive ?? false,
+          admissionYear: memberData.admissionYear ?? "",
         }
         
         setFormData(formattedData)
@@ -175,12 +186,16 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
         throw new Error("Please fix the form errors")
       }
 
+      // Include month and day in payload
+      const { birthMonth, birthDay, ...submitData } = formData;
+      const apiPayload = { ...submitData, birthMonth, birthDay };
+
       const response = await fetch(`/api/members/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(apiPayload),
       })
 
       const responseData = await response.json()
@@ -318,21 +333,39 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
                 )}
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="dateOfBirth" className="block text-sm font-medium">
+              <div className="space-y-2 col-span-1 md:col-span-2">
+                <label className="block text-sm font-medium">
                   Date of Birth
                 </label>
-                <input
-                  id="dateOfBirth"
-                  name="dateOfBirth"
-                  type="date"
-                  value={formData.dateOfBirth ?? ""}
-                  onChange={handleChange}
-                  className={`w-full rounded-md border ${errors.dateOfBirth ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
-                />
-                {errors.dateOfBirth && (
-                  <p className="text-sm text-red-500">{errors.dateOfBirth}</p>
-                )}
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <select
+                      name="birthMonth"
+                      value={formData.birthMonth}
+                      onChange={handleChange}
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="">Month</option>
+                      {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
+                        <option key={month} value={month.toString()}>{new Date(2000, month - 1, 1).toLocaleString('default', { month: 'long' })}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex-1">
+                    <select
+                      name="birthDay"
+                      value={formData.birthDay}
+                      onChange={handleChange}
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="">Day</option>
+                      {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+                        <option key={day} value={day.toString()}>{day}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500">For privacy reasons, only your birth month and day are collected.</p>
               </div>
 
               <div className="space-y-2">
@@ -460,6 +493,23 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
                 </select>
                 {errors.invitedById && (
                   <p className="text-sm text-red-500">{errors.invitedById}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="admissionYear" className="block text-sm font-medium">
+                  Admission Year
+                </label>
+                <input
+                  id="admissionYear"
+                  name="admissionYear"
+                  value={formData.admissionYear ?? ""}
+                  onChange={handleChange}
+                  placeholder="YYYY"
+                  className={`w-full rounded-md border ${errors.admissionYear ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                />
+                {errors.admissionYear && (
+                  <p className="text-sm text-red-500">{errors.admissionYear}</p>
                 )}
               </div>
 

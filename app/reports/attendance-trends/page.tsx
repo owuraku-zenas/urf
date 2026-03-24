@@ -34,6 +34,8 @@ export default function AttendanceTrendsReportPage() {
   const [reportData, setReportData] = useState<ReportData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState("all")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
   useEffect(() => {
     const fetchReportData = async () => {
@@ -55,10 +57,18 @@ export default function AttendanceTrendsReportPage() {
     fetchReportData()
   }, [])
 
-  const filteredEvents = reportData?.events.filter((event) => {
+  const filteredEvents = (reportData?.events || []).filter((event) => {
     if (filter === "all") return true
     return event.type === filter
-  }) || []
+  })
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filter])
+
+  const totalPages = Math.ceil(filteredEvents.length / pageSize)
+  const paginatedEvents = filteredEvents.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   if (error) {
     return (
@@ -121,7 +131,7 @@ export default function AttendanceTrendsReportPage() {
             <CardDescription>Average across all events</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold">{isLoading ? "..." : `${reportData?.averageAttendance.overall}%`}</div>
+            <div className="text-4xl font-bold">{isLoading ? "..." : `${reportData?.averageAttendance?.overall || 0}%`}</div>
           </CardContent>
         </Card>
 
@@ -131,7 +141,7 @@ export default function AttendanceTrendsReportPage() {
             <CardDescription>Average attendance</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold">{isLoading ? "..." : `${reportData?.averageAttendance.sunday}%`}</div>
+            <div className="text-4xl font-bold">{isLoading ? "..." : `${reportData?.averageAttendance?.sunday || 0}%`}</div>
           </CardContent>
         </Card>
 
@@ -141,7 +151,7 @@ export default function AttendanceTrendsReportPage() {
             <CardDescription>Average attendance</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold">{isLoading ? "..." : `${reportData?.averageAttendance.midweek}%`}</div>
+            <div className="text-4xl font-bold">{isLoading ? "..." : `${reportData?.averageAttendance?.midweek || 0}%`}</div>
           </CardContent>
         </Card>
 
@@ -151,7 +161,7 @@ export default function AttendanceTrendsReportPage() {
             <CardDescription>Average attendance</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold">{isLoading ? "..." : `${reportData?.averageAttendance.prayer}%`}</div>
+            <div className="text-4xl font-bold">{isLoading ? "..." : `${reportData?.averageAttendance?.prayer || 0}%`}</div>
           </CardContent>
         </Card>
       </div>
@@ -254,7 +264,7 @@ export default function AttendanceTrendsReportPage() {
                     </td>
                   </tr>
                 ) : (
-                  filteredEvents.map((event) => (
+                  paginatedEvents.map((event) => (
                     <tr key={event.id} className="border-b">
                       <td className="py-3 px-4">{new Date(event.date).toLocaleDateString()}</td>
                       <td className="py-3 px-4">{event.name}</td>
@@ -269,6 +279,50 @@ export default function AttendanceTrendsReportPage() {
               </tbody>
             </table>
           </div>
+          
+          {filteredEvents.length > 0 && (
+            <div className="flex items-center justify-between px-2 py-4 mt-2">
+              <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                <div className="flex items-center space-x-2">
+                  <p>Rows per page</p>
+                  <Select value={pageSize.toString()} onValueChange={(v) => { setPageSize(Number(v)); setCurrentPage(1); }}>
+                    <SelectTrigger className="h-8 w-[70px]">
+                      <SelectValue placeholder={pageSize.toString()} />
+                    </SelectTrigger>
+                    <SelectContent side="top">
+                      {[5, 10, 20, 50].map(size => (
+                        <SelectItem key={size} value={size.toString()}>{size}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="hidden sm:block">
+                  Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, filteredEvents.length)} of {filteredEvents.length} entries
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                <div className="text-sm font-medium mx-2">
+                  Page {currentPage} of {totalPages}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages || totalPages === 0}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

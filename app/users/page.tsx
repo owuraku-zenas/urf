@@ -24,13 +24,13 @@ import {
 import { toast } from "sonner";
 
 export default function ManageUsers() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<any[]>([]);
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const { data: session, status } = useSession();
-  const [deleteUserId, setDeleteUserId] = useState(null);
-  const [resetLoadingId, setResetLoadingId] = useState(null);
+  const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
+  const [resetLoadingId, setResetLoadingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "authenticated" && session.user.role !== "ADMIN") {
@@ -51,7 +51,7 @@ export default function ManageUsers() {
     fetchUsers();
   }, []);
 
-  const handleResetPassword = async (id) => {
+  const handleResetPassword = async (id: string) => {
     setResetLoadingId(id);
     try {
       const res = await fetch(`/api/users/${id}/reset-password`, { method: "POST" });
@@ -67,15 +67,15 @@ export default function ManageUsers() {
     setResetLoadingId(null);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     await fetch(`/api/users/${id}`, { method: 'DELETE' });
     setUsers(users.filter(user => user.id !== id));
     setDeleteUserId(null);
   };
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredUsers = users.filter((user: any) => {
+    const matchesSearch = user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRole = selectedRole === 'all' || user.role === selectedRole;
     const isNotCurrentUser = session?.user?.id !== user.id;
     return matchesSearch && matchesRole && isNotCurrentUser;

@@ -10,7 +10,8 @@
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "ts-node -T prisma/seed.ts",
-    "update-member-status": "ts-node -T scripts/update-member-status.ts"
+    "update-member-status": "ts-node -T scripts/update-member-status.ts",
+    "test:e2e": "playwright test"
   },
   "prisma": {
     "seed": "ts-node -T prisma/seed.ts"
@@ -78,17 +79,25 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/bcrypt": "^6.0.0",
     "@types/bcryptjs": "^2.4.6",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.11",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "css-loader": "^7.1.2",
     "eslint": "^8",
     "eslint-config-next": "14.0.0",
+    "jest": "^30.3.0",
+    "jest-mock-extended": "^4.0.0",
+    "node-mocks-http": "^1.17.2",
     "postcss": "^8",
     "prisma": "^5.10.2",
     "style-loader": "^4.0.0",
     "tailwindcss": "^3.4.17",
+    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "^5"
   }

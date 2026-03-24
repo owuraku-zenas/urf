@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { useSemester } from "@/context/semester-context"
 
 interface Event {
   id: string
@@ -20,13 +21,15 @@ interface Event {
 }
 
 export default function EventTypeAnalysisChart() {
+  const { selectedSemester } = useSemester()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/events')
+        const semesterQuery = selectedSemester ? `?semesterId=${selectedSemester}` : ''
+        const response = await fetch(`/api/events${semesterQuery}`)
         if (!response.ok) {
           throw new Error('Failed to fetch events')
         }
@@ -40,7 +43,7 @@ export default function EventTypeAnalysisChart() {
     }
 
     fetchData()
-  }, [])
+  }, [selectedSemester])
 
   // Group events by type and calculate attendance metrics
   const chartData = events.reduce((acc: any[], event) => {

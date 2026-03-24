@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { useSemester } from "@/context/semester-context"
 
 interface Member {
   id: string
@@ -12,13 +13,15 @@ interface Member {
 }
 
 export default function MemberGrowthChart() {
+  const { selectedSemester } = useSemester()
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/members')
+        const semesterQuery = selectedSemester ? `?semesterId=${selectedSemester}` : ''
+        const response = await fetch(`/api/members${semesterQuery}`)
         if (!response.ok) {
           throw new Error('Failed to fetch members')
         }
@@ -32,7 +35,7 @@ export default function MemberGrowthChart() {
     }
 
     fetchData()
-  }, [])
+  }, [selectedSemester])
 
   // Group members by month and calculate cumulative count
   const chartData = members

@@ -3,12 +3,14 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { SemesterSelector } from "@/components/semester-selector"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Plus, Eye } from "lucide-react"
 import { useSession } from "next-auth/react"
+import { useSemester } from "@/context/semester-context"
 
 interface Event {
   id: string
@@ -34,10 +36,12 @@ export default function EventsPage() {
   const { data: session } = useSession()
   const isAdmin = session?.user?.role === 'ADMIN'
 
+  const { selectedSemester } = useSemester()
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch('/api/events')
+        const response = await fetch(`/api/events?semesterId=${selectedSemester || ""}`)
         if (!response.ok) {
           throw new Error('Failed to fetch events')
         }
@@ -51,7 +55,7 @@ export default function EventsPage() {
     }
 
     fetchEvents()
-  }, [])
+  }, [selectedSemester])
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
@@ -83,7 +87,10 @@ export default function EventsPage() {
     <main className="flex-1">
       <div className="w-full max-w-7xl mx-auto px-5 py-10">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold">Church Events</h1>
+          <div className="flex items-center gap-4 flex-wrap">
+            <h1 className="text-2xl sm:text-3xl font-bold">Church Events</h1>
+            <SemesterSelector />
+          </div>
           {isAdmin && (
             <Button asChild className="w-full sm:w-auto">
               <Link href="/events/new">

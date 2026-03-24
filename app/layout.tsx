@@ -7,6 +7,8 @@ import { Toaster as SonnerToaster } from "sonner"
 import { cn } from "@/lib/utils"
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { Header } from "@/components/header"
+import { SemesterSelector } from "@/components/semester-selector"
+import { SemesterProvider } from "../context/semester-context"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -23,18 +25,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1 relative">
-              <div className="w-full max-w-7xl mx-auto px-5 py-5">
-                {children}
-              </div>
-            </main>
-          </div>
-          <Toaster />
-          <SonnerToaster />
-        </AuthProvider>
+        <SemesterProvider initialSemester={null}>
+          <AuthProvider>
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1 relative">
+                <div className="w-full max-w-7xl mx-auto px-5 py-5">
+                  {children}
+                </div>
+              </main>
+              <SonnerToaster />
+              <Toaster />
+            </div>
+          </AuthProvider>
+        </SemesterProvider>
       </body>
     </html>
   )

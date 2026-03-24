@@ -1,0 +1,214 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Church Logo" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img "Church Logo" [ref=e7]
+        - navigation [ref=e10]:
+          - link "Dashboard" [ref=e12] [cursor=pointer]:
+            - /url: /
+          - link "Members" [ref=e14] [cursor=pointer]:
+            - /url: /members
+          - link "Events" [ref=e16] [cursor=pointer]:
+            - /url: /events
+          - link "Attendance" [ref=e18] [cursor=pointer]:
+            - /url: /attendance
+          - link "Cell Groups" [ref=e20] [cursor=pointer]:
+            - /url: /cell-groups
+          - link "Reports" [ref=e22] [cursor=pointer]:
+            - /url: /reports
+            - text: Reports
+            - img [ref=e23]
+          - link "Semesters" [ref=e26] [cursor=pointer]:
+            - /url: /semesters
+          - link "SMS Admin" [ref=e28] [cursor=pointer]:
+            - /url: /admin/sms
+        - button "A" [ref=e30] [cursor=pointer]:
+          - generic [ref=e32]: A
+    - main [ref=e33]:
+      - generic [ref=e35]:
+        - link "Back to Members" [ref=e37] [cursor=pointer]:
+          - /url: /members
+          - img [ref=e38]
+          - text: Back to Members
+        - generic [ref=e41]:
+          - heading "Add New Member" [level=2] [ref=e42]
+          - paragraph [ref=e43]: Enter the details of the new church member
+          - generic [ref=e44]:
+            - generic [ref=e45]:
+              - generic [ref=e46]:
+                - generic [ref=e47]: Full Name *
+                - textbox "Full Name *" [ref=e48]: Test Member 1774188332147
+              - generic [ref=e49]:
+                - generic [ref=e50]: Email Address
+                - textbox "Email Address" [ref=e51]: test.e2e1774188337047@example.com
+              - generic [ref=e52]:
+                - generic [ref=e53]: Phone Number *
+                - textbox "Phone Number *" [ref=e54]: "+233597674114"
+              - generic [ref=e55]:
+                - generic [ref=e56]: Join Date *
+                - textbox "Join Date *" [ref=e57]: 2026-03-22
+              - generic [ref=e58]:
+                - generic [ref=e59]: Date of Birth
+                - generic [ref=e60]:
+                  - combobox [ref=e62]:
+                    - option "Month" [selected]
+                    - option "January"
+                    - option "February"
+                    - option "March"
+                    - option "April"
+                    - option "May"
+                    - option "June"
+                    - option "July"
+                    - option "August"
+                    - option "September"
+                    - option "October"
+                    - option "November"
+                    - option "December"
+                  - combobox [ref=e64]:
+                    - option "Day" [selected]
+                    - option "1"
+                    - option "2"
+                    - option "3"
+                    - option "4"
+                    - option "5"
+                    - option "6"
+                    - option "7"
+                    - option "8"
+                    - option "9"
+                    - option "10"
+                    - option "11"
+                    - option "12"
+                    - option "13"
+                    - option "14"
+                    - option "15"
+                    - option "16"
+                    - option "17"
+                    - option "18"
+                    - option "19"
+                    - option "20"
+                    - option "21"
+                    - option "22"
+                    - option "23"
+                    - option "24"
+                    - option "25"
+                    - option "26"
+                    - option "27"
+                    - option "28"
+                    - option "29"
+                    - option "30"
+                    - option "31"
+                - paragraph [ref=e65]: For privacy reasons, only your birth month and day are collected.
+              - generic [ref=e66]:
+                - generic [ref=e67]: University
+                - textbox "University" [ref=e68]
+              - generic [ref=e69]:
+                - generic [ref=e70]: Program Studied
+                - textbox "Program Studied" [ref=e71]
+              - generic [ref=e72]:
+                - generic [ref=e73]: Start Year
+                - textbox "Start Year" [ref=e74]:
+                  - /placeholder: YYYY
+                  - text: "2024"
+              - generic [ref=e75]:
+                - generic [ref=e76]: Hostel
+                - textbox "Hostel" [ref=e77]
+              - generic [ref=e78]:
+                - generic [ref=e79]: Room Number
+                - textbox "Room Number" [ref=e80]
+              - generic [ref=e81]:
+                - generic [ref=e82]: Cell Group *
+                - combobox "Cell Group *" [ref=e83]:
+                  - option "Select a cell group"
+                  - option "Diaspora" [selected]
+                  - option "Pent"
+                  - option "Volta Hall"
+                  - option "Main Campus"
+                  - option "E2E Cell 1774185853236"
+              - generic [ref=e84]:
+                - generic [ref=e85]: Invited By
+                - combobox "Invited By" [ref=e86]:
+                  - option "Select a member" [selected]
+                  - option "Test E2E Member"
+                  - option "Test E2E Member"
+                  - option "Test E2E Member"
+                  - option "Test E2E Member"
+                  - option "Test E2E Member"
+                  - option "Daniel Saijah"
+                  - option "Adwoa Pokua Aboagye"
+                  - option "Test Bot Member"
+                  - option "Kojo Williams"
+                  - option "John Appiah"
+                  - option "Abena Annan"
+                  - option "Sarah Mensah"
+                  - option "David Johnson"
+                  - option "Linda Asante"
+                  - option "Kofi Martinez"
+                  - option "Sarah Asante"
+                  - option "Kwame Rodriguez"
+                  - option "Elizabeth Asante"
+                  - option "Sarah Boakye"
+                  - option "Thomas Appiah"
+                  - option "Linda Ofori"
+                  - option "Barbara Johnson"
+                  - option "Linda Martinez"
+                  - option "Kofi Boateng"
+                  - option "Akua Frimpong"
+                  - option "Patricia Boateng"
+                  - option "Linda Ofori"
+                  - option "Mary Jones"
+                  - option "Jessica Miller"
+                  - option "Barbara Garcia"
+                  - option "Thomas Jones"
+                  - option "Jessica Annan"
+                  - option "Efua Appiah"
+                  - option "Richard Miller"
+                  - option "James Ofori"
+                  - option "David Williams"
+                  - option "Robert Owusu"
+                  - option "Elizabeth Johnson"
+                  - option "Kojo Rodriguez"
+                  - option "Jessica Ofori"
+                  - option "Patricia Boateng"
+                  - option "Amma Smith"
+                  - option "Efua Frimpong"
+                  - option "Richard Smith"
+                  - option "Richard Martinez"
+                  - option "Thomas Mensah"
+                  - option "John Annan"
+                  - option "Jennifer Appiah"
+                  - option "John Annan"
+                  - option "Joseph Davis"
+                  - option "Charles Ofori"
+                  - option "Charles Martinez"
+                  - option "Jennifer Mensah"
+                  - option "Kofi Ofori"
+                  - option "Jessica Boateng"
+                  - option "Yaa Rodriguez"
+                  - option "Charles Miller"
+                  - option "Amma Annan"
+              - generic [ref=e87]:
+                - generic [ref=e88]: Admission Year
+                - textbox "Admission Year" [ref=e89]:
+                  - /placeholder: YYYY
+                  - text: "2024"
+            - generic [ref=e90]:
+              - link "Cancel" [ref=e91] [cursor=pointer]:
+                - /url: /members
+              - button "Saving..." [disabled] [ref=e92]
+    - region "Notifications alt+T"
+    - region "Notifications (F8)":
+      - list
+  - status [ref=e93]:
+    - generic [ref=e94]:
+      - img [ref=e96]
+      - generic [ref=e98]:
+        - text: Static route
+        - button "Hide static indicator" [ref=e99] [cursor=pointer]:
+          - img [ref=e100]
+  - alert [ref=e103]
+```

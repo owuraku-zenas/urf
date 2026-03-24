@@ -2,22 +2,26 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/auth"
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const rawSemesterId = searchParams.get("semesterId")
+    const semesterId = rawSemesterId === 'all' ? null : rawSemesterId;
+
     console.log("Fetching cell groups...")
     const cellGroups = await prisma.cellGroup.findMany({
       include: {
         _count: {
           select: {
-            members: true,
+            members: semesterId ? { where: { joinedSemesterId: semesterId } } : true,
           },
         },
       },
     })
     console.log("Found cell groups:", cellGroups)
     return NextResponse.json(cellGroups)
-  } catch (error) {
-    console.error("Error fetching cell groups:", error)
+  } catch (error: any) {
+    console.log("DB ERROR cell-groups ->", error?.message || String(error));
     return NextResponse.json({ error: "Failed to fetch cell groups" }, { status: 500 })
   }
 }
@@ -69,8 +73,8 @@ export async function POST(request: Request) {
     })
     console.log("Successfully created cell group:", cellGroup)
     return NextResponse.json(cellGroup, { status: 201 })
-  } catch (error) {
-    console.error("Error creating cell group:", error)
+  } catch (error: any) {
+    console.log("DB ERROR cell-groups POST ->", error?.message || String(error));
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }

@@ -1,6 +1,23 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
+function calculateAcademicLevel(admissionYear: string | undefined | null): string | null {
+  if (!admissionYear) return null;
+  const year = parseInt(admissionYear, 10);
+  if (isNaN(year)) return null;
+
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth(); // 0-based, August = 7
+  let level = (currentYear - year) * 100;
+  if (currentMonth >= 7) {
+    level += 100; // Passed August, so they advanced to the next level
+  }
+  
+  if (level <= 0) return "100";
+  if (level > 400) return null; // Over 400 is atypical for explicit mapping
+  return level.toString();
+}
+
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> }
@@ -87,6 +104,32 @@ export async function PUT(
       )
     }
 
+    const joinDateObj = body.joinDate ? new Date(body.joinDate) : new Date();
+
+    // Auto-calculate joinedSemester based on updated joinDate
+    let finalJoinedSemesterId = null;
+    const matchingSemester = await prisma.semester.findFirst({
+      where: {
+        startDate: { lte: joinDateObj },
+        endDate: { gte: joinDateObj }
+      }
+    });
+
+    if (matchingSemester) {
+      finalJoinedSemesterId = matchingSemester.id;
+    } else {
+      // Fallback to active semester or most recent
+      const fallbackSemester = await prisma.semester.findFirst({
+        where: { status: 'ACTIVE' },
+      }) || await prisma.semester.findFirst({
+        orderBy: { startDate: 'desc' }
+      });
+      
+      if (fallbackSemester) {
+        finalJoinedSemesterId = fallbackSemester.id;
+      }
+    }
+
     // Update member
     const member = await prisma.member.update({
       where: {
@@ -96,7 +139,9 @@ export async function PUT(
         name: body.name,
         email: body.email,
         phone: body.phone,
-        dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
+        joinDate: joinDateObj,
+        birthMonth: body.birthMonth ? parseInt(body.birthMonth.toString()) : null,
+        birthDay: body.birthDay ? parseInt(body.birthDay.toString()) : null,
         university: body.university,
         program: body.program,
         startYear: body.startYear,
@@ -105,6 +150,9 @@ export async function PUT(
         cellGroupId: body.cellGroupId,
         invitedById: body.invitedById === "" ? null : body.invitedById,
         isActive: body.isActive !== undefined ? body.isActive : false,
+        admissionYear: body.admissionYear === "" ? null : body.admissionYear,
+        currentAcademicLevel: calculateAcademicLevel(body.admissionYear === "" ? null : body.admissionYear),
+        joinedSemesterId: finalJoinedSemesterId,
       },
       include: {
         cellGroup: {

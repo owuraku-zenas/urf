@@ -16,7 +16,6 @@ export type Member = {
   name: string
   email: string | null
   phone: string
-  dateOfBirth: Date | null
   university: string | null
   program: string | null
   startYear: string | null

@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { calculateMemberCommitment } from "@/lib/commitment"
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const semesterId = searchParams.get("semesterId")
+
     const attendances = await prisma.attendance.findMany({
+      where: semesterId ? { event: { semesterId } } : undefined,
       include: {
         event: true,
         member: true,
@@ -27,10 +32,23 @@ export async function POST(request: Request) {
       )
     }
 
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: { semesterId: true }
+    })
+
+    if (!event) {
+      return NextResponse.json(
+        { error: "Event not found" },
+        { status: 404 }
+      )
+    }
+
     const attendance = await prisma.attendance.create({
       data: {
         eventId,
         memberId,
+        ...(body.status && { status: body.status }),
       },
       include: {
         event: true,
@@ -46,6 +64,13 @@ export async function POST(request: Request) {
       await prisma.member.update({ where: { id: memberId }, data: { isActive: true } })
     } else {
       await prisma.member.update({ where: { id: memberId }, data: { isActive: false } })
+    }
+
+    if (event.semesterId) {
+      // Run asynchronously so we don't block the request response
+      calculateMemberCommitment(memberId, event.semesterId).catch(err => {
+        console.error("Failed to automatically calculate member commitment:", err)
+      })
     }
 
     return NextResponse.json(attendance)
@@ -70,11 +95,24 @@ export async function PUT(request: Request) {
       )
     }
 
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: { semesterId: true }
+    })
+
+    if (!event) {
+      return NextResponse.json(
+        { error: "Event not found" },
+        { status: 404 }
+      )
+    }
+
     const attendance = await prisma.attendance.update({
       where: { id },
       data: {
         eventId,
         memberId,
+        ...(body.status && { status: body.status }),
       },
       include: {
         event: true,
@@ -90,6 +128,13 @@ export async function PUT(request: Request) {
       await prisma.member.update({ where: { id: memberId }, data: { isActive: true } })
     } else {
       await prisma.member.update({ where: { id: memberId }, data: { isActive: false } })
+    }
+
+    if (event.semesterId) {
+      // Run asynchronously so we don't block the request response
+      calculateMemberCommitment(memberId, event.semesterId).catch(err => {
+        console.error("Failed to automatically calculate member commitment:", err)
+      })
     }
 
     return NextResponse.json(attendance)

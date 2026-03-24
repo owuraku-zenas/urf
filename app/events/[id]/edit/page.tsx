@@ -35,23 +35,31 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
   const [loading, setLoading] = useState(true)
   const [errors, setErrors] = useState<Partial<Record<keyof EventFormData, string>>>({})
 
-  const [formData, setFormData] = useState<EventFormData>({
+  const [formData, setFormData] = useState<EventFormData & { semesterId?: string }>({
     name: "",
     type: EventType.SUNDAY,
     date: "",
     description: "",
     preparations: "",
     feedback: "",
+    semesterId: "",
   })
+  const [semesters, setSemesters] = useState<{id: string, name: string}[]>([])
 
   useEffect(() => {
-    const fetchEvent = async () => {
+    const fetchEventAndSemesters = async () => {
       try {
-        const response = await fetch(`/api/events/${id}`)
-        if (!response.ok) {
-          throw new Error("Failed to fetch event data")
+        const [eventRes, semestersRes] = await Promise.all([
+          fetch(`/api/events/${id}`),
+          fetch(`/api/semesters`)
+        ])
+        
+        if (!eventRes.ok || !semestersRes.ok) {
+          throw new Error("Failed to fetch event data or semesters")
         }
-        const eventData = await response.json()
+        
+        const eventData = await eventRes.json()
+        const semestersData = await semestersRes.json()
         
         // Format date for input field
         const formattedData = {
@@ -60,6 +68,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
         }
         
         setFormData(formattedData)
+        setSemesters(semestersData)
       } catch (error) {
         console.error("Error fetching data:", error)
         toast({
@@ -72,7 +81,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
       }
     }
 
-    fetchEvent()
+    fetchEventAndSemesters()
   }, [id])
 
   const validateField = (name: keyof EventFormData, value: string) => {
@@ -205,6 +214,24 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                 {errors.type && (
                   <p className="text-sm text-red-500">{errors.type}</p>
                 )}
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="semesterId">Semester</Label>
+                <Select
+                  name="semesterId"
+                  value={formData.semesterId || ""}
+                  onValueChange={(value) => handleChange({ target: { name: 'semesterId', value } } as any)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select semester" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {semesters.map((s) => (
+                      <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="grid gap-2">

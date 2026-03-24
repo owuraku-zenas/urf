@@ -62,7 +62,8 @@ model Member {
   name        String
   email       String?      @unique
   phone       String   @unique
-  dateOfBirth DateTime?
+  birthMonth  Int?
+  birthDay    Int?
   joinDate    DateTime     @default(now())
   university  String?
   program     String?
@@ -71,12 +72,20 @@ model Member {
   roomNumber  String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  
+  admissionYear        String?
+  currentAcademicLevel String?
+  joinedSemesterId     String?
+  joinedSemester       Semester? @relation("MemberJoinedSemester", fields: [joinedSemesterId], references: [id])
+
   cellGroupId String?
   invitedById String?
   attendances Attendance[]
+  commitments SemesterCommitment[]
   cellGroup   CellGroup?   @relation(fields: [cellGroupId], references: [id])
   invitedBy   Member?      @relation("MemberInvites", fields: [invitedById], references: [id])
   invitees    Member[]     @relation("MemberInvites")
+  smsLogs     SmsLog[]
   isActive    Boolean      @default(false)
 }
 
@@ -99,6 +108,8 @@ model Event {
   feedback    String?     @db.Text
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  semesterId  String?
+  semester    Semester?    @relation(fields: [semesterId], references: [id])
   attendance  Attendance[]
 
   @@index([date])
@@ -125,6 +136,27 @@ model Attendance {
   @@index([eventId])
 }
 
+model Semester {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  startDate    DateTime
+  endDate      DateTime
+  academicYear String
+  status       SemesterStatus @default(ACTIVE)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  events       Event[]
+  joinedMembers Member[] @relation("MemberJoinedSemester")
+  commitments  SemesterCommitment[]
+  smsLogs      SmsLog[]
+}
+
+enum SemesterStatus {
+  ACTIVE
+  CLOSED
+}
+
 enum Role {
   ADMIN
   USER
@@ -136,3 +168,68 @@ enum EventType {
   PRAYER
   SPECIAL
 }
+
+model SemesterCommitment {
+  id             String           @id @default(cuid())
+  memberId       String
+  semesterId     String
+  status         CommitmentStatus @default(NEW_MEMBER)
+  overrideReason String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  member   Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  semester Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, semesterId])
+  @@index([memberId])
+  @@index([semesterId])
+}
+
+enum CommitmentStatus {
+  COMMITTED
+  UNCOMMITTED
+  AT_RISK
+  NEW_MEMBER
+}
+
+model SmsLog {
+  id             String         @id @default(cuid())
+  recipientId    String?        
+  member         Member?        @relation(fields: [recipientId], references: [id], onDelete: SetNull)
+  phoneNumber    String
+  message        String         @db.Text
+  status         SmsStatus      @default(PENDING) 
+  providerId     String?        
+  errorMessage   String?        @db.Text
+  batchId        String?
+  cost           Float?
+  semesterId     String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  semester       Semester?      @relation(fields: [semesterId], references: [id], onDelete: SetNull)
+
+  @@index([recipientId])
+  @@index([status])
+  @@index([batchId])
+  @@index([semesterId])
+}
+
+enum SmsStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+}
+
+model SmsTemplate {
+  id        String   @id @default(cuid())
+  name      String
+  content   String   @db.Text
+  isSystem  Boolean  @default(false)
+  type      String?  @unique // e.g., 'BIRTHDAY', null for custom
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

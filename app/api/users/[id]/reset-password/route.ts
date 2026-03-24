@@ -2,12 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
+import { auth } from "@/auth";
 
-export async function POST(req: NextRequest, context: { params: { id: string } }) {
+export async function POST(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    const { params } = context;
-    // Await params if necessary (for Next.js 13+ dynamic API routes)
-    const id = typeof params.then === "function" ? (await params).id : params.id;
+    const session = await auth();
+    if (!session?.user) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+    if (session.user.role !== "ADMIN") {
+      return new NextResponse("Forbidden", { status: 403 });
+    }
+
+    const { id } = await context.params;
     const userId = id;
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
