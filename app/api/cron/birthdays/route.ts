@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   try {
     // Basic authorization for the Cron Job (Vercel Cron provides a secretly injected header)
     const authHeader = request.headers.get("authorization")
-    if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return new NextResponse("Unauthorized", { status: 401 })
     }
 
