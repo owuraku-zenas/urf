@@ -2,9 +2,16 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { sendSMS } from "@/lib/sms"
 import crypto from "crypto"
+import { auth } from "@/auth"
 
 export async function POST(request: Request) {
   try {
+    // Auth guard: only admins can dispatch SMS broadcasts
+    const session = await auth()
+    if (!session?.user || session.user.role !== "ADMIN") {
+      return new NextResponse("Unauthorized", { status: 401 })
+    }
+
     const { message, recipientIds, filters } = await request.json()
 
     // 1. Validation Setup
