@@ -23,9 +23,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <SemesterProvider initialSemester={null}>
-      <html lang="en">
-        <body className={inter.className}>
+    <html lang="en">
+      <body className={inter.className}>
+        <SemesterProvider initialSemester={null}>
           <AuthProvider>
             <div className="flex min-h-screen flex-col">
               <Header />
@@ -38,8 +38,8 @@ export default function RootLayout({
               <Toaster />
             </div>
           </AuthProvider>
-        </body>
-      </html>
-    </SemesterProvider>
+        </SemesterProvider>
+      </body>
+    </html>
   )
 }
