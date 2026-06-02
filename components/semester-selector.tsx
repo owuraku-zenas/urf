@@ -24,10 +24,10 @@ export function SemesterSelector() {
     fetchSemesters();
   }, []);
 
-  const visibleSemesters = isAdmin ? semesters : semesters.filter(s => s.status === 'ACTIVE');
+  const visibleSemesters = semesters;
 
   return (
-    <Select value={selectedSemester || ""} onValueChange={setSelectedSemester} disabled={!isAdmin && visibleSemesters.length <= 1}>
+    <Select value={selectedSemester || ""} onValueChange={setSelectedSemester}>
       <SelectTrigger className="w-[220px]">
         <SelectValue placeholder="Select Semester" />
       </SelectTrigger>

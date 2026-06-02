@@ -2,48 +2,66 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import { useSemester } from "@/context/semester-context"
+
+interface Semester {
+  id: string
+  name: string
+  status: "ACTIVE" | "CLOSED"
+}
 
 export default function NewEventPage() {
   const router = useRouter()
   const { selectedSemester } = useSemester()
   const [isLoading, setIsLoading] = useState(false)
+  const [semesters, setSemesters] = useState<Semester[]>([])
   const [formData, setFormData] = useState({
     name: "",
     type: "MIDWEEK",
     date: "",
     description: "",
+    semesterId: "",
   })
+
+  useEffect(() => {
+    async function fetchSemesters() {
+      const res = await fetch("/api/semesters")
+      if (res.ok) {
+        const data: Semester[] = await res.json()
+        setSemesters(data)
+        // Pre-select the globally selected semester if it's a real ID, else fall back to ACTIVE
+        const isRealId = selectedSemester && selectedSemester !== "all"
+        const defaultId = isRealId
+          ? selectedSemester
+          : (data.find((s) => s.status === "ACTIVE")?.id ?? data[0]?.id ?? "")
+        setFormData((prev) => ({ ...prev, semesterId: defaultId }))
+      }
+    }
+    fetchSemesters()
+  }, [selectedSemester])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!formData.semesterId) {
+      toast({ title: "Error", description: "Please select a semester.", variant: "destructive" })
+      return
+    }
+
     setIsLoading(true)
 
     try {
-      // Format the date to ISO string
-      const formattedData = {
-        ...formData,
-        date: new Date(formData.date).toISOString(),
-        semesterId: selectedSemester,
-      }
-
       const response = await fetch("/api/events", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formattedData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          date: new Date(formData.date).toISOString(),
+        }),
       })
 
       if (!response.ok) {
@@ -51,11 +69,7 @@ export default function NewEventPage() {
         throw new Error(error.error || "Failed to create event")
       }
 
-      toast({
-        title: "Success",
-        description: "Event created successfully",
-      })
-
+      toast({ title: "Success", description: "Event created successfully" })
       router.push("/events")
     } catch (error) {
       console.error("Error creating event:", error)
@@ -71,10 +85,7 @@ export default function NewEventPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   return (
@@ -95,6 +106,27 @@ export default function NewEventPage() {
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               required
             />
+          </div>
+
+          <div>
+            <label htmlFor="semesterId" className="block text-sm font-medium text-gray-700">
+              Semester
+            </label>
+            <select
+              id="semesterId"
+              name="semesterId"
+              value={formData.semesterId}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              required
+            >
+              <option value="">Select a semester</option>
+              {semesters.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name} {s.status === "ACTIVE" ? "(Active)" : "(Closed)"}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
