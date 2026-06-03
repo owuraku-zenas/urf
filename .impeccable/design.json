@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-03T00:00:00Z",
+  "title": "Design System: URF Management System",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Operational Blue",
+        "canonical": "oklch(59% 0.199 257°)",
+        "tonalRamp": ["#1e3a8a", "#1d4ed8", "#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#bfdbfe", "#dbeafe"]
+      },
+      "urf-navy": {
+        "role": "neutral",
+        "displayName": "URF Navy",
+        "canonical": "oklch(18% 0.052 254°)",
+        "tonalRamp": ["#060d1a", "#0f1829", "#1e3044", "#2d4a60", "#3d647c", "#5a8099", "#8fb0c5", "#c7dce8"]
+      },
+      "signal-purple": {
+        "role": "secondary",
+        "displayName": "Signal Purple",
+        "canonical": "oklch(48% 0.19 286°)",
+        "tonalRamp": ["#2e1065", "#4c1d95", "#5b21b6", "#6d28d9", "#7c3aed", "#8b5cf6", "#a78bfa", "#ddd6fe"]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Page White",
+        "canonical": "oklch(100% 0 0°)",
+        "tonalRamp": ["#f8fafc", "#f1f5f9", "#e2e8f0", "#cbd5e1", "#94a3b8", "#64748b", "#475569", "#334155"]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Resting Surface",
+        "canonical": "oklch(96.5% 0.006 240°)",
+        "tonalRamp": ["#f8fafc", "#f1f5f9", "#e2e8f0", "#cbd5e1", "#94a3b8", "#64748b", "#475569", "#334155"]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "URF Foreground",
+        "canonical": "oklch(15% 0.04 254°)",
+        "tonalRamp": ["#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#f1f5f9"]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Divider Line",
+        "canonical": "oklch(91% 0.01 246°)",
+        "tonalRamp": ["#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f1f5f9", "#f8fafc", "#ffffff", "#ffffff"]
+      },
+      "destructive": {
+        "role": "tertiary",
+        "displayName": "Destructive Red",
+        "canonical": "oklch(62% 0.22 25°)",
+        "tonalRamp": ["#7f1d1d", "#991b1b", "#b91c1c", "#dc2626", "#ef4444", "#f87171", "#fca5a5", "#fee2e2"]
+      },
+      "chart-amber": {
+        "role": "tertiary",
+        "displayName": "Chart Amber",
+        "canonical": "oklch(76% 0.16 85°)",
+        "tonalRamp": ["#78350f", "#92400e", "#b45309", "#d97706", "#f59e0b", "#fbbf24", "#fcd34d", "#fef3c7"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page-level headings. One per screen." },
+      "headline": { "displayName": "Headline", "purpose": "Card titles, section headers, modal titles." },
+      "title": { "displayName": "Title", "purpose": "Table column headers, form section labels." },
+      "body": { "displayName": "Body", "purpose": "All paragraph and table cell content. Max 70ch." },
+      "label": { "displayName": "Label", "purpose": "Status badges, metadata chips, helper text." }
+    },
+    "shadows": [
+      {
+        "name": "resting-card",
+        "value": "0 1px 2px rgba(0,0,0,0.05), 0 0 0 1px #e2e8f0",
+        "purpose": "Standard card at rest. Minimal lift plus the 1px border ring."
+      },
+      {
+        "name": "elevated-dropdown",
+        "value": "0 4px 16px rgba(15,24,41,0.12), 0 0 0 1px #e2e8f0",
+        "purpose": "Menus, tooltips, popovers. Navy-tinted shadow connects to the URF Navy anchor."
+      },
+      {
+        "name": "modal",
+        "value": "0 20px 60px rgba(15,24,41,0.20)",
+        "purpose": "Dialog overlays."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-transition",
+        "value": "150ms ease-out",
+        "purpose": "Default for color and opacity state changes (button hover, nav hover, input focus)."
+      },
+      {
+        "name": "accordion",
+        "value": "200ms ease-out",
+        "purpose": "Accordion open/close. Transitions grid-template-rows, not height."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1400px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single primary action on a screen. One per view.",
+      "html": "<button class=\"ds-btn-primary\">Save Member</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; height: 40px; padding: 8px 16px; background: #3b82f6; color: #f8fafc; font-size: 0.875rem; font-weight: 500; border: none; border-radius: 6px; cursor: pointer; transition: background 150ms ease-out; } .ds-btn-primary:hover { background: #2563eb; } .ds-btn-primary:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.5; pointer-events: none; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action alongside a primary button.",
+      "html": "<button class=\"ds-btn-outline\">Cancel</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; height: 40px; padding: 8px 16px; background: #ffffff; color: #0f172a; font-size: 0.875rem; font-weight: 500; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: background 150ms ease-out, border-color 150ms ease-out; } .ds-btn-outline:hover { background: #f1f5f9; border-color: #cbd5e1; } .ds-btn-outline:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Used inside tables and menus where a border would compete with content.",
+      "html": "<button class=\"ds-btn-ghost\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7\"/><path d=\"M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z\"/></svg> Edit</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 4px 12px; background: transparent; color: #0f172a; font-size: 0.875rem; font-weight: 500; border: none; border-radius: 6px; cursor: pointer; transition: background 150ms ease-out; } .ds-btn-ghost:hover { background: #f1f5f9; } .ds-btn-ghost:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }"
+    },
+    {
+      "name": "Destructive Button",
+      "kind": "button",
+      "refersTo": "button-destructive",
+      "description": "Irreversible actions only: delete member, delete semester.",
+      "html": "<button class=\"ds-btn-destructive\">Delete Member</button>",
+      "css": ".ds-btn-destructive { display: inline-flex; align-items: center; justify-content: center; height: 40px; padding: 8px 16px; background: #ef4444; color: #f8fafc; font-size: 0.875rem; font-weight: 500; border: none; border-radius: 6px; cursor: pointer; transition: background 150ms ease-out; } .ds-btn-destructive:hover { background: #dc2626; } .ds-btn-destructive:focus-visible { outline: 2px solid #ef4444; outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Standard form field. Focus ring is the only state change.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-label\" for=\"name\">Full Name</label><input class=\"ds-input\" id=\"name\" type=\"text\" placeholder=\"e.g. Kwame Asante\" /></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; } .ds-label { font-size: 0.875rem; font-weight: 500; color: #0f172a; } .ds-input { height: 40px; padding: 8px 12px; background: #ffffff; color: #0f172a; font-size: 0.875rem; border: 1px solid #e2e8f0; border-radius: 6px; outline: none; transition: border-color 150ms ease-out, box-shadow 150ms ease-out; } .ds-input::placeholder { color: #64748b; } .ds-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.2); } .ds-input:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Commitment Badge",
+      "kind": "chip",
+      "refersTo": "badge-default",
+      "description": "Status indicator. Always color + text. Five variants covering all commitment states.",
+      "html": "<div class=\"ds-badges\"><span class=\"ds-badge ds-badge--committed\">COMMITTED</span><span class=\"ds-badge ds-badge--at-risk\">AT RISK</span><span class=\"ds-badge ds-badge--uncommitted\">UNCOMMITTED</span><span class=\"ds-badge ds-badge--new-member\">NEW MEMBER</span><span class=\"ds-badge ds-badge--legacy\">LEGACY</span></div>",
+      "css": ".ds-badges { display: flex; flex-wrap: wrap; gap: 8px; } .ds-badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.01em; } .ds-badge--committed { background: #dcfce7; color: #15803d; } .ds-badge--at-risk { background: #fef9c3; color: #a16207; } .ds-badge--uncommitted { background: #fee2e2; color: #b91c1c; } .ds-badge--new-member { background: #dbeafe; color: #1d4ed8; } .ds-badge--legacy { background: #fef3c7; color: #92400e; }"
+    },
+    {
+      "name": "Data Card",
+      "kind": "card",
+      "refersTo": "card-default",
+      "description": "Groups a distinct content region. Never nested.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card__header\"><span class=\"ds-card__title\">Cell Group Members</span><span class=\"ds-card__meta\">Pent Campus</span></div><div class=\"ds-card__body\">Content lives here.</div></div>",
+      "css": ".ds-card { background: #ffffff; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 0 0 1px #e2e8f0; overflow: hidden; } .ds-card__header { display: flex; align-items: baseline; justify-content: space-between; padding: 24px 24px 0; } .ds-card__title { font-size: 1.25rem; font-weight: 600; color: #0f172a; } .ds-card__meta { font-size: 0.75rem; font-weight: 500; color: #64748b; } .ds-card__body { padding: 16px 24px 24px; }"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "nav-sidebar",
+      "description": "Full-height fixed left nav. URF Navy background. Signal Purple marks the active item.",
+      "html": "<nav class=\"ds-sidebar\"><a class=\"ds-nav-item ds-nav-item--active\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\"/></svg> Dashboard</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M23 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/></svg> Members</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/></svg> Events</a></nav>",
+      "css": ".ds-sidebar { width: 220px; background: #0f1829; padding: 8px; display: flex; flex-direction: column; gap: 2px; } .ds-nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: rgba(248,250,252,0.8); font-size: 0.875rem; font-weight: 500; border-radius: 6px; text-decoration: none; transition: background 150ms ease-out, color 150ms ease-out; } .ds-nav-item:hover { background: rgba(255,255,255,0.08); color: #f8fafc; } .ds-nav-item--active { background: rgba(124,58,237,0.2); color: #f8fafc; border-left: 2px solid #7c3aed; padding-left: 10px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Field Register",
+    "overview": "This system is the operational equivalent of a field register kept by a community worker: every name on the page is a real person, every status reflects a real pattern of presence, every action taken here has a consequence in the community being served. The interface should feel like that register: well-organized, trustworthy, immediately readable, and free of anything that doesn't help the work.\n\nThe density is moderate. Screens hold enough information to work from without requiring constant navigation, but they don't pack data until it suffocates. Hierarchy is achieved through type weight and spatial rhythm, not color explosions or card-within-card nesting. The dark navy sidebar is the only surface that announces itself visually; everything else is calm, light, and precise.\n\nThe system rejects four things by name: the sea of identical white cards and blue buttons that defines generic SaaS products; the grey density and nested modals of legacy enterprise software; the playful gradients and bouncing animations of consumer apps; and the doves, golden gradients, and inspirational overlays of church website aesthetics.",
+    "keyCharacteristics": [
+      "Light mode only; the dark sidebar is structural, not atmospheric",
+      "Hierarchy through weight contrast and spacing, not color density",
+      "Status signals always paired: color plus text, never color alone",
+      "The navy-and-purple sidebar is the single most distinctive visual element",
+      "Cards used sparingly; most content lives in tables, lists, and form layouts"
+    ],
+    "rules": [
+      { "name": "The One Voice Rule", "body": "Operational Blue (#3b82f6) is the action color. It appears on primary buttons, active links, and focus rings. It does not appear as a background tint, a section color, a badge background for non-primary statuses, or a decorative highlight.", "section": "colors" },
+      { "name": "The Sidebar Lock Rule", "body": "URF Navy (#0f1829) is used exactly one place: the navigation sidebar. It is not a valid background for content areas, modals, tooltips, or code blocks.", "section": "colors" },
+      { "name": "The Flat-By-Default Rule", "body": "If a surface is not interactive and does not need to communicate that it floats above other content, it has no shadow. A tinted background or a 1px border is always preferred over a shadow for visual separation on static surfaces.", "section": "elevation" },
+      { "name": "The Weight Carries Rule", "body": "With a single-family type system, hierarchy depends entirely on weight contrast. The gap between 400 (body) and 600/700 (headings) must be preserved. Never introduce a 500-weight heading at the same size as body.", "section": "typography" }
+    ],
+    "dos": [
+      "Do pair every status color with its text label. Color conveys category; text confirms it.",
+      "Do use weight and scale to establish hierarchy before reaching for color.",
+      "Do use #64748b (Subdued Text) for metadata, timestamps, and supporting information.",
+      "Do keep URF Navy exclusively in the sidebar.",
+      "Do use border + minimal shadow-sm to separate cards.",
+      "Do show full names before IDs in all member contexts.",
+      "Do use the ghost button variant inside tables and menus."
+    ],
+    "donts": [
+      "Don't use border-left greater than 1px as a colored accent stripe on cards or list items.",
+      "Don't use gradient text (background-clip: text with a gradient fill).",
+      "Don't put decorative blur, glass, or backdrop-filter on content surfaces.",
+      "Don't make the interface look like a generic SaaS product.",
+      "Don't reference church-website visual conventions: no golden gradients, dove imagery, or congregation stock photography.",
+      "Don't design for consumer-app energy: no bouncing animations, no gamified progress bars.",
+      "Don't use URF Navy as a background for content areas, modals, or non-navigation surfaces.",
+      "Don't use Operational Blue for more than one role per screen.",
+      "Don't use Arial as the final answer — this is a known gap in the type system.",
+      "Don't nest cards."
+    ]
+  }
+}
