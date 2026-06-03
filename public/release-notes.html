@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>URF System — What's New</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', serif;
+      font-size: 13.5px;
+      line-height: 1.75;
+      color: #1a1a1a;
+      background: #fff;
+      padding: 48px 64px;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .logo-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #1d4ed8;
+      padding-bottom: 16px;
+      margin-bottom: 32px;
+    }
+
+    .logo-bar .org {
+      font-family: 'Arial', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #1d4ed8;
+      letter-spacing: 0.5px;
+    }
+
+    .logo-bar .date {
+      font-family: 'Arial', sans-serif;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 6px;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 36px;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .change {
+      margin-bottom: 32px;
+      padding: 20px 24px;
+      border-left: 4px solid #1d4ed8;
+      background: #f8faff;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .change.fix {
+      border-left-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    .change.archive {
+      border-left-color: #d97706;
+      background: #fffbeb;
+    }
+
+    .change-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      font-family: 'Arial', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+
+    .badge.new     { background: #dbeafe; color: #1d4ed8; }
+    .badge.fix     { background: #dcfce7; color: #15803d; }
+    .badge.improve { background: #ede9fe; color: #6d28d9; }
+    .badge.archive { background: #fef3c7; color: #92400e; }
+
+    h2 {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: #111827;
+      font-family: 'Arial', sans-serif;
+    }
+
+    p { margin-bottom: 8px; color: #374151; }
+
+    ul {
+      margin: 8px 0 0 20px;
+      color: #374151;
+    }
+
+    ul li { margin-bottom: 4px; }
+
+    .note {
+      font-size: 12px;
+      color: #9ca3af;
+      font-style: italic;
+      margin-top: 10px;
+    }
+
+    .footer {
+      margin-top: 48px;
+      padding-top: 16px;
+      border-top: 1px solid #e5e7eb;
+      font-family: 'Arial', sans-serif;
+      font-size: 11.5px;
+      color: #9ca3af;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    @media print {
+      body { padding: 24px 36px; }
+      .change { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo-bar">
+    <span class="org">Universal Radiant Family (URF)</span>
+    <span class="date">June 2026 — System Update</span>
+  </div>
+
+  <h1>What's New in the URF System</h1>
+  <p class="subtitle">A summary of the latest improvements and fixes — written for all users.</p>
+
+  <!-- 1 -->
+  <div class="change fix">
+    <div class="change-header">
+      <span class="badge fix">Fix</span>
+      <h2>Members List Now Shows Everyone</h2>
+    </div>
+    <p>
+      Previously, switching to a past semester (e.g. "First Semester 2024/25") would cause the Members page to only show the members who joined <em>in that particular semester</em> — hiding everyone else. This was confusing because the dashboard would show 32 members while the list showed only 8.
+    </p>
+    <p>
+      <strong>This has been fixed.</strong> The Members page now always shows every member regardless of which semester is selected. The semester selector still works normally on all other pages (events, attendance, reports).
+    </p>
+  </div>
+
+  <!-- 2 -->
+  <div class="change">
+    <div class="change-header">
+      <span class="badge new">New</span>
+      <h2>All Users Can Now Switch Between Semesters</h2>
+    </div>
+    <p>
+      The semester dropdown in the top navigation was previously disabled for non-admin users — they were locked into only seeing the current active semester.
+    </p>
+    <p>
+      <strong>Now everyone can switch.</strong> Whether you are an admin or a regular user, you can click the semester selector and choose any past or current semester to view data from that period. Your selection is remembered even after you close and reopen the app.
+    </p>
+  </div>
+
+  <!-- 3 -->
+  <div class="change">
+    <div class="change-header">
+      <span class="badge new">New</span>
+      <h2>You Can Now Add Data to Past Semesters</h2>
+    </div>
+    <p>
+      It was not previously possible to create events or record attendance for semesters that had already been closed. This made it impossible to backfill historical data.
+    </p>
+    <p><strong>Two improvements were made:</strong></p>
+    <ul>
+      <li>
+        <strong>Event creation:</strong> When creating a new event, the form now includes a <em>Semester</em> dropdown. You can pick any semester — past or present — so events can be properly filed under the right period.
+      </li>
+      <li>
+        <strong>Attendance page:</strong> The event list on the Attendance page now filters based on whichever semester you have selected. Switch to an old semester and only its events appear, making it straightforward to fill in historical attendance records.
+      </li>
+    </ul>
+    <p class="note">Note: There are no restrictions on the system side — any admin can write data to any semester at any time.</p>
+  </div>
+
+  <!-- 4 -->
+  <div class="change archive">
+    <div class="change-header">
+      <span class="badge archive">New</span>
+      <h2>Archive Semesters for Long-Standing Members</h2>
+    </div>
+    <p>
+      Some members have been part of URF since 2018 or earlier — long before the system started recording semesters. When these members were added, the system incorrectly labelled them as "New Members" in the current semester, which was inaccurate.
+    </p>
+    <p><strong>How it works now:</strong></p>
+    <ul>
+      <li>An admin can create a special <strong>Archive Semester</strong> (e.g. covering 2015–2022) by ticking the <em>"Archive semester"</em> checkbox when creating or editing a semester.</li>
+      <li>When adding a member whose join date falls within that archive range, they are automatically given a <strong>LEGACY</strong> status instead of "New Member".</li>
+      <li>If a member's join date doesn't match any semester at all, they also receive <strong>LEGACY</strong> status automatically.</li>
+      <li>Legacy members appear with an amber <strong>LEGACY</strong> label in the Members list and are never penalised in commitment calculations — their historical attendance data simply isn't tracked.</li>
+    </ul>
+  </div>
+
+  <!-- 5 -->
+  <div class="change">
+    <div class="change-header">
+      <span class="badge improve">Improvement</span>
+      <h2>Academic Level Calculation Fixed &amp; Expanded</h2>
+    </div>
+    <p>
+      The system that automatically calculates a member's academic level (100, 200, 300, 400 …) had two problems:
+    </p>
+    <ul>
+      <li>It stopped at Level 400 — anyone who had been a student for more than 4 years showed a blank level.</li>
+      <li>It assumed every university starts its academic year in August, which is not always true.</li>
+    </ul>
+    <p><strong>What changed:</strong></p>
+    <ul>
+      <li>Levels now go all the way up to <strong>600</strong> and then <strong>ALUMNI</strong> — no more blank levels for older members.</li>
+      <li>A new optional field — <strong>Academic Year Start Month</strong> — lets you record which month a member's university year begins (e.g. January, September). This defaults to August if left blank.</li>
+      <li>A new optional field — <strong>Programme Duration</strong> — lets you record how many years the member's course lasts (2, 3, 4, 5, or 6 years). The system uses this to know when the member should become an Alumnus. Defaults to 4 years.</li>
+    </ul>
+    <p>Both fields appear on the <em>Add Member</em> and <em>Edit Member</em> forms and are completely optional.</p>
+  </div>
+
+  <div class="footer">
+    <span>URF Management System — Internal Release Notes</span>
+    <span>June 2026</span>
+  </div>
+
+</body>
+</html>
