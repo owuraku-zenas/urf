@@ -1,23 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
-
-function calculateAcademicLevel(admissionYear: string | undefined | null): string | null {
-  if (!admissionYear) return null;
-  const year = parseInt(admissionYear, 10);
-  if (isNaN(year)) return null;
-
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth(); // 0-based, August = 7
-  let level = (currentYear - year) * 100;
-  if (currentMonth >= 7) {
-    level += 100; // Passed August, so they advanced to the next level
-  }
-  
-  if (level <= 0) return "100";
-  if (level > 400) return null; // Over 400 is atypical for explicit mapping
-  return level.toString();
-}
+import { calculateAcademicLevel } from "@/lib/progression"
 
 export async function GET(request: Request) {
   try {
@@ -89,6 +73,8 @@ export async function POST(request: Request) {
       invitedById,
       joinedSemesterId, // Ignore what the client sends
       admissionYear,
+      admissionMonth,
+      programDuration,
       currentAcademicLevel,
       birthMonth,
       birthDay,
@@ -137,7 +123,13 @@ export async function POST(request: Request) {
           connect: { id: finalJoinedSemesterId }
         } : undefined,
         admissionYear: admissionYear === "" ? null : admissionYear,
-        currentAcademicLevel: calculateAcademicLevel(admissionYear === "" ? null : admissionYear),
+        admissionMonth: admissionMonth ? parseInt(admissionMonth.toString()) : 8,
+        programDuration: programDuration ? parseInt(programDuration.toString()) : 4,
+        currentAcademicLevel: calculateAcademicLevel(
+          admissionYear === "" ? null : admissionYear,
+          admissionMonth ? parseInt(admissionMonth.toString()) : 8,
+          programDuration ? parseInt(programDuration.toString()) : 4
+        ),
         cellGroup: {
           connect: { id: cellGroupId }
         },

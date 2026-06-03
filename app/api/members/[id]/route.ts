@@ -1,22 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-
-function calculateAcademicLevel(admissionYear: string | undefined | null): string | null {
-  if (!admissionYear) return null;
-  const year = parseInt(admissionYear, 10);
-  if (isNaN(year)) return null;
-
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth(); // 0-based, August = 7
-  let level = (currentYear - year) * 100;
-  if (currentMonth >= 7) {
-    level += 100; // Passed August, so they advanced to the next level
-  }
-  
-  if (level <= 0) return "100";
-  if (level > 400) return null; // Over 400 is atypical for explicit mapping
-  return level.toString();
-}
+import { calculateAcademicLevel } from "@/lib/progression"
 
 export async function GET(
   request: Request,
@@ -151,7 +135,13 @@ export async function PUT(
         invitedById: body.invitedById === "" ? null : body.invitedById,
         isActive: body.isActive !== undefined ? body.isActive : false,
         admissionYear: body.admissionYear === "" ? null : body.admissionYear,
-        currentAcademicLevel: calculateAcademicLevel(body.admissionYear === "" ? null : body.admissionYear),
+        admissionMonth: body.admissionMonth ? parseInt(body.admissionMonth.toString()) : 8,
+        programDuration: body.programDuration ? parseInt(body.programDuration.toString()) : 4,
+        currentAcademicLevel: calculateAcademicLevel(
+          body.admissionYear === "" ? null : body.admissionYear,
+          body.admissionMonth ? parseInt(body.admissionMonth.toString()) : 8,
+          body.programDuration ? parseInt(body.programDuration.toString()) : 4
+        ),
         joinedSemesterId: finalJoinedSemesterId,
       },
       include: {

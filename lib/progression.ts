@@ -1,38 +1,30 @@
 /**
- * Infers a member's current academic level based on their admission year and the current academic year.
- * 
- * @param admissionYear The year the member was admitted (e.g., "2024")
- * @param currentAcademicYear The current academic year (e.g., "2024/2025" or "2024")
- * @returns The inferred academic level (e.g., "100", "200", "ALUMNI", etc.) or null if invalid
+ * Calculate a member's current academic level from their admission year,
+ * the month their academic year starts (1-indexed, default 8 = August),
+ * and the total years their programme lasts (default 4).
+ *
+ * Formula: count how many times the start-of-year month has passed since
+ * the admission year. Each passage is one completed level.
+ *   1 passage → 100, 2 → 200, ..., programDuration → (programDuration * 100)
+ *   > programDuration → ALUMNI
  */
 export function calculateAcademicLevel(
   admissionYear: string | null | undefined,
-  currentAcademicYear: string | null | undefined
+  admissionMonth: number = 8,
+  programDuration: number = 4
 ): string | null {
-  if (!admissionYear || !currentAcademicYear) return null;
+  if (!admissionYear) return null;
+  const year = parseInt(admissionYear, 10);
+  if (isNaN(year)) return null;
 
-  const admission = parseInt(admissionYear, 10);
-  
-  // Handle formats like "2024/2025" by taking the first year
-  const currentYearStr = currentAcademicYear.includes('/') 
-    ? currentAcademicYear.split('/')[0] 
-    : currentAcademicYear;
-    
-  const current = parseInt(currentYearStr, 10);
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1; // getMonth() is 0-indexed
 
-  if (isNaN(admission) || isNaN(current)) return null;
+  const completedYears =
+    (currentYear - year) + (currentMonth >= admissionMonth ? 1 : 0);
 
-  const diff = current - admission;
-
-  if (diff < 0) return null; // Admission year is in the future
-  
-  switch (diff) {
-    case 0: return "100";
-    case 1: return "200";
-    case 2: return "300";
-    case 3: return "400";
-    case 4: return "500";
-    case 5: return "600";
-    default: return "ALUMNI";
-  }
+  if (completedYears <= 0) return null;
+  if (completedYears <= programDuration) return (completedYears * 100).toString();
+  return "ALUMNI";
 }

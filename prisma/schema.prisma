@@ -74,6 +74,8 @@ model Member {
   updatedAt   DateTime     @updatedAt
   
   admissionYear        String?
+  admissionMonth       Int?    @default(8)
+  programDuration      Int?    @default(4)
   currentAcademicLevel String?
   joinedSemesterId     String?
   joinedSemester       Semester? @relation("MemberJoinedSemester", fields: [joinedSemesterId], references: [id])

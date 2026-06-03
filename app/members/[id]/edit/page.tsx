@@ -46,6 +46,8 @@ const MemberFormSchema = z.object({
   invitedById: z.string().nullable().optional(),
   isActive: z.boolean().optional(),
   admissionYear: z.string().refine(val => !val || /^\d{4}$/.test(val), "Must be a 4-digit number").nullable().optional(),
+  admissionMonth: z.string().optional(),
+  programDuration: z.string().optional(),
 })
 
 type MemberFormData = z.infer<typeof MemberFormSchema>
@@ -91,6 +93,8 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
     invitedById: "",
     isActive: false,
     admissionYear: "",
+    admissionMonth: "8",
+    programDuration: "4",
   })
 
   useEffect(() => {
@@ -111,6 +115,8 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
           joinDate: memberData.joinDate ? new Date(memberData.joinDate).toISOString().split('T')[0] : "",
           isActive: memberData.isActive ?? false,
           admissionYear: memberData.admissionYear ?? "",
+          admissionMonth: memberData.admissionMonth ? String(memberData.admissionMonth) : "8",
+          programDuration: memberData.programDuration ? String(memberData.programDuration) : "4",
         }
         
         setFormData(formattedData)
@@ -511,6 +517,40 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
                 {errors.admissionYear && (
                   <p className="text-sm text-red-500">{errors.admissionYear}</p>
                 )}
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="admissionMonth" className="block text-sm font-medium">
+                  Academic Year Start Month <span className="text-gray-400 font-normal">(optional, default August)</span>
+                </label>
+                <select
+                  id="admissionMonth"
+                  name="admissionMonth"
+                  value={formData.admissionMonth ?? "8"}
+                  onChange={handleChange}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                    <option key={m} value={m}>{new Date(2000, m - 1, 1).toLocaleString('default', { month: 'long' })}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="programDuration" className="block text-sm font-medium">
+                  Programme Duration (years) <span className="text-gray-400 font-normal">(optional, default 4)</span>
+                </label>
+                <select
+                  id="programDuration"
+                  name="programDuration"
+                  value={formData.programDuration ?? "4"}
+                  onChange={handleChange}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  {[2, 3, 4, 5, 6].map(d => (
+                    <option key={d} value={d}>{d} years</option>
+                  ))}
+                </select>
               </div>
 
               <div className="space-y-2 md:col-span-2">
