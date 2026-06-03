@@ -26,6 +26,7 @@ export default function SemestersPage() {
   const [semesters, setSemesters] = useState<Semester[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const [migrating, setMigrating] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState({
     name: "",
@@ -74,6 +75,23 @@ export default function SemestersPage() {
       setSemesters(semesters.filter(s => s.id !== id))
     } else {
       toast.error(await res.text())
+    }
+  }
+
+  async function handleMigrateLegacy() {
+    setMigrating(true)
+    try {
+      const res = await fetch("/api/admin/migrate-legacy", { method: "POST" })
+      const data = await res.json()
+      if (res.ok) {
+        toast.success(data.message)
+      } else {
+        toast.error(data.error || "Migration failed")
+      }
+    } catch {
+      toast.error("Failed to run migration")
+    } finally {
+      setMigrating(false)
     }
   }
 
@@ -200,6 +218,33 @@ export default function SemestersPage() {
                 )}
               </TableBody>
             </Table>
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Maintenance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-start gap-4">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-gray-900">Fix Legacy Member Status</p>
+              <p className="mt-1 text-sm text-gray-500">
+                Updates members whose join date falls outside all recorded semester ranges from
+                <span className="font-medium"> NEW MEMBER</span> to
+                <span className="font-medium"> LEGACY</span>. Run this once after creating an archive
+                semester, or if you notice historical members showing incorrect statuses.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleMigrateLegacy}
+              disabled={migrating}
+              className="shrink-0"
+            >
+              {migrating ? "Running..." : "Run Migration"}
+            </Button>
           </div>
         </CardContent>
       </Card>
