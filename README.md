@@ -172,6 +172,43 @@ This README serves as a running log of all major changes, migrations, and featur
 
 ---
 
+### [2026-06-03] Historical Data Support: Archive Semesters & LEGACY Status
+- Added `isArchive` boolean flag to the `Semester` model so administrators can designate a semester as an archive bucket for historical members who pre-date any recorded semester.
+- Added `LEGACY` to the `CommitmentStatus` enum. Members whose `joinDate` falls within an archive semester, or whose date doesn't match any semester at all, are automatically assigned `LEGACY` instead of `NEW_MEMBER`.
+- The commitment recalculation engine (`lib/commitment.ts`) now explicitly skips any member whose status is `LEGACY` — their record is never overwritten by attendance-based calculations.
+- Updated the Semesters admin page to show an amber "Archive" type badge in the table and a labelled checkbox in the create/edit form.
+- Updated the Members page to render a distinct amber `LEGACY` badge alongside the existing commitment status colours.
+
+---
+
+### [2026-06-03] Semester Selector & Members List Fixes
+- Removed the role-based filter in `SemesterSelector` that previously hid closed semesters from non-admin users. All users can now see and switch to any semester (active or closed).
+- Fixed the Members page so it always fetches all members (`semesterId=all`) regardless of the globally selected semester. Previously, selecting a closed semester would only show members who *joined* in that semester, causing a mismatch with the dashboard's total count.
+
+---
+
+### [2026-06-03] Upload Data to Previous/Closed Semesters
+- Added an explicit `Semester` dropdown to the event creation form (`/events/new`). The form now pre-selects the globally chosen semester but allows the user to override it to any semester — including closed ones. This fixes a silent failure where creating an event while "All Semesters" was selected would send an invalid `semesterId: "all"` to the API.
+- Confirmed that the attendance bulk API and member creation API have no server-side block on closed semesters, so all historical data entry flows work end-to-end.
+
+---
+
+### [2026-06-03] Attendance Page Semester Filter
+- Wired the existing `SemesterSelector` component in the attendance page header to the event list fetch. The event dropdown now only shows events belonging to the selected semester.
+- Switching semesters clears the current event selection and re-fetches automatically, making it straightforward to mark attendance for events in past semesters.
+
+---
+
+### [2026-06-03] Academic Level Calculation Overhaul + Admission Month & Programme Duration
+- Completely rewrote `lib/progression.ts` to fix a broken inline function that was duplicated in both member API routes. The old version capped at Level 400 and returned `null` for anyone admitted more than 4 years ago.
+- New formula: count how many times the academic year's start month has passed since the admission year. Each passage advances one level (100 → 200 → … → ALUMNI). Fully supports Level 500, Level 600, and ALUMNI.
+- Added optional `admissionMonth` field to the `Member` model (default 8 = August). Covers universities whose academic year starts in January, September, or any other month.
+- Added optional `programDuration` field to the `Member` model (default 4 years, options 2–6). The ALUMNI threshold is now `programDuration` years rather than a hardcoded 7.
+- Both new fields appear as dropdowns in the member create and edit forms.
+- Removed the duplicate local `calculateAcademicLevel` functions from both `app/api/members/route.ts` and `app/api/members/[id]/route.ts`; both now import the single canonical function from `lib/progression.ts`.
+
+---
+
 ### How to Use This Log
 - Every time a major change is made (e.g., migration, new model, new UI, new API), add a dated entry here.
 - Summarize what was changed, why, and any important notes for future developers or admins.

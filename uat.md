@@ -1,75 +1,140 @@
-# Exhaustive User Acceptance Testing (UAT) Plan: URF Management System
+# User Acceptance Testing (UAT) Plan — URF Management System
 
-This document provides a comprehensive list of all functional features to be verified in the URF Management System.
+This document lists every functional scenario to verify before releasing a build. Each row is a discrete, testable behaviour with a clear pass/fail criterion.
 
-## 1. Dashboard & Global Context
-| ID | Feature / Scenario | Success Criteria |
-|:---|:---|:---|
-| 1.1 | **Semester Selector** | Selector appears in navigation; switching immediately filters ALL dashboard metrics and charts. |
-| 1.2 | **KPI Cards** | Displays accurate counts for Total Members, Average Attendance, and Commitment segments based on context. |
-| 1.3 | **Upcoming Birthdays** | Displays members with birthdays in the next 14 days; no manual "Send" button (automated via cron). |
-| 1.4 | **Lifetime View** | Selecting "All Semesters" (if available) aggregates cumulative data since the app's inception. |
+---
 
-## 2. Member & Enrollment Management
-| ID | Feature / Scenario | Success Criteria |
-|:---|:---|:---|
-| 2.1 | **Member Registration** | Fields for `Admission Year`, `Join Date`, and `Birth Month/Day` persist correctly. |
-| 2.2 | **Joined Semester Logic** | New members are auto-assigned to the semester active on their `Join Date`. |
-| 2.3 | **Commitment Grace Period** | Newly added members show `NEW_MEMBER` status and are excluded from ratio-based Penalization. |
-| 2.4 | **Academic Level Logic** | `Level 100-400` or `Alumnus` is auto-computed; increments correctly during the August transition. |
-| 2.5 | **Invitation Network** | Can specify "Invited By" during registration; the Invitation Network chart updates to show the new node. |
-| 2.6 | **Manual Status Override** | Admin can manually override a member's commitment status (e.g., set an AT_RISK member to COMMITTED). |
-| 2.7 | **Member List Pagination** | Pagination controls allow switching pages and changing "rows-per-page" (10, 20, 50, All) without lag. |
-| 2.8 | **Member Attendance Context** | Individual member profile history can be dynamically filtered by the selected Academic Semester. |
-| 2.9 | **Form Validation** | Zod schemas reject malformed data (e.g., invalid phone/email) and show descriptive error messages. |
+## 1. Authentication & User Management
 
-## 3. Attendance & Event Lifecycle
-| ID | Feature / Scenario | Success Criteria |
-|:---|:---|:---|
-| 3.1 | **Event Creation** | Events (Sunday Service, Mid-week, etc.) are strictly bound to the active semester. |
-| 3.2 | **Marking Attendance** | Recording a member as `PRESENT`/`ABSENT` triggers an async update of their commitment ratio. |
-| 3.3 | **Historical Edits** | Can edit attendance for past events; commitment statuses for that semester reflect the change. |
-| 3.4 | **Attendance Baseline** | Commitment ratios correctly exclude any events that occurred *prior* to a member's `Join Date`. |
-| 3.5 | **Event List Filtering** | Admins can filter the event list by type or date range within the selected semester scope. |
+| ID | Scenario | Steps | Pass Criteria |
+|:---|:---|:---|:---|
+| 1.1 | **Login** | Visit `/login`, enter valid credentials | Redirected to dashboard; session persists on refresh |
+| 1.2 | **Login failure** | Enter wrong password | Error message shown; no redirect |
+| 1.3 | **User invite** | Admin creates new user at `/users/new` | Invite email sent; link leads to `/set-password` |
+| 1.4 | **Set password** | Open invite link, set a password | Account activated; can now log in |
+| 1.5 | **Password reset** | Admin triggers reset on a user | Reset email sent; user can set a new password |
+| 1.6 | **Change own password** | Logged-in user goes to Profile | Old password required; new password takes effect immediately |
+| 1.7 | **RBAC — admin routes** | Log in as USER role; try to navigate to `/semesters` and `/admin/sms` | Redirected away; routes are inaccessible |
+| 1.8 | **RBAC — semester selector** | Log in as USER role | Semester selector is visible and shows all semesters (active and closed) |
 
-## 4. SMS Communication Suite
-| ID | Feature / Scenario | Success Criteria |
-|:---|:---|:---|
-| 4.1 | **Batch Composer** | Support for multi-select, character count calculator, and dynamic loading of templates. |
-| 4.2 | **Dynamic Templates** | Create/Edit/Save reusable snippets with `{{name}}` variable support; `BIRTHDAY` template is system-restricted. |
-| 4.3 | **SMS Audience Filtering** | Quick-filters (Cell Group, Level 100s, Committed Only) correctly populate the recipient list. |
-| 4.4 | **Grouped Delivery History** | Logs are grouped by `Batch ID` via Accordion; UI live-updates immediately after a new broadcast. |
-| 4.5 | **Financial Tracking** | "Total Spend" (GHS/USD) metric displays cumulative cost of SMS dispatches for the selected semester. |
-| 4.6 | **Birthday Auto-Cron** | Daily automated dispatch using `BIRTHDAY` template; includes personalization and a system-level fallback. |
-| 4.7 | **SMS Template Modals** | Templates are managed via modern Shadcn UI modals rather than native browser `prompt`/`confirm` dialogs. |
+---
 
-## 5. Advanced Analytics & Reporting
-| ID | Feature / Scenario | Success Criteria |
-|:---|:---|:---|
-| 5.1 | **Comparative Growth Chart** | Visualizes Member Joins vs. Attendance metrics across different semesters. |
-| 5.2 | **Commitment Trends** | Sankey or Pie chart showing movement between Committed, At Risk, and Uncommitted segments. |
-| 5.3 | **Cell Group Leaderboard** | Ranking of Cell Groups based on their average attendance percentage for the term. |
-| 5.4 | **Event Type Analysis** | Breakdown of attendance performance by event category (e.g., Special Service vs. Regular). |
-| 5.5 | **Invitation Network Tree** | Interactive graph showing the growth of the church through personal invitations. |
-| 5.6 | **Growth Velocity** | Dashboard shows net-new member additions specific to the selected semester timeframe. |
+## 2. Semester Management
 
-## 6. Admin & User Management
-| ID | Feature / Scenario | Success Criteria |
-|:---|:---|:---|
-| 6.1 | **User Invitation Flow** | Admin creates a user; system triggers an invite email with a secure token to the `/set-password` page. |
-| 6.2 | **Semester CRUD** | Admin can Create, Update, or Delete semesters; system blocks overlapping dates or multiple actives. |
-| 6.3 | **RBAC (Middleware)** | Regular users are strictly blocked from `/semesters`, `/admin/sms`, and User management views. |
-| 6.4 | **Super-Admin Locks** | Only the Super Admin (`urfzone4@gmail.com`) can perform destructive actions like `DELETE` on a Semester. |
+| ID | Scenario | Steps | Pass Criteria |
+|:---|:---|:---|:---|
+| 2.1 | **Create regular semester** | Admin opens `/semesters`, creates a semester with valid dates | Semester appears in table; status shows Active or Closed as set |
+| 2.2 | **Single active enforcement** | Create a new ACTIVE semester when one already exists | Previous semester auto-closes; new one is Active |
+| 2.3 | **Overlapping date rejection** | Try to create a semester with dates that overlap an existing one | API returns a conflict error; semester is not created |
+| 2.4 | **Edit semester** | Admin clicks Edit on a semester | Name, dates, and status update correctly |
+| 2.5 | **Delete semester (super admin)** | Log in as `urfzone4@gmail.com`; delete a semester | Semester removed; associated data cascade-deleted |
+| 2.6 | **Delete blocked (non-super admin)** | Log in as any other admin; try to delete a semester | Request rejected with 403 Forbidden |
+| 2.7 | **Create archive semester** | Admin creates a semester, ticks "Archive semester" checkbox | Semester appears in table with amber "Archive" type badge |
+| 2.8 | **Edit semester to archive** | Admin edits an existing semester and ticks the archive checkbox | Semester type updates to Archive in the table |
+| 2.9 | **Semester selector — all users** | Log in as USER role | Closed semesters appear in the dropdown alongside the active one |
+| 2.10 | **Semester selector persistence** | Select a semester, reload the page | Same semester remains selected (stored in localStorage) |
 
-## 7. Exports & Documentation
-| ID | Feature / Scenario | Success Criteria |
-|:---|:---|:---|
-| 7.1 | **PDF Report Generation** | Professional PDF export including Member Directories and Dashboard Charts. |
-| 7.2 | **CSV Data Export** | Accurate export of Semester Comparison tables and Member lists with all progression fields. |
-| 7.3 | **Environment Parity** | All migrations are synced; `.env` contains necessary Hubtel and SMTP credentials. |
+---
 
-## 8. UI/UX & Feedback
-| ID | Feature / Scenario | Success Criteria |
-|:---|:---|:---|
-| 8.1 | **Universal Toasters** | Success/Error notifications (Toasts) appear after every CRUD action (Member, Semester, SMS). |
-| 8.2 | **Mobile Navigation** | Navigation sidebar is fully functional and reflects RBAC permissions on mobile devices. |
+## 3. Member Management
+
+| ID | Scenario | Steps | Pass Criteria |
+|:---|:---|:---|:---|
+| 3.1 | **Create member — basic** | Fill required fields (name, phone, join date, cell group) and save | Member appears in the list |
+| 3.2 | **Create member — joined semester auto-assign** | Set a join date that falls within a specific semester's date range | Member's `joinedSemesterId` is set to that semester |
+| 3.3 | **Create member — archive semester** | Set a join date within an archive semester's range | Member receives `LEGACY` commitment status |
+| 3.4 | **Create member — no matching semester** | Set a join date outside all semester ranges (e.g. 2018) | Member falls back to active/most recent semester and receives `LEGACY` status |
+| 3.5 | **NEW_MEMBER grace period** | Create a member with a join date in a regular semester | Status shows `NEW_MEMBER`; no commitment penalty |
+| 3.6 | **Academic level — default (August, 4 years)** | Create member with admissionYear=2022, leave month and duration as defaults | Level shows correctly based on current date vs August boundary |
+| 3.7 | **Academic level — custom month** | Create member with admissionYear=2022, admissionMonth=January | Level reflects January as the academic year boundary |
+| 3.8 | **Academic level — custom duration** | Create member with admissionYear=2018, programDuration=6 | Level shows 600 or ALUMNI correctly; does not cap at 400 |
+| 3.9 | **Academic level — ALUMNI** | Create member whose completed years exceed programDuration | Level shows `ALUMNI` |
+| 3.10 | **Edit member — level recalculates** | Edit a member's admissionYear or admissionMonth | `currentAcademicLevel` updates on save |
+| 3.11 | **Invitation network** | Specify "Invited By" when creating a member | Invitation Network chart on dashboard shows the new node |
+| 3.12 | **Manual commitment override** | Admin sets an AT_RISK member to COMMITTED with a reason | Status shows COMMITTED; reason is stored |
+| 3.13 | **Members list — all members shown** | Select any closed semester in the global selector | Members list still shows ALL members (not filtered by joinedSemester) |
+| 3.14 | **Members list — search and filter** | Search by name/phone; filter by cell group, status, commitment | List narrows correctly; pagination resets to page 1 |
+| 3.15 | **Members list — LEGACY badge** | View a member with LEGACY status | Amber "LEGACY" badge is displayed in the commitment column |
+| 3.16 | **Form validation** | Submit with invalid phone (wrong format) or missing required fields | Zod error messages appear inline; form does not submit |
+| 3.17 | **Delete member** | Admin deletes a member from their profile page | Member removed from list; associated attendance cascade-deleted |
+
+---
+
+## 4. Events
+
+| ID | Scenario | Steps | Pass Criteria |
+|:---|:---|:---|:---|
+| 4.1 | **Create event — active semester** | Go to `/events/new`, leave semester on the active one | Event saved under active semester |
+| 4.2 | **Create event — previous semester** | Select a closed semester in the semester picker on the form | Event saved under the closed semester; visible when that semester is selected |
+| 4.3 | **Create event — All Semesters selected globally** | Set global selector to "All Semesters", then create an event | Form still works; semester dropdown defaults to Active semester |
+| 4.4 | **Event list filter** | Select a specific semester in the global selector | Event list only shows events belonging to that semester |
+| 4.5 | **Edit event** | Admin edits event name, type, date, or semester | Changes persist; re-assigned events appear under the new semester |
+| 4.6 | **Delete event** | Admin deletes an event | Event removed; associated attendance records cascade-deleted |
+
+---
+
+## 5. Attendance
+
+| ID | Scenario | Steps | Pass Criteria |
+|:---|:---|:---|:---|
+| 5.1 | **Attendance page — semester filter** | Select a semester in the global selector | Event dropdown on attendance page shows only events from that semester |
+| 5.2 | **Attendance page — switch semester** | Change the global semester selector | Event dropdown clears and reloads with new semester's events |
+| 5.3 | **Mark attendance** | Select an event, click "Mark Attendance", mark members as PRESENT/ABSENT | Records saved; navigating back shows correct marks |
+| 5.4 | **Commitment recalculation** | After marking attendance, view a member's profile | Commitment status (COMMITTED/AT_RISK/UNCOMMITTED) has updated |
+| 5.5 | **LEGACY member — no recalculation** | Mark attendance for an event; one of the members has LEGACY status | LEGACY member's commitment status remains LEGACY after the save |
+| 5.6 | **Historical attendance** | Select an old closed semester; create or select an event; mark attendance | Attendance saves correctly; commitment for that semester updates |
+| 5.7 | **Attendance baseline** | Member's join date is after some events in a semester | Commitment ratio only counts events on or after the join date |
+| 5.8 | **Bulk attendance** | POST to `/api/attendance/bulk` with a list of members | All records upserted; commitment recalculated for each member |
+
+---
+
+## 6. SMS Communication
+
+| ID | Scenario | Steps | Pass Criteria |
+|:---|:---|:---|:---|
+| 6.1 | **Compose and send** | Admin goes to `/admin/sms`, selects recipients, types a message, and sends | SMS dispatched via Hubtel; SmsLog records created with SENT status |
+| 6.2 | **Name personalisation** | Use `{{name}}` in the message body | Each recipient receives the message with their first name substituted |
+| 6.3 | **Audience filters** | Apply "Committed Only", "Level 100s", or cell group filter | Recipient grid narrows to matching members |
+| 6.4 | **Load template** | Select a template from the dropdown in the composer | Template text loads into the message box |
+| 6.5 | **Create/edit/delete template** | Go to Templates tab; perform CRUD operations | Changes reflect immediately; BIRTHDAY template cannot be deleted |
+| 6.6 | **Delivery history — grouping** | Send a broadcast; go to Delivery History tab | Sends are grouped by batchId in accordion; message and cost visible per row |
+| 6.7 | **Financial tracking** | View Delivery History | Total spend for the selected semester is displayed |
+| 6.8 | **Birthday cron** | On a day where a member has a birthday, trigger `/api/cron/birthdays` | BIRTHDAY template sent to matching member; SmsLog record created |
+
+---
+
+## 7. Reporting & Analytics
+
+| ID | Scenario | Steps | Pass Criteria |
+|:---|:---|:---|:---|
+| 7.1 | **Dashboard KPIs** | Switch semesters using the global selector | Member count, attendance %, and commitment counts update immediately |
+| 7.2 | **Member Growth chart** | View `/reports/member-growth` | Monthly join trend reflects selected semester |
+| 7.3 | **Attendance Trends chart** | View `/reports/attendance-trends` | Breakdown by event type (SUNDAY/MIDWEEK/PRAYER) shows correct averages |
+| 7.4 | **Semester Comparison** | View `/reports/semester-comparison` | Side-by-side metrics for each semester; "All Semesters" option works |
+| 7.5 | **Invitation Network** | View dashboard | Force-directed graph renders all member-to-member invite relationships |
+| 7.6 | **Upcoming Birthdays widget** | View dashboard | Shows members with birthdays in the next 14 days; quick SMS link works |
+| 7.7 | **PDF export** | Click export on a members or attendance view | PDF downloads with correct data |
+| 7.8 | **CSV export** | Click CSV export on members list | File downloads with name, status, phone, email, cell group, join date |
+
+---
+
+## 8. Cell Groups
+
+| ID | Scenario | Steps | Pass Criteria |
+|:---|:---|:---|:---|
+| 8.1 | **Create cell group** | Admin creates a new cell group | Appears in list; selectable on member forms |
+| 8.2 | **Edit cell group** | Admin edits name or description | Changes persist |
+| 8.3 | **Delete cell group** | Admin deletes a cell group with no members | Group removed from list |
+| 8.4 | **Cell group member count** | View cell groups list | Member count shown per group |
+
+---
+
+## 9. UI / UX
+
+| ID | Scenario | Steps | Pass Criteria |
+|:---|:---|:---|:---|
+| 9.1 | **Toast notifications** | Perform any CRUD action | Success or error toast appears; auto-dismisses |
+| 9.2 | **Loading states** | Navigate to a page with data | Spinner shown while data loads; no layout shift on completion |
+| 9.3 | **Pagination** | Members list with more than 10 members | Page controls work; rows-per-page selector (10, 20, 50, All) functions |
+| 9.4 | **Mobile navigation** | Open app on a mobile viewport | Navigation is accessible; RBAC-gated items hidden for USER role |
+| 9.5 | **Semester selector — disabled state** | Verify selector is no longer disabled for non-admin users | Selector is interactive for all logged-in users |

@@ -7,6 +7,20 @@ This plan outlines the EXHAUSTIVE, step-by-step procedure to extend the current 
 
 ---
 
+## Recent Additions (2026-06-03) — All Complete
+
+- [x] **Archive Semester support** — Added `isArchive` flag to the `Semester` model. Archive semesters act as a catch-all for historical members who pre-date any recorded semester. UI shows amber "Archive" badge and create/edit checkbox.
+- [x] **LEGACY commitment status** — Added `LEGACY` to `CommitmentStatus` enum. Members assigned to an archive semester, or whose join date falls outside all semester ranges, receive `LEGACY` status instead of `NEW_MEMBER`. Commitment recalculation skips LEGACY members entirely.
+- [x] **All users can switch semesters** — Removed the role-based filter from `SemesterSelector`. Both admin and non-admin users can see and select any semester (active or closed).
+- [x] **Members page always shows all members** — Fixed the members list to always fetch `semesterId=all`, preventing the confusing behaviour where selecting a closed semester would only show members who joined that semester.
+- [x] **Event creation supports any semester** — Added an explicit semester dropdown to the `/events/new` form. Defaults to the globally selected semester but allows override. Fixes silent failure when "All Semesters" was selected globally.
+- [x] **Attendance page semester filter** — The event dropdown on the attendance page is now filtered by the selected semester. Switching semester clears and reloads the event list.
+- [x] **Fixed academic level calculation** — Rewrote `lib/progression.ts`. Old inline functions capped at Level 400 and were duplicated across two API files. New function supports Level 500, Level 600, and ALUMNI. Both API routes now import from the single canonical function.
+- [x] **Admission month field** — Added optional `admissionMonth` (1–12, default 8 = August) to the `Member` model. Academic year boundary advances on this month each year. Form fields added to create and edit pages.
+- [x] **Programme duration field** — Added optional `programDuration` (2–6 years, default 4) to the `Member` model. Determines when a member transitions to ALUMNI instead of continuing to count up. Form fields added to create and edit pages.
+
+---
+
 ## 2. Semester Model & Foundation (Complete)
 - [x] **Design & add Semester model** to the database (Prisma schema):
     - Fields: `id`, `name`, `startDate`, `endDate`, `academicYear`, `status` (ACTIVE, CLOSED)
