@@ -7,6 +7,11 @@ const AT_RISK_THRESHOLD = 0.4;
 
 export async function calculateMemberCommitment(memberId: string, semesterId: string) {
   try {
+    const existing = await prisma.semesterCommitment.findUnique({
+      where: { memberId_semesterId: { memberId, semesterId } }
+    });
+    if ((existing?.status as string) === 'LEGACY') return;
+
     const member = await prisma.member.findUnique({
       where: { id: memberId },
       select: { joinDate: true }

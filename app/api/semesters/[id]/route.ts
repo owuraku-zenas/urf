@@ -39,7 +39,7 @@ export async function PATCH(
     const { id } = await params;
 
     const body = await req.json();
-    const { name, academicYear, startDate, endDate, status } = body;
+    const { name, academicYear, startDate, endDate, status, isArchive } = body;
 
     const updateData: any = {};
     if (name) updateData.name = name;
@@ -47,6 +47,7 @@ export async function PATCH(
     if (startDate) updateData.startDate = new Date(startDate);
     if (endDate) updateData.endDate = new Date(endDate);
     if (status) updateData.status = status;
+    if (isArchive !== undefined) updateData.isArchive = isArchive;
 
     if (status === "ACTIVE") {
       await db.semester.updateMany({

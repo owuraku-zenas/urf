@@ -143,6 +143,7 @@ model Semester {
   endDate      DateTime
   academicYear String
   status       SemesterStatus @default(ACTIVE)
+  isArchive    Boolean        @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -191,6 +192,7 @@ enum CommitmentStatus {
   UNCOMMITTED
   AT_RISK
   NEW_MEMBER
+  LEGACY
 }
 
 model SmsLog {

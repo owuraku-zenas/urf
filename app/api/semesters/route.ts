@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, academicYear, startDate, endDate, status } = body;
+    const { name, academicYear, startDate, endDate, status, isArchive } = body;
 
     if (!name || !academicYear || !startDate || !endDate || !status) {
       return new NextResponse("Missing required fields", { status: 400 });
@@ -79,6 +79,7 @@ export async function POST(req: Request) {
         startDate: startDateObj,
         endDate: endDateObj,
         status,
+        isArchive: isArchive === true,
       },
     });
 

@@ -99,6 +99,8 @@ export async function POST(request: Request) {
 
     // Auto-calculate joinedSemester based on joinDate
     let finalJoinedSemesterId = null;
+    let initialCommitmentStatus: 'NEW_MEMBER' | 'LEGACY' = 'NEW_MEMBER';
+
     const matchingSemester = await prisma.semester.findFirst({
       where: {
         startDate: { lte: joinDateObj },
@@ -108,16 +110,20 @@ export async function POST(request: Request) {
 
     if (matchingSemester) {
       finalJoinedSemesterId = matchingSemester.id;
+      if (matchingSemester.isArchive) {
+        initialCommitmentStatus = 'LEGACY';
+      }
     } else {
-      // Fallback to active semester or most recent
+      // No semester covers this joinDate — fall back and mark as LEGACY
       const fallbackSemester = await prisma.semester.findFirst({
         where: { status: 'ACTIVE' },
       }) || await prisma.semester.findFirst({
         orderBy: { startDate: 'desc' }
       });
-      
+
       if (fallbackSemester) {
         finalJoinedSemesterId = fallbackSemester.id;
+        initialCommitmentStatus = 'LEGACY';
       }
     }
 
@@ -141,7 +147,7 @@ export async function POST(request: Request) {
         commitments: finalJoinedSemesterId ? {
           create: {
             semesterId: finalJoinedSemesterId,
-            status: 'NEW_MEMBER'
+            status: initialCommitmentStatus
           }
         } : undefined
       },

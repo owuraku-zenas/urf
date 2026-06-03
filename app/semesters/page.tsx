@@ -18,6 +18,7 @@ interface Semester {
   endDate: string
   academicYear: string
   status: "ACTIVE" | "CLOSED"
+  isArchive: boolean
 }
 
 export default function SemestersPage() {
@@ -31,7 +32,8 @@ export default function SemestersPage() {
     startDate: "",
     endDate: "",
     academicYear: "",
-    status: "ACTIVE"
+    status: "ACTIVE",
+    isArchive: false,
   })
 
   useEffect(() => {
@@ -58,6 +60,7 @@ export default function SemestersPage() {
       endDate: format(new Date(semester.endDate), "yyyy-MM-dd"),
       academicYear: semester.academicYear,
       status: semester.status,
+      isArchive: semester.isArchive,
     })
     setEditingId(semester.id)
     setShowModal(true)
@@ -120,7 +123,7 @@ export default function SemestersPage() {
               <DialogTrigger asChild>
                 <Button variant="default" onClick={() => {
                   setEditingId(null)
-                  setForm({ name: "", startDate: "", endDate: "", academicYear: "", status: "ACTIVE" })
+                  setForm({ name: "", startDate: "", endDate: "", academicYear: "", status: "ACTIVE", isArchive: false })
                 }}>Create Semester</Button>
               </DialogTrigger>
               <DialogContent>
@@ -141,6 +144,15 @@ export default function SemestersPage() {
                       <SelectItem value="CLOSED">Closed</SelectItem>
                     </SelectContent>
                   </Select>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={form.isArchive}
+                      onChange={e => setForm(f => ({ ...f, isArchive: e.target.checked }))}
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    Archive semester (for historical members before recorded semesters)
+                  </label>
                   <Button type="submit" variant="default">{editingId ? "Save Changes" : "Create"}</Button>
                 </form>
               </DialogContent>
@@ -155,6 +167,7 @@ export default function SemestersPage() {
                   <TableHead>Start Date</TableHead>
                   <TableHead>End Date</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Type</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -175,6 +188,7 @@ export default function SemestersPage() {
                       <TableCell>{format(new Date(semester.startDate), "yyyy-MM-dd")}</TableCell>
                       <TableCell>{format(new Date(semester.endDate), "yyyy-MM-dd")}</TableCell>
                       <TableCell>{semester.status === "ACTIVE" ? <span className="font-medium text-green-600">Active</span> : <span className="font-medium text-gray-400">Closed</span>}</TableCell>
+                      <TableCell>{semester.isArchive ? <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">Archive</span> : <span className="text-gray-400 text-xs">Regular</span>}</TableCell>
                       <TableCell>
                         <Button variant="outline" size="sm" onClick={() => handleEditClick(semester)}>Edit</Button>
                         {session?.user?.email === "urfzone4@gmail.com" && (
