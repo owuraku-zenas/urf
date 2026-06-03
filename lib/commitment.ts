@@ -31,14 +31,26 @@ export async function calculateMemberCommitment(memberId: string, semesterId: st
     })
 
     if (totalEvents === 0) {
-      // No events yet in this semester since they joined. Don't penalize them.
+      // No events in this semester since they joined.
+      // Check if their joinDate falls outside all regular (non-archive) semesters.
+      // If so, they are a historical member and should be LEGACY, not NEW_MEMBER.
+      const regularSemesters = await prisma.semester.findMany({
+        where: { isArchive: false },
+        select: { startDate: true, endDate: true },
+      });
+      const joinedDuringRecordedSemester = regularSemesters.some(
+        (s) => member.joinDate >= s.startDate && member.joinDate <= s.endDate
+      );
+
       const existingCommitment = await prisma.semesterCommitment.findUnique({
-         where: {
-            memberId_semesterId: { memberId, semesterId }
-         }
+        where: { memberId_semesterId: { memberId, semesterId } },
       });
       if (!existingCommitment?.overrideReason) {
-          await upsertCommitment(memberId, semesterId, 'NEW_MEMBER');
+        await upsertCommitment(
+          memberId,
+          semesterId,
+          joinedDuringRecordedSemester ? 'NEW_MEMBER' : 'LEGACY'
+        );
       }
       return;
     }
@@ -76,7 +88,7 @@ export async function calculateMemberCommitment(memberId: string, semesterId: st
 }
 
 // Helper to handle the actual database upsert, respecting manual overrides
-async function upsertCommitment(memberId: string, semesterId: string, calculatedStatus: 'COMMITTED' | 'UNCOMMITTED' | 'AT_RISK' | 'NEW_MEMBER') {
+async function upsertCommitment(memberId: string, semesterId: string, calculatedStatus: 'COMMITTED' | 'UNCOMMITTED' | 'AT_RISK' | 'NEW_MEMBER' | 'LEGACY') {
     const existing = await prisma.semesterCommitment.findUnique({
         where: {
             memberId_semesterId: { memberId, semesterId }

@@ -29,8 +29,8 @@ export function MainNav({ isAdmin = false }: { isAdmin?: boolean }) {
     { href: "/events", label: "Events" },
     { href: "/attendance", label: "Attendance" },
     { href: "/cell-groups", label: "Cell Groups" },
-    { 
-      href: "/reports", 
+    {
+      href: "/reports",
       label: "Reports",
       subItems: [
         { href: "/reports/attendance-trends", label: "Attendance Trends" },
@@ -38,6 +38,7 @@ export function MainNav({ isAdmin = false }: { isAdmin?: boolean }) {
         { href: "/reports/semester-comparison", label: "Semester Comparison" }
       ]
     },
+    { href: "/whats-new", label: "What's New" },
   ]
   if (isAdmin) {
     navItems.push({ href: "/semesters", label: "Semesters" })
