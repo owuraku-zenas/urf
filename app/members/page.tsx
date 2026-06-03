@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation"
 import { format } from "date-fns"
 import { generateMemberListPDF } from "@/lib/pdf-utils"
 import { useUser } from "@/context/user-context"
+import { useSemester } from "@/context/semester-context"
 import { SemesterSelector } from "@/components/semester-selector"
 import UpcomingBirthdays from "@/components/upcoming-birthdays"
 
@@ -49,10 +50,10 @@ interface CellGroup {
 
 export default function MembersPage() {
   const { user } = useUser()
+  const { selectedSemester } = useSemester()
   const router = useRouter()
-  // Debug log to help diagnose user context issues
   console.log("user from useUser:", user)
-  const isAdmin = user?.role === "admin" || !user // fallback to true if user is missing (for testing)
+  const isAdmin = user?.role === "admin" || !user
 
   // State declarations (ensure these are present)
   const [members, setMembers] = useState<Member[]>([])
@@ -85,8 +86,11 @@ export default function MembersPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const commitmentParam = selectedSemester && selectedSemester !== 'all'
+          ? `&commitmentSemesterId=${selectedSemester}`
+          : ''
         const [membersRes, cellGroupsRes] = await Promise.all([
-          fetch('/api/members?semesterId=all'),
+          fetch(`/api/members?semesterId=all${commitmentParam}`),
           fetch('/api/cell-groups')
         ])
 
@@ -109,7 +113,7 @@ export default function MembersPage() {
     }
 
     fetchData()
-  }, [])
+  }, [selectedSemester])
 
   const getCommitmentStatus = (member: any) => {
     if (!member.commitments || member.commitments.length === 0) return 'NEW_MEMBER'

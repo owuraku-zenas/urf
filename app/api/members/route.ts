@@ -6,19 +6,27 @@ import { calculateAcademicLevel } from "@/lib/progression"
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
+    // semesterId filters which members are shown (joinedSemesterId). Pass 'all' to show everyone.
     const rawSemesterId = searchParams.get("semesterId")
     const semesterId = rawSemesterId === 'all' ? null : rawSemesterId;
+    // commitmentSemesterId filters which commitment record is included per member.
+    // This drives the KPI cards and status badges without affecting which members appear.
+    const rawCommitmentSemesterId = searchParams.get("commitmentSemesterId")
+    const commitmentSemesterId = rawCommitmentSemesterId && rawCommitmentSemesterId !== 'all'
+      ? rawCommitmentSemesterId
+      : null;
 
-    console.log("Fetching all members...")
     const members = await prisma.member.findMany({
       where: semesterId ? { joinedSemesterId: semesterId } : undefined,
       include: {
         commitments: {
-          where: semesterId ? { semesterId } : undefined,
+          where: commitmentSemesterId ? { semesterId: commitmentSemesterId } : undefined,
           select: {
             status: true,
             semesterId: true
-          }
+          },
+          orderBy: { updatedAt: 'desc' },
+          take: 1,
         },
         cellGroup: {
           select: {
