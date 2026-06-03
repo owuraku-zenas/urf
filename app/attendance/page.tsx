@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { ClipboardList } from "lucide-react"
+import { useSemester } from "@/context/semester-context"
 
 interface Event {
   id: string
@@ -35,6 +36,7 @@ interface AttendanceRecord {
 }
 
 export default function AttendancePage() {
+  const { selectedSemester } = useSemester()
   const [isLoading, setIsLoading] = useState(true)
   const [events, setEvents] = useState<Event[]>([])
   const [selectedEventId, setSelectedEventId] = useState("")
@@ -43,12 +45,14 @@ export default function AttendancePage() {
   const [selectedCellGroup, setSelectedCellGroup] = useState<string>("all")
   const [error, setError] = useState<string | null>(null)
 
-  // Fetch events only once when component mounts
+  // Re-fetch events when the selected semester changes
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         setIsLoading(true)
-        const response = await fetch('/api/events')
+        setSelectedEventId("")
+        const semesterParam = selectedSemester ? `?semesterId=${selectedSemester}` : ''
+        const response = await fetch(`/api/events${semesterParam}`)
         if (!response.ok) {
           throw new Error('Failed to fetch events')
         }
@@ -62,7 +66,7 @@ export default function AttendancePage() {
     }
 
     fetchEvents()
-  }, [])
+  }, [selectedSemester])
 
   // Fetch attendance records when selected event changes
   useEffect(() => {
@@ -270,14 +274,4 @@ export default function AttendancePage() {
       </div>
     </main>
   )
-}
-
-function formatEventType(type: string) {
-  const types = {
-    MIDWEEK: "Midweek Service",
-    SUNDAY: "Sunday Service",
-    PRAYER: "Prayer Service",
-    SPECIAL: "Special Program",
-  }
-  return types[type as keyof typeof types] || type
 }
