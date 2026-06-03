@@ -117,6 +117,12 @@ export default function MembersPage() {
 
   const getCommitmentStatus = (member: any) => {
     if (!member.commitments || member.commitments.length === 0) return 'NEW_MEMBER'
+    // Prefer the commitment for the currently selected semester.
+    // Fall back to the most recently updated one if no match exists for this semester.
+    if (selectedSemester && selectedSemester !== 'all') {
+      const match = member.commitments.find((c: any) => c.semesterId === selectedSemester)
+      if (match) return match.status
+    }
     return member.commitments[0].status
   }
 

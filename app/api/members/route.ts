@@ -20,13 +20,12 @@ export async function GET(request: Request) {
       where: semesterId ? { joinedSemesterId: semesterId } : undefined,
       include: {
         commitments: {
-          where: commitmentSemesterId ? { semesterId: commitmentSemesterId } : undefined,
           select: {
             status: true,
             semesterId: true
           },
           orderBy: { updatedAt: 'desc' },
-          take: 1,
+          take: 5,
         },
         cellGroup: {
           select: {

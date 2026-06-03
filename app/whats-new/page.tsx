@@ -32,6 +32,17 @@ const releases: Release[] = [
     displayDate: "June 3, 2026",
     changes: [
       {
+        type: "FIX",
+        title: "Committed count on members page now shows the correct number",
+        body: "The Committed, At Risk, and Uncommitted cards were showing wrong counts because each member's commitment status was being read from whichever record happened to come back first, regardless of semester. The page now picks the commitment record that matches the selected semester specifically, and falls back to the most recent record when no match exists. The cards also re-fetch automatically when you switch semesters.",
+      },
+      {
+        type: "FIX",
+        title: "Historical members now show as Committed, not New Member",
+        body: "Members with join dates before any recorded semester (e.g. joined in 2018-2022) were being labelled as New Members indefinitely because the system had no attendance data to evaluate them. They now start as Committed by default, which reflects that they have been part of URF for years. If they start attending events in the current semester, their status will update based on actual attendance. To apply this fix to existing members, go to Semesters and click Run Migration.",
+        note: "The Migration button is in the Maintenance section at the bottom of the Semesters page.",
+      },
+      {
         type: "IMPROVEMENT",
         title: "Academic level now calculates correctly for all students, including alumni",
         body: "The calculation previously stopped at Level 400 and returned blank for anyone who had been studying more than 4 years. It now supports Levels 100 through 600 and correctly shows ALUMNI. Two optional fields were added to each member profile: Academic Year Start Month (which month their university year begins, defaults to August) and Programme Duration (how many years the course lasts, defaults to 4). These determine when the level advances and when the member becomes an alumnus.",
@@ -44,9 +55,9 @@ const releases: Release[] = [
       },
       {
         type: "NEW",
-        title: "Archive semesters and LEGACY status for long-standing members",
-        body: "Some members joined URF as far back as 2018, before any semesters were recorded in the system. They were being incorrectly labelled as New Members in the current semester. Admins can now create a special Archive Semester covering historical dates. Any member whose join date falls within that range is automatically given a LEGACY status. Legacy members show an amber badge and are never penalised in commitment calculations.",
-        note: "To set this up: go to Semesters, create a semester covering your historical date range (e.g. 2015 to the day before your first real semester), and tick the Archive Semester checkbox.",
+        title: "Archive semesters for long-standing members",
+        body: "Admins can now create a special Archive Semester covering historical dates. Members whose join date falls within that range are automatically given Committed status rather than being labelled as New Members. The archive semester type is set with a checkbox when creating or editing a semester.",
+        note: "Go to Semesters, create a semester covering your historical date range (e.g. 2015 to the day before your first real semester), and tick the Archive Semester checkbox. Then click Run Migration to update existing members.",
       },
       {
         type: "FIX",
