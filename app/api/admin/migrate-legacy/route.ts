@@ -56,10 +56,10 @@ export async function POST() {
     })
   }
 
-  // 4. Batch update to LEGACY
+  // 4. Batch update to COMMITTED — historical members start committed by default
   const result = await prisma.semesterCommitment.updateMany({
     where: { id: { in: toUpdate } },
-    data: { status: "LEGACY" },
+    data: { status: "COMMITTED" },
   })
 
   return NextResponse.json({

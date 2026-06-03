@@ -427,11 +427,11 @@ export default function MembersPage() {
                         <span className={`px-2 py-1 text-xs rounded-full ${
                           getCommitmentStatus(member) === 'COMMITTED' ? 'bg-green-100 text-green-800' :
                           getCommitmentStatus(member) === 'AT_RISK' ? 'bg-yellow-100 text-yellow-800' :
-                          getCommitmentStatus(member) === 'LEGACY' ? 'bg-amber-100 text-amber-800' :
                           getCommitmentStatus(member) === 'NEW_MEMBER' ? 'bg-blue-100 text-blue-800' :
-                          'bg-red-100 text-red-800'
+                          getCommitmentStatus(member) === 'UNCOMMITTED' ? 'bg-red-100 text-red-800' :
+                          'bg-green-100 text-green-800'
                         }`}>
-                          {getCommitmentStatus(member).replace('_', ' ')}
+                          {getCommitmentStatus(member) === 'LEGACY' ? 'COMMITTED' : getCommitmentStatus(member).replace('_', ' ')}
                         </span>
                       </TableCell>
                       <TableCell>{member.phone}</TableCell>

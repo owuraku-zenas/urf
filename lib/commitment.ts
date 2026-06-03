@@ -1,17 +1,10 @@
 import { prisma } from "./prisma"
 
-// A member is "COMMITTED" if they attend >= 70% of semester events.
 const COMMITTED_THRESHOLD = 0.7;
-// A member is "AT_RISK" if they attend >= 40% but < 70%. Below 40 is "UNCOMMITTED".
 const AT_RISK_THRESHOLD = 0.4;
 
 export async function calculateMemberCommitment(memberId: string, semesterId: string) {
   try {
-    const existing = await prisma.semesterCommitment.findUnique({
-      where: { memberId_semesterId: { memberId, semesterId } }
-    });
-    if ((existing?.status as string) === 'LEGACY') return;
-
     const member = await prisma.member.findUnique({
       where: { id: memberId },
       select: { joinDate: true }
@@ -22,40 +15,47 @@ export async function calculateMemberCommitment(memberId: string, semesterId: st
       return;
     }
 
-    // 1. Get the total number of events in this semester that occurred ON OR AFTER the member joined
+    // 1. Count events in this semester that occurred on or after the member joined
     const totalEvents = await prisma.event.count({
-      where: { 
+      where: {
         semesterId,
         date: { gte: member.joinDate }
       },
-    })
+    });
 
     if (totalEvents === 0) {
-      // No events in this semester since they joined.
-      // Check if their joinDate falls outside all regular (non-archive) semesters.
-      // If so, they are a historical member and should be LEGACY, not NEW_MEMBER.
+      // No events recorded yet for this member in this semester.
+      // Determine whether this is a historical member (joined before any recorded semester).
       const regularSemesters = await prisma.semester.findMany({
         where: { isArchive: false },
         select: { startDate: true, endDate: true },
       });
-      const joinedDuringRecordedSemester = regularSemesters.some(
+      const joinedInRecordedSemester = regularSemesters.some(
         (s) => member.joinDate >= s.startDate && member.joinDate <= s.endDate
       );
 
-      const existingCommitment = await prisma.semesterCommitment.findUnique({
+      const existing = await prisma.semesterCommitment.findUnique({
         where: { memberId_semesterId: { memberId, semesterId } },
       });
-      if (!existingCommitment?.overrideReason) {
-        await upsertCommitment(
-          memberId,
-          semesterId,
-          joinedDuringRecordedSemester ? 'NEW_MEMBER' : 'LEGACY'
-        );
+
+      if (existing?.overrideReason) return;
+
+      if (!joinedInRecordedSemester) {
+        // Historical member with no events: start at COMMITTED and don't downgrade them
+        // until they actually have attendance data to measure.
+        const currentStatus = existing?.status as string | undefined;
+        if (!currentStatus || currentStatus === 'NEW_MEMBER') {
+          await upsertCommitment(memberId, semesterId, 'COMMITTED');
+        }
+        // If already COMMITTED/AT_RISK/UNCOMMITTED, leave it — attendance data drove that.
+      } else {
+        // Regular member with no events yet: grace period.
+        await upsertCommitment(memberId, semesterId, 'NEW_MEMBER');
       }
       return;
     }
 
-    // 2. Count how many times this specific member attended an event in this semester
+    // 2. Count their PRESENT records for events in this semester after they joined
     const memberAttendances = await prisma.attendance.count({
       where: {
         memberId,
@@ -65,55 +65,36 @@ export async function calculateMemberCommitment(memberId: string, semesterId: st
           date: { gte: member.joinDate }
         },
       },
-    })
+    });
 
-    // 3. Calculate percentage
-    const attendancePercentage = memberAttendances / totalEvents;
+    // 3. Calculate attendance percentage and determine status
+    const pct = memberAttendances / totalEvents;
 
-    // 4. Determine Status
-    let newStatus: 'COMMITTED' | 'UNCOMMITTED' | 'AT_RISK' | 'NEW_MEMBER' = 'UNCOMMITTED';
-    
-    if (attendancePercentage >= COMMITTED_THRESHOLD) {
-      newStatus = 'COMMITTED';
-    } else if (attendancePercentage >= AT_RISK_THRESHOLD) {
-      newStatus = 'AT_RISK';
-    }
+    let newStatus: 'COMMITTED' | 'AT_RISK' | 'UNCOMMITTED' = 'UNCOMMITTED';
+    if (pct >= COMMITTED_THRESHOLD) newStatus = 'COMMITTED';
+    else if (pct >= AT_RISK_THRESHOLD) newStatus = 'AT_RISK';
 
-    // 5. Update the Database
     await upsertCommitment(memberId, semesterId, newStatus);
-    
+
   } catch (error) {
-    console.error(`Error calculating commitment for member ${memberId} in semester ${semesterId}:`, error)
+    console.error(`Error calculating commitment for member ${memberId} in semester ${semesterId}:`, error);
   }
 }
 
-// Helper to handle the actual database upsert, respecting manual overrides
-async function upsertCommitment(memberId: string, semesterId: string, calculatedStatus: 'COMMITTED' | 'UNCOMMITTED' | 'AT_RISK' | 'NEW_MEMBER' | 'LEGACY') {
-    const existing = await prisma.semesterCommitment.findUnique({
-        where: {
-            memberId_semesterId: { memberId, semesterId }
-        }
-    });
+async function upsertCommitment(
+  memberId: string,
+  semesterId: string,
+  calculatedStatus: 'COMMITTED' | 'AT_RISK' | 'UNCOMMITTED' | 'NEW_MEMBER'
+) {
+  const existing = await prisma.semesterCommitment.findUnique({
+    where: { memberId_semesterId: { memberId, semesterId } }
+  });
 
-    // If an Admin has manually overridden the status, do not overwrite it.
-    if (existing?.overrideReason) {
-        return existing;
-    }
+  if (existing?.overrideReason) return existing;
 
-    return await prisma.semesterCommitment.upsert({
-        where: {
-            memberId_semesterId: {
-                memberId,
-                semesterId
-            }
-        },
-        update: {
-            status: calculatedStatus as any,
-        },
-        create: {
-            memberId,
-            semesterId,
-            status: calculatedStatus as any,
-        }
-    });
+  return prisma.semesterCommitment.upsert({
+    where: { memberId_semesterId: { memberId, semesterId } },
+    update: { status: calculatedStatus as any },
+    create: { memberId, semesterId, status: calculatedStatus as any },
+  });
 }
