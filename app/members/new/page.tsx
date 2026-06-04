@@ -292,10 +292,15 @@ export default function NewMemberPage() {
                   id="phone"
                   name="phone"
                   value={formData.phone}
-                  onChange={handleChange}
+                  onChange={e => {
+                    const stripped = e.target.value.replace(/\s/g, '')
+                    setFormData(prev => ({ ...prev, phone: stripped }))
+                  }}
                   required
+                  placeholder="024XXXXXXX or +233XXXXXXXX"
                   className={`w-full rounded-md border ${errors.phone ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                 />
+                <p className="text-xs text-gray-500">No spaces. Ghanaian format: 024XXXXXXX or +233XXXXXXXX</p>
                 {errors.phone && (
                   <p className="text-sm text-red-500">{errors.phone}</p>
                 )}

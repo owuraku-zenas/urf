@@ -80,7 +80,9 @@ async function dispatchToProvider(phone: string, message: string): Promise<SmsPr
   }
 
   const apiUrl = "https://smsc.hubtel.com/v1/messages/send";
-  const url = `${apiUrl}?clientsecret=${clientSecret}&clientid=${clientId}&from=${senderId}&to=${phone}&content=${encodeURIComponent(message)}`;
+  // Hubtel expects no leading + (233XXXXXXXXX not +233XXXXXXXXX)
+  const formattedPhone = phone.startsWith('+') ? phone.slice(1) : phone;
+  const url = `${apiUrl}?clientsecret=${encodeURIComponent(clientSecret)}&clientid=${encodeURIComponent(clientId)}&from=${encodeURIComponent(senderId)}&to=${encodeURIComponent(formattedPhone)}&content=${encodeURIComponent(message)}`;
 
   try {
     const res = await fetch(url);
