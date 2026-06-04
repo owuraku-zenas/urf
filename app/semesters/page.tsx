@@ -340,7 +340,7 @@ export default function SemestersPage() {
                 <p className="mt-1 text-sm text-gray-500">
                   Updates members whose join date falls outside all recorded semester ranges from
                   <span className="font-medium"> NEW MEMBER</span> to
-                  <span className="font-medium"> LEGACY</span>. Run this once after creating an archive
+                  <span className="font-medium"> COMMITTED</span>. Run this once after creating an archive
                   semester, or if you notice historical members showing incorrect statuses.
                 </p>
               </div>

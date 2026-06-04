@@ -67,6 +67,6 @@ export async function POST() {
 
   return NextResponse.json({
     updated: result.count,
-    message: `Updated ${result.count} commitment${result.count !== 1 ? "s" : ""} from NEW_MEMBER to LEGACY.`,
+    message: `Updated ${result.count} commitment${result.count !== 1 ? "s" : ""} from NEW_MEMBER to COMMITTED.`,
   })
 }
