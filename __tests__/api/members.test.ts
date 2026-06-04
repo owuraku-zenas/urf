@@ -40,16 +40,16 @@ describe('Member Profile Validation API', () => {
       startYear: null,
       hostel: null,
       roomNumber: null,
-      isActive: true,
       joinDate: new Date('2024-01-01'),
-      joinedSemesterId: 'semester-1',
       admissionYear: '2024',
-      currentAcademicLevel: '100', // Server should algorithmically inject this!
+      admissionMonth: 8,
+      programDuration: 4,
+      currentAcademicLevel: '100',
       cellGroupId: 'cell-group-id',
       invitedById: null,
       createdAt: new Date(),
-      updatedAt: new Date()
-    });
+      updatedAt: new Date(),
+    } as any);
 
     const mockRequest = new Request('http://localhost/api/members', {
       method: 'POST',

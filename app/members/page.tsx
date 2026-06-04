@@ -81,14 +81,13 @@ export default function MembersPage() {
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
   const [semesters, setSemesters] = useState<Semester[]>([])
-  const [selectedJoinedSemester, setSelectedJoinedSemester] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null)
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchQuery, selectedCellGroup, selectedCommitment, startDate, endDate, itemsPerPage, selectedJoinedSemester])
+  }, [searchQuery, selectedCellGroup, selectedCommitment, startDate, endDate, itemsPerPage, selectedSemester])
 
   const confirmDelete = async () => {
     if (!memberToDelete) return
@@ -108,12 +107,10 @@ export default function MembersPage() {
     const fetchData = async () => {
       if (!loading) setRefetching(true)
       try {
-        const commitmentParam = selectedSemester && selectedSemester !== 'all'
-          ? `&commitmentSemesterId=${selectedSemester}`
-          : ''
-        const joinedParam = selectedJoinedSemester !== 'all' ? selectedJoinedSemester : 'all'
+        const semParam = selectedSemester && selectedSemester !== 'all' ? selectedSemester : 'all'
+        const commitmentParam = semParam !== 'all' ? `&commitmentSemesterId=${semParam}` : ''
         const [membersRes, cellGroupsRes, semestersRes] = await Promise.all([
-          fetch(`/api/members?semesterId=${joinedParam}${commitmentParam}`),
+          fetch(`/api/members?semesterId=${semParam}${commitmentParam}`),
           fetch('/api/cell-groups'),
           fetch('/api/semesters'),
         ])
@@ -141,13 +138,13 @@ export default function MembersPage() {
     }
 
     fetchData()
-  }, [selectedSemester, selectedJoinedSemester])
+  }, [selectedSemester])
 
   const getCommitmentStatus = (member: any) => {
     if (!member.commitments || member.commitments.length === 0) return 'NEW_MEMBER'
     if (selectedSemester && selectedSemester !== 'all') {
       const match = member.commitments.find((c: any) => c.semesterId === selectedSemester)
-      if (match) return match.status
+      return match ? match.status : 'NEW_MEMBER'
     }
     return member.commitments[0].status
   }
@@ -335,22 +332,10 @@ export default function MembersPage() {
                     <SelectItem value="committed">Committed</SelectItem>
                     <SelectItem value="at_risk">At Risk</SelectItem>
                     <SelectItem value="uncommitted">Uncommitted</SelectItem>
+                    <SelectItem value="new_member">New Member</SelectItem>
                   </SelectContent>
                 </Select>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-xs text-muted-foreground pl-0.5">Joined in semester</span>
-                  <Select value={selectedJoinedSemester} onValueChange={setSelectedJoinedSemester}>
-                    <SelectTrigger className="w-full sm:w-[200px]" aria-label="Filter by joined semester">
-                      <SelectValue placeholder="All Semesters" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Semesters</SelectItem>
-                      {semesters.map((s) => (
-                        <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+
                 <Select value={itemsPerPage.toString()} onValueChange={(val) => setItemsPerPage(Number(val))}>
                   <SelectTrigger className="w-full sm:w-[130px]" aria-label="Rows per page">
                     <SelectValue placeholder="Per page" />

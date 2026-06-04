@@ -9,7 +9,9 @@ export async function GET(request: Request) {
 
     const data = await Promise.all(semesters.map(async (sem) => {
       const [membersJoined, commitments, events] = await Promise.all([
-        prisma.member.count({ where: { joinedSemesterId: sem.id } }),
+        sem.startDate && sem.endDate
+          ? prisma.member.count({ where: { joinDate: { gte: sem.startDate, lte: sem.endDate } } })
+          : Promise.resolve(0),
         prisma.semesterCommitment.groupBy({
           by: ['status'],
           where: { semesterId: sem.id },

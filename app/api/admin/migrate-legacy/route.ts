@@ -17,9 +17,9 @@ export async function POST() {
     return NextResponse.json({ error: "Admins only" }, { status: 403 })
   }
 
-  // 1. Fetch all regular (non-archive, non-bucket) semesters with defined date ranges
+  // 1. Fetch all regular (non-archive) semesters with defined date ranges
   const allRegular = await prisma.semester.findMany({
-    where: { isArchive: false, isOldMemberBucket: false },
+    where: { isArchive: false },
     select: { id: true, startDate: true, endDate: true },
   })
   const regularSemesters = allRegular.filter(

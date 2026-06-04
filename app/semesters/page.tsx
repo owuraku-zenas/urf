@@ -36,7 +36,6 @@ interface Semester {
   academicYear: string
   status: "ACTIVE" | "CLOSED"
   isArchive: boolean
-  isOldMemberBucket: boolean
 }
 
 interface FormState {
@@ -48,7 +47,6 @@ interface FormState {
   endYear: number
   status: string
   isArchive: boolean
-  isOldMemberBucket: boolean
 }
 
 const emptyForm = (): FormState => ({
@@ -60,7 +58,6 @@ const emptyForm = (): FormState => ({
   endYear: currentYear,
   status: "ACTIVE",
   isArchive: false,
-  isOldMemberBucket: false,
 })
 
 export default function SemestersPage() {
@@ -69,6 +66,7 @@ export default function SemestersPage() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [migrating, setMigrating] = useState(false)
+  const [recalculating, setRecalculating] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<FormState>(emptyForm())
 
@@ -94,7 +92,6 @@ export default function SemestersPage() {
       endYear: endD ? endD.getFullYear() : currentYear,
       status: semester.status,
       isArchive: semester.isArchive,
-      isOldMemberBucket: semester.isOldMemberBucket,
     })
     setEditingId(semester.id)
     setShowModal(true)
@@ -122,6 +119,20 @@ export default function SemestersPage() {
       toast.error("Failed to run migration")
     } finally {
       setMigrating(false)
+    }
+  }
+
+  async function handleRecalculate() {
+    setRecalculating(true)
+    try {
+      const res = await fetch("/api/admin/recalculate-commitments", { method: "POST" })
+      const data = await res.json()
+      if (res.ok) toast.success(data.message)
+      else toast.error(data.error || "Recalculation failed")
+    } catch {
+      toast.error("Failed to run recalculation")
+    } finally {
+      setRecalculating(false)
     }
   }
 
@@ -195,64 +206,42 @@ export default function SemestersPage() {
                     required
                   />
 
-                  {/* Old Member Bucket toggle */}
-                  <label className="flex items-center gap-2 text-sm font-medium">
-                    <input
-                      type="checkbox"
-                      checked={form.isOldMemberBucket}
-                      onChange={e => setF({ isOldMemberBucket: e.target.checked })}
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
-                    Old Members bucket (catch-all for members with no matching semester)
-                  </label>
-
-                  {/* Date range — hidden for bucket semesters */}
-                  {!form.isOldMemberBucket && (
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-sm font-medium mb-1">Start month</p>
-                        <div className="flex gap-2">
-                          <Select value={String(form.startMonth)} onValueChange={v => setF({ startMonth: Number(v) })}>
-                            <SelectTrigger className="flex-1">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {MONTHS.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                          <Select value={String(form.startYear)} onValueChange={v => setF({ startYear: Number(v) })}>
-                            <SelectTrigger className="w-28">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium mb-1">End month</p>
-                        <div className="flex gap-2">
-                          <Select value={String(form.endMonth)} onValueChange={v => setF({ endMonth: Number(v) })}>
-                            <SelectTrigger className="flex-1">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {MONTHS.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                          <Select value={String(form.endYear)} onValueChange={v => setF({ endYear: Number(v) })}>
-                            <SelectTrigger className="w-28">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </div>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm font-medium mb-1">Start month</p>
+                      <div className="flex gap-2">
+                        <Select value={String(form.startMonth)} onValueChange={v => setF({ startMonth: Number(v) })}>
+                          <SelectTrigger className="flex-1"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {MONTHS.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        <Select value={String(form.startYear)} onValueChange={v => setF({ startYear: Number(v) })}>
+                          <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
-                  )}
+                    <div>
+                      <p className="text-sm font-medium mb-1">End month</p>
+                      <div className="flex gap-2">
+                        <Select value={String(form.endMonth)} onValueChange={v => setF({ endMonth: Number(v) })}>
+                          <SelectTrigger className="flex-1"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {MONTHS.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        <Select value={String(form.endYear)} onValueChange={v => setF({ endYear: Number(v) })}>
+                          <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
 
                   <Select value={form.status} onValueChange={v => setF({ status: v })}>
                     <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
@@ -308,11 +297,9 @@ export default function SemestersPage() {
                         : <span className="font-medium text-gray-400">Closed</span>}
                     </TableCell>
                     <TableCell>
-                      {semester.isOldMemberBucket
-                        ? <span className="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-800">Old Members</span>
-                        : semester.isArchive
-                          ? <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">Archive</span>
-                          : <span className="text-gray-400 text-xs">Regular</span>}
+                      {semester.isArchive
+                        ? <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">Archive</span>
+                        : <span className="text-gray-400 text-xs">Regular</span>}
                     </TableCell>
                     <TableCell>
                       <Button variant="outline" size="sm" onClick={() => handleEditClick(semester)}>Edit</Button>
@@ -333,19 +320,34 @@ export default function SemestersPage() {
           <CardTitle className="text-base">Maintenance</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-start gap-4">
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900">Fix Legacy Member Status</p>
-              <p className="mt-1 text-sm text-gray-500">
-                Updates members whose join date falls outside all recorded semester ranges from
-                <span className="font-medium"> NEW MEMBER</span> to
-                <span className="font-medium"> LEGACY</span>. Run this once after creating an archive
-                semester, or if you notice historical members showing incorrect statuses.
-              </p>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-start gap-4">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Recalculate Commitment Scores</p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Recalculates commitment status for every member across all semesters based on
+                  their attendance records. Run this after adding historical attendance data or if
+                  scores look incorrect.
+                </p>
+              </div>
+              <Button variant="outline" size="sm" onClick={handleRecalculate} disabled={recalculating} className="shrink-0">
+                {recalculating ? "Running..." : "Recalculate"}
+              </Button>
             </div>
-            <Button variant="outline" size="sm" onClick={handleMigrateLegacy} disabled={migrating} className="shrink-0">
-              {migrating ? "Running..." : "Run Migration"}
-            </Button>
+            <div className="flex items-start gap-4 border-t pt-4">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Fix Legacy Member Status</p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Updates members whose join date falls outside all recorded semester ranges from
+                  <span className="font-medium"> NEW MEMBER</span> to
+                  <span className="font-medium"> LEGACY</span>. Run this once after creating an archive
+                  semester, or if you notice historical members showing incorrect statuses.
+                </p>
+              </div>
+              <Button variant="outline" size="sm" onClick={handleMigrateLegacy} disabled={migrating} className="shrink-0">
+                {migrating ? "Running..." : "Run Migration"}
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

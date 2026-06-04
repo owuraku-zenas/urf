@@ -27,7 +27,6 @@ export default async function SmsAdminPage() {
       cellGroup: {
         select: { name: true }
       },
-      joinedSemesterId: true,
       commitments: {
         select: { status: true, semesterId: true }
       }

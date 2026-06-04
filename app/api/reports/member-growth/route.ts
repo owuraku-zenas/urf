@@ -7,12 +7,20 @@ export async function GET(request: Request) {
     const rawSemesterId = searchParams.get("semesterId")
     const semesterId = rawSemesterId === 'all' ? null : rawSemesterId;
 
-    // Get all members ordered by creation date, optionally filtered by semester
-    const members = await prisma.member.findMany({
-      where: semesterId ? { joinedSemesterId: semesterId } : undefined,
-      orderBy: {
-        createdAt: 'asc'
+    let memberWhere = undefined;
+    if (semesterId) {
+      const semester = await prisma.semester.findUnique({
+        where: { id: semesterId },
+        select: { startDate: true, endDate: true },
+      });
+      if (semester?.startDate && semester?.endDate) {
+        memberWhere = { joinDate: { gte: semester.startDate, lte: semester.endDate } };
       }
+    }
+
+    const members = await prisma.member.findMany({
+      where: memberWhere,
+      orderBy: { createdAt: 'asc' },
     })
 
     // Group members by month

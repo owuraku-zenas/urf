@@ -9,11 +9,22 @@ export async function GET(request: Request) {
     const semesterId = rawSemesterId === 'all' ? null : rawSemesterId;
 
     console.log("Fetching cell groups...")
+    let joinDateFilter: { gte: Date; lte: Date } | undefined;
+    if (semesterId) {
+      const semester = await prisma.semester.findUnique({
+        where: { id: semesterId },
+        select: { startDate: true, endDate: true },
+      });
+      if (semester?.startDate && semester?.endDate) {
+        joinDateFilter = { gte: semester.startDate, lte: semester.endDate };
+      }
+    }
+
     const cellGroups = await prisma.cellGroup.findMany({
       include: {
         _count: {
           select: {
-            members: semesterId ? { where: { joinedSemesterId: semesterId } } : true,
+            members: joinDateFilter ? { where: { joinDate: joinDateFilter } } : true,
           },
         },
       },

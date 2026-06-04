@@ -8,11 +8,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const semester = await db.semester.findUnique({
-      where: {
-        id,
-      },
-    });
+    const semester = await db.semester.findUnique({ where: { id } });
 
     if (!semester) {
       return new NextResponse("Semester not found", { status: 404 });
@@ -37,34 +33,24 @@ export async function PATCH(
     }
 
     const { id } = await params;
-
     const body = await req.json();
-    const { name, academicYear, startMonth, startYear, endMonth, endYear, status, isArchive, isOldMemberBucket } = body;
-
-    const existing = await db.semester.findUnique({ where: { id } });
-    if (!existing) return new NextResponse("Semester not found", { status: 404 });
+    const { name, academicYear, startMonth, startYear, endMonth, endYear, status, isArchive } = body;
 
     const updateData: any = {};
     if (name) updateData.name = name;
     if (academicYear) updateData.academicYear = academicYear;
     if (status) updateData.status = status;
     if (isArchive !== undefined) updateData.isArchive = isArchive;
-    if (isOldMemberBucket !== undefined) updateData.isOldMemberBucket = isOldMemberBucket;
 
-    const bucketAfterUpdate = isOldMemberBucket !== undefined ? isOldMemberBucket : existing.isOldMemberBucket;
-
-    if (!bucketAfterUpdate && startMonth && startYear && endMonth && endYear) {
+    if (startMonth && startYear && endMonth && endYear) {
       updateData.startDate = new Date(Number(startYear), Number(startMonth) - 1, 1, 0, 0, 0, 0);
       updateData.endDate = new Date(Number(endYear), Number(endMonth), 0, 23, 59, 59, 999);
-    } else if (bucketAfterUpdate) {
-      updateData.startDate = null;
-      updateData.endDate = null;
     }
 
     if (status === "ACTIVE") {
       await db.semester.updateMany({
         where: { status: "ACTIVE", id: { not: id } },
-        data: { status: "CLOSED" }
+        data: { status: "CLOSED" },
       });
     }
 
@@ -96,12 +82,7 @@ export async function DELETE(
     }
 
     const { id } = await params;
-
-    const semester = await db.semester.delete({
-      where: {
-        id,
-      },
-    });
+    const semester = await db.semester.delete({ where: { id } });
 
     return NextResponse.json(semester);
   } catch (error) {

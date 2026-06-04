@@ -105,7 +105,6 @@ async function main() {
           birthMonth,
           birthDay,
           cellGroupId: randomElement(cellGroups).id,
-          joinedSemesterId: joinedSem.id,
           joinDate: new Date((joinedSem.startDate ?? new Date()).getTime() + randomInt(1000, 10000000)),
         }
       })

@@ -77,8 +77,6 @@ model Member {
   admissionMonth       Int?    @default(8)
   programDuration      Int?    @default(4)
   currentAcademicLevel String?
-  joinedSemesterId     String?
-  joinedSemester       Semester? @relation("MemberJoinedSemester", fields: [joinedSemesterId], references: [id])
 
   cellGroupId String?
   invitedById String?
@@ -138,21 +136,19 @@ model Attendance {
 }
 
 model Semester {
-  id                String         @id @default(cuid())
-  name              String         @unique
-  startDate         DateTime?
-  endDate           DateTime?
-  academicYear      String
-  status            SemesterStatus @default(ACTIVE)
-  isArchive         Boolean        @default(false)
-  isOldMemberBucket Boolean        @default(false)
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
+  id           String         @id @default(cuid())
+  name         String         @unique
+  startDate    DateTime?
+  endDate      DateTime?
+  academicYear String
+  status       SemesterStatus @default(ACTIVE)
+  isArchive    Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
-  events       Event[]
-  joinedMembers Member[] @relation("MemberJoinedSemester")
-  commitments  SemesterCommitment[]
-  smsLogs      SmsLog[]
+  events      Event[]
+  commitments SemesterCommitment[]
+  smsLogs     SmsLog[]
 }
 
 enum SemesterStatus {

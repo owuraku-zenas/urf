@@ -27,7 +27,7 @@ export async function calculateMemberCommitment(memberId: string, semesterId: st
       // No events recorded yet for this member in this semester.
       // Determine whether this is a historical member (joined before any recorded semester).
       const allRegularSemesters = await prisma.semester.findMany({
-        where: { isArchive: false, isOldMemberBucket: false },
+        where: { isArchive: false },
         select: { startDate: true, endDate: true },
       });
       const regularSemesters = allRegularSemesters.filter(

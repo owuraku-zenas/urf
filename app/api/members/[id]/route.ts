@@ -92,31 +92,6 @@ export async function PUT(
     let joinDateObj = body.joinDate ? new Date(body.joinDate) : new Date();
     joinDateObj = new Date(joinDateObj.getFullYear(), joinDateObj.getMonth(), 1, 0, 0, 0, 0);
 
-    let finalJoinedSemesterId = null;
-    const matchingSemester = await prisma.semester.findFirst({
-      where: {
-        isOldMemberBucket: false,
-        startDate: { lte: joinDateObj },
-        endDate: { gte: joinDateObj }
-      }
-    });
-
-    if (matchingSemester) {
-      finalJoinedSemesterId = matchingSemester.id;
-    } else {
-      const fallbackSemester = await prisma.semester.findFirst({
-        where: { isOldMemberBucket: true },
-      }) || await prisma.semester.findFirst({
-        where: { status: 'ACTIVE' },
-      }) || await prisma.semester.findFirst({
-        orderBy: { startDate: 'desc' }
-      });
-
-      if (fallbackSemester) {
-        finalJoinedSemesterId = fallbackSemester.id;
-      }
-    }
-
     // Update member
     const member = await prisma.member.update({
       where: {
@@ -144,7 +119,6 @@ export async function PUT(
           body.admissionMonth ? parseInt(body.admissionMonth.toString()) : 8,
           body.programDuration ? parseInt(body.programDuration.toString()) : 4
         ),
-        joinedSemesterId: finalJoinedSemesterId,
       },
       include: {
         cellGroup: {

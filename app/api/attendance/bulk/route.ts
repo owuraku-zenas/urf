@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { AttendanceStatus } from "@prisma/client"
+import { calculateMemberCommitment } from "@/lib/commitment"
 
 export async function POST(request: Request) {
   try {
@@ -44,6 +45,16 @@ export async function POST(request: Request) {
         })
       )
     )
+
+    // Recalculate commitment for every member in this event
+    if (event.semesterId) {
+      const memberIds = [...new Set(attendances.map((a: any) => a.memberId))]
+      memberIds.forEach(memberId =>
+        calculateMemberCommitment(memberId, event.semesterId!).catch(err =>
+          console.error("Commitment recalc failed for", memberId, err)
+        )
+      )
+    }
 
     return NextResponse.json(createdAttendances)
   } catch (error) {
