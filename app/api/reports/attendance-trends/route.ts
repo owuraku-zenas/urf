@@ -7,21 +7,26 @@ export async function GET(request: Request) {
     const rawSemesterId = searchParams.get("semesterId")
     const semesterId = rawSemesterId === 'all' ? null : rawSemesterId
 
+    // Denominator: members who had joined on or before the semester ended.
+    // When no semester is selected, use total membership.
+    let memberCountWhere: any = undefined
+    if (semesterId) {
+      const semester = await prisma.semester.findUnique({
+        where: { id: semesterId },
+        select: { endDate: true },
+      })
+      if (semester?.endDate) {
+        memberCountWhere = { joinDate: { lte: semester.endDate } }
+      }
+    }
+
     const [events, membersCount] = await Promise.all([
       prisma.event.findMany({
         where: semesterId ? { semesterId } : undefined,
-        include: {
-          _count: {
-            select: {
-              attendance: true
-            }
-          }
-        },
-        orderBy: {
-          date: 'desc'
-        }
+        include: { _count: { select: { attendance: true } } },
+        orderBy: { date: 'desc' },
       }),
-      prisma.member.count()
+      prisma.member.count({ where: memberCountWhere }),
     ])
 
     const totalMembers = membersCount > 0 ? membersCount : 1
@@ -32,35 +37,30 @@ export async function GET(request: Request) {
       date: event.date,
       type: event.type,
       attendanceCount: event._count.attendance,
-      attendancePercentage: Math.round((event._count.attendance / totalMembers) * 100)
+      attendancePercentage: Math.round((event._count.attendance / totalMembers) * 100),
     }))
 
-    const getAveragePercentage = (type?: string) => {
-      const filteredEvents = type ? events.filter(e => e.type === type) : events
-      if (filteredEvents.length === 0) return 0
-      
-      const totalPercentage = filteredEvents.reduce((sum, event) => 
-        sum + ((event._count.attendance / totalMembers) * 100), 0
+    const avgForType = (type?: string) => {
+      const filtered = type ? events.filter(e => e.type === type) : events
+      if (filtered.length === 0) return 0
+      return Math.round(
+        filtered.reduce((sum, e) => sum + (e._count.attendance / totalMembers) * 100, 0) / filtered.length
       )
-      
-      return Math.round(totalPercentage / filteredEvents.length)
     }
 
     return NextResponse.json({
       events: eventsData,
       totalMembers: membersCount,
       averageAttendance: {
-        overall: getAveragePercentage(),
-        sunday: getAveragePercentage("SUNDAY"),
-        midweek: getAveragePercentage("MIDWEEK"),
-        prayer: getAveragePercentage("PRAYER")
-      }
+        overall: avgForType(),
+        sunday: avgForType("SUNDAY"),
+        midweek: avgForType("MIDWEEK"),
+        prayer: avgForType("PRAYER"),
+        special: avgForType("SPECIAL"),
+      },
     })
   } catch (error) {
     console.error("Error generating attendance trends:", error)
-    return NextResponse.json(
-      { error: "Failed to generate attendance trends" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to generate attendance trends" }, { status: 500 })
   }
 }

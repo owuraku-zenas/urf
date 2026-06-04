@@ -11,11 +11,13 @@ import { exportToCSV } from "@/lib/utils"
 interface SemesterData {
   semesterId: string
   name: string
+  startDate: string | null
   membersJoined: number
-  avgAttendance: number
+  avgAttendeesPerEvent: number
   committed: number
   uncommitted: number
   atRisk: number
+  newMember: number
 }
 
 export default function SemesterComparisonReportPage() {
@@ -82,10 +84,11 @@ export default function SemesterComparisonReportPage() {
               const exportData = reportData.map(sem => ({
                 Semester: sem.name,
                 'New Members Joined': sem.membersJoined,
-                'Average Attendance': sem.avgAttendance,
+                'Avg Attendees / Event': sem.avgAttendeesPerEvent,
                 'Committed': sem.committed,
                 'At Risk': sem.atRisk,
-                'Uncommitted': sem.uncommitted
+                'Uncommitted': sem.uncommitted,
+                'New Member': sem.newMember,
               }))
               exportToCSV(exportData, 'semester-comparison-report')
             } catch (error) {
@@ -124,7 +127,7 @@ export default function SemesterComparisonReportPage() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="avgAttendance" name="Avg Attendance" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="avgAttendeesPerEvent" name="Avg Attendees / Event" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="membersJoined" name="New Members" fill="#10b981" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -158,7 +161,8 @@ export default function SemesterComparisonReportPage() {
                     <Legend />
                     <Bar dataKey="committed" stackId="a" name="Committed" fill="#10b981" />
                     <Bar dataKey="atRisk" stackId="a" name="At Risk" fill="#f59e0b" />
-                    <Bar dataKey="uncommitted" stackId="a" name="Uncommitted" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="uncommitted" stackId="a" name="Uncommitted" fill="#ef4444" />
+                    <Bar dataKey="newMember" stackId="a" name="New Member" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -179,10 +183,11 @@ export default function SemesterComparisonReportPage() {
                 <tr>
                   <th className="text-left font-medium p-4">Semester</th>
                   <th className="text-right font-medium p-4">New Members</th>
-                  <th className="text-right font-medium p-4">Avg Attendance</th>
+                  <th className="text-right font-medium p-4">Avg Attendees / Event</th>
                   <th className="text-right font-medium p-4">Committed</th>
                   <th className="text-right font-medium p-4 text-orange-600">At Risk</th>
                   <th className="text-right font-medium p-4 text-red-600">Uncommitted</th>
+                  <th className="text-right font-medium p-4 text-blue-600">New Member</th>
                 </tr>
               </thead>
               <tbody>
@@ -203,10 +208,11 @@ export default function SemesterComparisonReportPage() {
                     <tr key={sem.semesterId} className="border-b transition-colors hover:bg-muted/50">
                       <td className="p-4 font-medium">{sem.name}</td>
                       <td className="p-4 text-right">{sem.membersJoined}</td>
-                      <td className="p-4 text-right">{sem.avgAttendance}</td>
+                      <td className="p-4 text-right">{sem.avgAttendeesPerEvent}</td>
                       <td className="p-4 text-right">{sem.committed}</td>
                       <td className="p-4 text-right text-orange-600 font-medium">{sem.atRisk}</td>
                       <td className="p-4 text-right text-red-600 font-medium">{sem.uncommitted}</td>
+                      <td className="p-4 text-right text-blue-600 font-medium">{sem.newMember}</td>
                     </tr>
                   ))
                 )}
