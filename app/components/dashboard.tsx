@@ -55,7 +55,8 @@ interface CellGroup {
   }
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8']
+// URF design-system palette (Operational Blue, Signal Purple, Cyan, Amber, Orange)
+const COLORS = ['#3b82f6', '#7c3aed', '#06b6d4', '#f59e0b', '#f97316']
 
 export default function Dashboard() {
   const { selectedSemester } = useSemester()
@@ -131,7 +132,27 @@ export default function Dashboard() {
   })) || []
 
   if (loading) {
-    return <div className="text-center py-8">Loading dashboard data...</div>
+    return (
+      <div className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="h-3 w-24 animate-pulse rounded bg-gray-100 mb-3" />
+              <div className="h-7 w-16 animate-pulse rounded bg-gray-100" />
+            </div>
+          ))}
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="h-4 w-32 animate-pulse rounded bg-gray-100 mb-2" />
+              <div className="h-3 w-48 animate-pulse rounded bg-gray-100 mb-6" />
+              <div className="h-[300px] animate-pulse rounded bg-gray-50" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -206,7 +227,7 @@ export default function Dashboard() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="members" fill="#8884d8" />
+                  <Bar dataKey="members" fill="#3b82f6" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -227,7 +248,7 @@ export default function Dashboard() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="attendance" stroke="#8884d8" />
+                  <Line type="monotone" dataKey="attendance" stroke="#3b82f6" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -248,7 +269,7 @@ export default function Dashboard() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="invitations" fill="#8884d8" />
+                  <Bar dataKey="invitations" fill="#3b82f6" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -270,7 +291,7 @@ export default function Dashboard() {
                     cy="50%"
                     labelLine={false}
                     outerRadius={80}
-                    fill="#8884d8"
+                    fill="#3b82f6"
                     dataKey="value"
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >
