@@ -39,15 +39,27 @@ export async function PATCH(
     const { id } = await params;
 
     const body = await req.json();
-    const { name, academicYear, startDate, endDate, status, isArchive } = body;
+    const { name, academicYear, startMonth, startYear, endMonth, endYear, status, isArchive, isOldMemberBucket } = body;
+
+    const existing = await db.semester.findUnique({ where: { id } });
+    if (!existing) return new NextResponse("Semester not found", { status: 404 });
 
     const updateData: any = {};
     if (name) updateData.name = name;
     if (academicYear) updateData.academicYear = academicYear;
-    if (startDate) updateData.startDate = new Date(startDate);
-    if (endDate) updateData.endDate = new Date(endDate);
     if (status) updateData.status = status;
     if (isArchive !== undefined) updateData.isArchive = isArchive;
+    if (isOldMemberBucket !== undefined) updateData.isOldMemberBucket = isOldMemberBucket;
+
+    const bucketAfterUpdate = isOldMemberBucket !== undefined ? isOldMemberBucket : existing.isOldMemberBucket;
+
+    if (!bucketAfterUpdate && startMonth && startYear && endMonth && endYear) {
+      updateData.startDate = new Date(Number(startYear), Number(startMonth) - 1, 1, 0, 0, 0, 0);
+      updateData.endDate = new Date(Number(endYear), Number(endMonth), 0, 23, 59, 59, 999);
+    } else if (bucketAfterUpdate) {
+      updateData.startDate = null;
+      updateData.endDate = null;
+    }
 
     if (status === "ACTIVE") {
       await db.semester.updateMany({
@@ -56,13 +68,8 @@ export async function PATCH(
       });
     }
 
-    // In a production app, we would re-run overlap checks here for updated dates
-    // if required. To ensure things work safely, we just do the basic update.
-
     const semester = await db.semester.update({
-      where: {
-        id,
-      },
+      where: { id },
       data: updateData,
     });
 

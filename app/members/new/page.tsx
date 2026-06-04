@@ -6,6 +6,17 @@ import Link from "next/link"
 import { useToast } from "@/components/ui/use-toast"
 import { z } from "zod"
 
+const MONTHS = [
+  { value: 1, label: "January" }, { value: 2, label: "February" },
+  { value: 3, label: "March" }, { value: 4, label: "April" },
+  { value: 5, label: "May" }, { value: 6, label: "June" },
+  { value: 7, label: "July" }, { value: 8, label: "August" },
+  { value: 9, label: "September" }, { value: 10, label: "October" },
+  { value: 11, label: "November" }, { value: 12, label: "December" },
+]
+const CUR_YEAR = new Date().getFullYear()
+const JOIN_YEARS = Array.from({ length: CUR_YEAR - 2009 }, (_, i) => CUR_YEAR - i)
+
 // Validation schema
 const MemberFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
@@ -80,7 +91,7 @@ export default function NewMemberPage() {
     phone: "",
     birthMonth: "",
     birthDay: "",
-    joinDate: new Date().toISOString().split('T')[0],
+    joinDate: `${CUR_YEAR}-${String(new Date().getMonth() + 1).padStart(2, '0')}-01`,
     university: "",
     program: "",
     startYear: "",
@@ -291,21 +302,32 @@ export default function NewMemberPage() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="joinDate" className="block text-sm font-medium">
-                  Join Date *
-                </label>
-                <input
-                  id="joinDate"
-                  name="joinDate"
-                  type="date"
-                  value={formData.joinDate}
-                  onChange={handleChange}
-                  required
-                  className={`w-full rounded-md border ${errors.joinDate ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
-                />
-                {errors.joinDate && (
-                  <p className="text-sm text-red-500">{errors.joinDate}</p>
-                )}
+                <label className="block text-sm font-medium">Join Month &amp; Year *</label>
+                <div className="flex gap-2">
+                  <select
+                    value={Number(formData.joinDate.split('-')[1])}
+                    onChange={e => {
+                      const month = String(e.target.value).padStart(2, '0')
+                      const year = formData.joinDate.split('-')[0]
+                      setFormData(prev => ({ ...prev, joinDate: `${year}-${month}-01` }))
+                    }}
+                    className={`flex-1 rounded-md border ${errors.joinDate ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                  >
+                    {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                  </select>
+                  <select
+                    value={Number(formData.joinDate.split('-')[0])}
+                    onChange={e => {
+                      const year = e.target.value
+                      const month = formData.joinDate.split('-')[1]
+                      setFormData(prev => ({ ...prev, joinDate: `${year}-${month}-01` }))
+                    }}
+                    className={`w-28 rounded-md border ${errors.joinDate ? 'border-red-500' : 'border-gray-300'} px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                  >
+                    {JOIN_YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                  </select>
+                </div>
+                {errors.joinDate && <p className="text-sm text-red-500">{errors.joinDate}</p>}
               </div>
 
               <div className="space-y-2 col-span-1 md:col-span-2">

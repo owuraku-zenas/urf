@@ -88,12 +88,14 @@ export async function PUT(
       )
     }
 
-    const joinDateObj = body.joinDate ? new Date(body.joinDate) : new Date();
+    // Normalize joinDate to first of the month
+    let joinDateObj = body.joinDate ? new Date(body.joinDate) : new Date();
+    joinDateObj = new Date(joinDateObj.getFullYear(), joinDateObj.getMonth(), 1, 0, 0, 0, 0);
 
-    // Auto-calculate joinedSemester based on updated joinDate
     let finalJoinedSemesterId = null;
     const matchingSemester = await prisma.semester.findFirst({
       where: {
+        isOldMemberBucket: false,
         startDate: { lte: joinDateObj },
         endDate: { gte: joinDateObj }
       }
@@ -102,13 +104,14 @@ export async function PUT(
     if (matchingSemester) {
       finalJoinedSemesterId = matchingSemester.id;
     } else {
-      // Fallback to active semester or most recent
       const fallbackSemester = await prisma.semester.findFirst({
+        where: { isOldMemberBucket: true },
+      }) || await prisma.semester.findFirst({
         where: { status: 'ACTIVE' },
       }) || await prisma.semester.findFirst({
         orderBy: { startDate: 'desc' }
       });
-      
+
       if (fallbackSemester) {
         finalJoinedSemesterId = fallbackSemester.id;
       }

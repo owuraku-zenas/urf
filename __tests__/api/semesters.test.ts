@@ -8,6 +8,19 @@ jest.mock('@/auth', () => ({
 
 const mockAuth = auth as jest.Mock;
 
+const mockSemester = {
+  id: 'existing-1',
+  name: 'Overlapping Fall',
+  academicYear: '2026/2027',
+  startDate: new Date('2026-08-01T00:00:00Z'),
+  endDate: new Date('2026-10-01T00:00:00Z'),
+  status: 'CLOSED' as const,
+  isArchive: false,
+  isOldMemberBucket: false,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
 describe('POST /api/semesters', () => {
   beforeEach(() => {
     mockAuth.mockReset();
@@ -16,8 +29,10 @@ describe('POST /api/semesters', () => {
   const validBody = {
     name: "Fall 2026",
     academicYear: "2026/2027",
-    startDate: "2026-09-01T00:00:00Z",
-    endDate: "2026-12-15T00:00:00Z",
+    startMonth: 9,
+    startYear: 2026,
+    endMonth: 12,
+    endYear: 2026,
     status: "ACTIVE"
   };
 
@@ -40,26 +55,13 @@ describe('POST /api/semesters', () => {
     expect(res.status).toBe(401);
   });
 
-  // The 'returns 409 if trying to create an ACTIVE semester' test is removed.
-  // The backend now securely auto-closes the active semester with `updateMany`
-  // mapping implicitly preventing overlaps.
   it('returns 409 if dates overlap with an existing semester', async () => {
     mockAuth.mockResolvedValue({ user: { role: 'ADMIN' } });
-    
-    // First findFirst (active check) returns null because we will attempt to create a CLOSED semester
+
     const closedBody = { ...validBody, status: 'CLOSED' };
-    
-    // Second findFirst (overlap check) returns an overlapping semester
-    dbMock.semester.findFirst.mockResolvedValueOnce({
-      id: 'existing-1',
-      name: 'Overlapping Fall',
-      academicYear: '2026/2027',
-      startDate: new Date('2026-08-01T00:00:00Z'),
-      endDate: new Date('2026-10-01T00:00:00Z'),
-      status: 'CLOSED',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
+
+    // Overlap check returns a conflicting semester
+    dbMock.semester.findFirst.mockResolvedValueOnce(mockSemester);
 
     const res = await POST(createRequest(closedBody));
     expect(res.status).toBe(409);
@@ -68,30 +70,32 @@ describe('POST /api/semesters', () => {
 
   it('successfully creates a semester', async () => {
     mockAuth.mockResolvedValue({ user: { role: 'ADMIN' } });
-    
-    // Both findFirst checks return null (no active, no overlap)
+
     dbMock.semester.findFirst.mockResolvedValue(null);
-    
+    dbMock.semester.updateMany.mockResolvedValue({ count: 0 });
     dbMock.semester.create.mockResolvedValue({
       id: 'new-sem',
-      ...validBody,
-      startDate: new Date(validBody.startDate).toISOString(),
-      endDate: new Date(validBody.endDate).toISOString(),
+      name: validBody.name,
+      academicYear: validBody.academicYear,
+      startDate: new Date(2026, 8, 1),
+      endDate: new Date(2026, 11, 31, 23, 59, 59),
       status: 'ACTIVE',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    } as any);
+      isArchive: false,
+      isOldMemberBucket: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
 
     const res = await POST(createRequest(validBody));
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.name).toBe(validBody.name);
-    
+
     expect(dbMock.semester.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         name: validBody.name,
         academicYear: validBody.academicYear,
-        status: validBody.status
+        status: validBody.status,
       })
     });
   });

@@ -245,7 +245,7 @@ interface Attendance {
                   {member.joinDate && (
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-gray-500" />
-                      <span>Join Date: {new Date(member.joinDate).toLocaleDateString()}</span>
+                      <span>Join Date: {new Date(member.joinDate).toLocaleDateString("en-US", { month: "long", year: "numeric" })}</span>
                     </div>
                   )}
                 </div>

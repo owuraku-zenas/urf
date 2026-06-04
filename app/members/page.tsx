@@ -6,15 +6,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Plus, Eye, Download, MessageSquare } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { format } from "date-fns"
 import { generateMemberListPDF } from "@/lib/pdf-utils"
 import { useUser } from "@/context/user-context"
 import { useSemester } from "@/context/semester-context"
 import { SemesterSelector } from "@/components/semester-selector"
 import UpcomingBirthdays from "@/components/upcoming-birthdays"
+import { useToast } from "@/components/ui/use-toast"
 
 interface Member {
   id: string
@@ -35,6 +45,7 @@ interface Member {
     id: string
     name: string
   }
+  joinDate: string
   createdAt: string
   updatedAt: string
   cellGroupId: string | null
@@ -57,13 +68,13 @@ export default function MembersPage() {
   const { user } = useUser()
   const { selectedSemester } = useSemester()
   const router = useRouter()
-  console.log("user from useUser:", user)
+  const { toast } = useToast()
   const isAdmin = user?.role === "admin" || !user
 
-  // State declarations (ensure these are present)
   const [members, setMembers] = useState<Member[]>([])
   const [cellGroups, setCellGroups] = useState<CellGroup[]>([])
   const [loading, setLoading] = useState(true)
+  const [refetching, setRefetching] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCellGroup, setSelectedCellGroup] = useState("all")
   const [selectedCommitment, setSelectedCommitment] = useState("all")
@@ -73,24 +84,29 @@ export default function MembersPage() {
   const [selectedJoinedSemester, setSelectedJoinedSemester] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [memberToDelete, setMemberToDelete] = useState<string | null>(null)
 
   useEffect(() => {
     setCurrentPage(1)
   }, [searchQuery, selectedCellGroup, selectedCommitment, startDate, endDate, itemsPerPage, selectedJoinedSemester])
 
-  const handleDeleteMember = async (memberId: string) => {
-    if (!window.confirm("Are you sure you want to delete this member?")) return;
+  const confirmDelete = async () => {
+    if (!memberToDelete) return
     try {
-      const res = await fetch(`/api/members/${memberId}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete member");
-      setMembers(prev => prev.filter(m => m.id !== memberId));
-    } catch (err) {
-      alert("Error deleting member");
+      const res = await fetch(`/api/members/${memberToDelete}`, { method: "DELETE" })
+      if (!res.ok) throw new Error("Failed to delete member")
+      setMembers(prev => prev.filter(m => m.id !== memberToDelete))
+      toast({ title: "Member deleted" })
+    } catch {
+      toast({ title: "Error", description: "Failed to delete member. Please try again.", variant: "destructive" })
+    } finally {
+      setMemberToDelete(null)
     }
-  };
+  }
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!loading) setRefetching(true)
       try {
         const commitmentParam = selectedSemester && selectedSemester !== 'all'
           ? `&commitmentSemesterId=${selectedSemester}`
@@ -99,7 +115,7 @@ export default function MembersPage() {
         const [membersRes, cellGroupsRes, semestersRes] = await Promise.all([
           fetch(`/api/members?semesterId=${joinedParam}${commitmentParam}`),
           fetch('/api/cell-groups'),
-          fetch('/api/semesters')
+          fetch('/api/semesters'),
         ])
 
         if (!membersRes.ok || !cellGroupsRes.ok || !semestersRes.ok) {
@@ -109,7 +125,7 @@ export default function MembersPage() {
         const [membersData, cellGroupsData, semestersData] = await Promise.all([
           membersRes.json(),
           cellGroupsRes.json(),
-          semestersRes.json()
+          semestersRes.json(),
         ])
 
         setMembers(membersData)
@@ -117,8 +133,10 @@ export default function MembersPage() {
         setSemesters(semestersData)
       } catch (error) {
         console.error('Error fetching data:', error)
+        toast({ title: "Error", description: "Failed to load members.", variant: "destructive" })
       } finally {
         setLoading(false)
+        setRefetching(false)
       }
     }
 
@@ -127,8 +145,6 @@ export default function MembersPage() {
 
   const getCommitmentStatus = (member: any) => {
     if (!member.commitments || member.commitments.length === 0) return 'NEW_MEMBER'
-    // Prefer the commitment for the currently selected semester.
-    // Fall back to the most recently updated one if no match exists for this semester.
     if (selectedSemester && selectedSemester !== 'all') {
       const match = member.commitments.find((c: any) => c.semesterId === selectedSemester)
       if (match) return match.status
@@ -141,55 +157,42 @@ export default function MembersPage() {
       member.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (member.email || '').toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCellGroup = selectedCellGroup === 'all' || member.cellGroupId === selectedCellGroup
-    const matchesStatus = true
     const matchesCommitment = selectedCommitment === 'all' || getCommitmentStatus(member) === selectedCommitment.toUpperCase()
-    
-    // Date range filtering
     const memberDate = new Date(member.createdAt)
     const matchesDateRange = (!startDate || memberDate >= new Date(startDate)) &&
       (!endDate || memberDate <= new Date(endDate + 'T23:59:59'))
-
-    return matchesSearch && matchesCellGroup && matchesStatus && matchesCommitment && matchesDateRange
+    return matchesSearch && matchesCellGroup && matchesCommitment && matchesDateRange
   })
 
-  // Pagination Logic
   const totalPages = Math.ceil(filteredMembers.length / itemsPerPage)
-  const paginatedMembers = itemsPerPage > 0 
+  const paginatedMembers = itemsPerPage > 0
     ? filteredMembers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
     : filteredMembers
 
-  // KPI Calculations
-  const committedCount = members.filter(m => getCommitmentStatus(m) === 'COMMITTED').length
-  const atRiskCount = members.filter(m => getCommitmentStatus(m) === 'AT_RISK').length
+  const committedCount  = members.filter(m => getCommitmentStatus(m) === 'COMMITTED').length
+  const atRiskCount     = members.filter(m => getCommitmentStatus(m) === 'AT_RISK').length
   const uncommittedCount = members.filter(m => getCommitmentStatus(m) === 'UNCOMMITTED').length
+  const newMemberCount  = members.filter(m => getCommitmentStatus(m) === 'NEW_MEMBER').length
 
   const handleExportPDF = () => {
     generateMemberListPDF(
       filteredMembers.map(member => ({
         ...member,
         cellGroup: member.cellGroup || null,
-        joinDate: member.createdAt,
+        joinDate: member.joinDate,
         status: getCommitmentStatus(member).replace('_', ' '),
       })),
       {
         title: 'Member List',
         subtitle: `Generated on ${new Date().toLocaleDateString()}`,
-        filename: 'member-list'
+        filename: 'member-list',
       }
     )
   }
 
   function handleExportCSV() {
     const csvRows = [
-      [
-        "Name",
-        "Status",
-        "Phone",
-        "Email",
-        "Cell Group",
-        "Invited By",
-        "Join Date"
-      ],
+      ["Name", "Status", "Phone", "Email", "Cell Group", "Invited By", "Join Date"],
       ...filteredMembers.map(member => [
         member.name,
         getCommitmentStatus(member).replace('_', ' '),
@@ -197,21 +200,24 @@ export default function MembersPage() {
         member.email,
         member.cellGroup?.name || "No Cell Group",
         member.invitedBy?.name || "Not invited by anyone",
-        member.createdAt
-      ])
-    ];
+        member.joinDate,
+      ]),
+    ]
+    const csvContent = "data:text/csv;charset=utf-8," +
+      csvRows.map(e => e.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n")
+    const link = document.createElement("a")
+    link.setAttribute("href", encodeURI(csvContent))
+    link.setAttribute("download", "member-list.csv")
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      csvRows.map(e => e.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "member-list.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleSmsFiltered = () => {
+    const payload = new URLSearchParams()
+    if (selectedCommitment !== 'all') payload.set("filter", selectedCommitment)
+    else payload.set("ids", filteredMembers.map(m => m.id).join(","))
+    router.push(`/admin/sms?${payload.toString()}`)
   }
 
   if (loading) {
@@ -219,300 +225,310 @@ export default function MembersPage() {
   }
 
   return (
-    <div className="py-10">
-      <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-4 flex-wrap">
-          <h1 className="text-3xl font-bold">Members</h1>
-          <SemesterSelector />
-        </div>
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-          <Button onClick={handleExportPDF} className="w-full sm:w-auto">
-            <Download className="mr-2 h-4 w-4" />
-            Export PDF
-          </Button>
-          <Button onClick={handleExportCSV} className="w-full sm:w-auto">
-            <Download className="mr-2 h-4 w-4" />
-            Export CSV
-          </Button>
-          <Link href="/members/new" className="w-full sm:w-auto">
-            <Button className="w-full sm:w-auto">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Member
+    <>
+      <div className="py-10">
+        {/* Page header */}
+        <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+          <div className="flex items-center gap-4 flex-wrap">
+            <h1 className="text-3xl font-bold">Members</h1>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs text-muted-foreground">Score by semester</span>
+              <SemesterSelector />
+            </div>
+          </div>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <Button variant="outline" onClick={handleExportPDF} className="w-full sm:w-auto">
+              <Download className="mr-2 h-4 w-4" />
+              Export PDF
             </Button>
-          </Link>
+            <Button variant="outline" onClick={handleExportCSV} className="w-full sm:w-auto">
+              <Download className="mr-2 h-4 w-4" />
+              Export CSV
+            </Button>
+            {isAdmin && (
+              <Button variant="outline" onClick={handleSmsFiltered} className="w-full sm:w-auto">
+                <MessageSquare className="mr-2 h-4 w-4" />
+                SMS Filtered ({filteredMembers.length})
+              </Button>
+            )}
+            <Link href="/members/new" className="w-full sm:w-auto">
+              <Button className="w-full sm:w-auto">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Member
+              </Button>
+            </Link>
+          </div>
         </div>
-      </div>
 
-      <div className="grid gap-4 md:grid-cols-3 mb-6">
+        {/* KPI cards — 4 columns now includes New Members */}
+        <div className="grid gap-4 md:grid-cols-4 mb-6">
           <Card className="bg-green-50/50 border-green-200">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-green-800">Committed Members</CardTitle>
+              <CardTitle className="text-sm font-medium text-green-800">Committed</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">{committedCount}</div>
-              <p className="text-xs text-green-600/80 mt-1">High attendance track</p>
+              <p className="text-xs text-green-600/80 mt-1">≥70% attendance</p>
             </CardContent>
           </Card>
           <Card className="bg-yellow-50/50 border-yellow-200">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-yellow-800">At Risk Members</CardTitle>
+              <CardTitle className="text-sm font-medium text-yellow-800">At Risk</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-yellow-600">{atRiskCount}</div>
-              <p className="text-xs text-yellow-600/80 mt-1">40-74% attendance track</p>
+              <p className="text-xs text-yellow-600/80 mt-1">40–74% attendance</p>
             </CardContent>
           </Card>
           <Card className="bg-red-50/50 border-red-200">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-red-800">Uncommitted Members</CardTitle>
+              <CardTitle className="text-sm font-medium text-red-800">Uncommitted</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-600">{uncommittedCount}</div>
-              <p className="text-xs text-red-600/80 mt-1">Below standard tracking</p>
+              <p className="text-xs text-red-600/80 mt-1">&lt;40% attendance</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-blue-50/50 border-blue-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-blue-800">New Members</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">{newMemberCount}</div>
+              <p className="text-xs text-blue-600/80 mt-1">Grace period</p>
             </CardContent>
           </Card>
         </div>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Member List</CardTitle>
-          <CardDescription>
-            {filteredMembers.length} members found
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4 flex flex-col gap-4">
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <Input
-                placeholder="Search by name, phone, or email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full sm:max-w-sm"
-              />
-              <Select
-                value={selectedCellGroup}
-                onValueChange={setSelectedCellGroup}
-              >
-                <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder="Select cell group" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Cell Groups</SelectItem>
-                  {cellGroups.map((group) => (
-                    <SelectItem key={group.id} value={group.id}>
-                      {group.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={selectedCommitment}
-                onValueChange={setSelectedCommitment}
-              >
-                <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder="Commitment Level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Levels</SelectItem>
-                  <SelectItem value="committed">Committed</SelectItem>
-                  <SelectItem value="at_risk">At Risk</SelectItem>
-                  <SelectItem value="uncommitted">Uncommitted</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={selectedJoinedSemester}
-                onValueChange={setSelectedJoinedSemester}
-              >
-                <SelectTrigger className="w-full sm:w-[200px]">
-                  <SelectValue placeholder="Joined in semester" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Semesters</SelectItem>
-                  {semesters.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>
-                      {s.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={itemsPerPage.toString()}
-                onValueChange={(val) => setItemsPerPage(Number(val))}
-              >
-                <SelectTrigger className="w-full sm:w-[130px]">
-                  <SelectValue placeholder="Per page" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10 per page</SelectItem>
-                  <SelectItem value="20">20 per page</SelectItem>
-                  <SelectItem value="50">50 per page</SelectItem>
-                  <SelectItem value="1000000">All</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex flex-col gap-4 sm:flex-row justify-between">
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Member List</CardTitle>
+            <CardDescription>{filteredMembers.length} members found</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-4 flex flex-col gap-3">
+              {/* Filter row */}
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+                <Input
+                  placeholder="Search by name, phone, or email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full sm:max-w-xs"
+                />
+                <Select value={selectedCellGroup} onValueChange={setSelectedCellGroup}>
+                  <SelectTrigger className="w-full sm:w-[180px]" aria-label="Filter by cell group">
+                    <SelectValue placeholder="All Cell Groups" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Cell Groups</SelectItem>
+                    {cellGroups.map((group) => (
+                      <SelectItem key={group.id} value={group.id}>{group.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={selectedCommitment} onValueChange={setSelectedCommitment}>
+                  <SelectTrigger className="w-full sm:w-[160px]" aria-label="Filter by commitment level">
+                    <SelectValue placeholder="All Levels" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Levels</SelectItem>
+                    <SelectItem value="committed">Committed</SelectItem>
+                    <SelectItem value="at_risk">At Risk</SelectItem>
+                    <SelectItem value="uncommitted">Uncommitted</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs text-muted-foreground pl-0.5">Joined in semester</span>
+                  <Select value={selectedJoinedSemester} onValueChange={setSelectedJoinedSemester}>
+                    <SelectTrigger className="w-full sm:w-[200px]" aria-label="Filter by joined semester">
+                      <SelectValue placeholder="All Semesters" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Semesters</SelectItem>
+                      {semesters.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Select value={itemsPerPage.toString()} onValueChange={(val) => setItemsPerPage(Number(val))}>
+                  <SelectTrigger className="w-full sm:w-[130px]" aria-label="Rows per page">
+                    <SelectValue placeholder="Per page" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10 per page</SelectItem>
+                    <SelectItem value="20">20 per page</SelectItem>
+                    <SelectItem value="50">50 per page</SelectItem>
+                    <SelectItem value="1000000">All</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* Date range row */}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <span className="text-xs text-muted-foreground whitespace-nowrap">Joined between</span>
+                <div className="flex gap-2">
                   <Input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full sm:w-[180px]"
-                    placeholder="Start date"
+                    className="w-full sm:w-[160px]"
+                    aria-label="Start date"
                   />
                   <Input
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full sm:w-[180px]"
-                    placeholder="End date"
+                    className="w-full sm:w-[160px]"
+                    aria-label="End date"
                   />
                 </div>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setStartDate("")
-                    setEndDate("")
-                  }}
-                  className="w-full sm:w-auto"
-                >
-                  Clear Dates
-                </Button>
+                {(startDate || endDate) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => { setStartDate(""); setEndDate("") }}
+                  >
+                    Clear dates
+                  </Button>
+                )}
               </div>
-              
-              {isAdmin && (
-                <Button
-                  onClick={() => {
-                    // Extract exactly what we filtered currently and send their IDs to the SMS dashboard
-                    const memberIds = filteredMembers.map(m => m.id).join(",")
-                    // We can either pass specific IDs or abstract "filter=AT_RISK" bounds if they chose one explicitly. 
-                    // To be safe and precise across ALL random filter combos, we just map out exactly the derived IDs.
-                    const payload = new URLSearchParams()
-                    if (selectedCommitment !== 'all') payload.set("filter", selectedCommitment)
-                    else payload.set("ids", memberIds) // fallback to explicit subset targeting
-                    
-                    router.push(`/admin/sms?${payload.toString()}`)
-                  }}
-                  className="w-full sm:w-auto"
-                >
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Mass SMS Filtered
-                </Button>
-              )}
             </div>
-          </div>
 
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Commitment</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead className="hidden sm:table-cell">Email</TableHead>
-                  <TableHead className="hidden sm:table-cell">Cell Group</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedMembers.length === 0 ? (
+            {/* Table with refetch overlay */}
+            <div className="relative overflow-x-auto">
+              {refetching && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center rounded bg-white/60">
+                  <span className="text-sm text-muted-foreground">Loading...</span>
+                </div>
+              )}
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center">
-                      No members found
-                    </TableCell>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Commitment</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead className="hidden sm:table-cell">Email</TableHead>
+                    <TableHead className="hidden sm:table-cell">Cell Group</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ) : (
-                  paginatedMembers.map((member) => (
-                    <TableRow key={member.id}>
-                      <TableCell className="font-medium">
-                        <div>
-                          {member.name}
-                          <div className="mt-1 text-sm text-gray-500 sm:hidden">
-                            {member.email || 'N/A'}
-                          </div>
-                          <div className="text-sm text-gray-500 sm:hidden">
-                            Cell Group: {member.cellGroup?.name || 'No Cell Group'}
-                          </div>
-                          <div className="text-sm text-gray-500 sm:hidden">
-                            Invited by: {member.invitedBy?.name || 'Not invited by anyone'}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          getCommitmentStatus(member) === 'COMMITTED' ? 'bg-green-100 text-green-800' :
-                          getCommitmentStatus(member) === 'AT_RISK' ? 'bg-yellow-100 text-yellow-800' :
-                          getCommitmentStatus(member) === 'NEW_MEMBER' ? 'bg-blue-100 text-blue-800' :
-                          getCommitmentStatus(member) === 'UNCOMMITTED' ? 'bg-red-100 text-red-800' :
-                          'bg-green-100 text-green-800'
-                        }`}>
-                          {getCommitmentStatus(member) === 'LEGACY' ? 'COMMITTED' : getCommitmentStatus(member).replace('_', ' ')}
-                        </span>
-                      </TableCell>
-                      <TableCell>{member.phone}</TableCell>
-                      <TableCell className="hidden sm:table-cell">{member.email || 'N/A'}</TableCell>
-                      <TableCell className="hidden sm:table-cell">{member.cellGroup?.name || '-'}</TableCell>
-                      <TableCell className="text-right">
-                        <Link href={`/members/${member.id}`}>
-                          <Button variant="outline" size="sm" className="w-full sm:w-auto">
-                            <Eye className="mr-2 h-4 w-4" />
-                            <span className="hidden sm:inline">View Details</span>
-                            <span className="sm:hidden">View</span>
-                          </Button>
-                        </Link>
-                        {isAdmin && (
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="ml-2"
-                            onClick={() => handleDeleteMember(member.id)}
-                          >
-                            Delete
-                          </Button>
-                        )}
+                </TableHeader>
+                <TableBody>
+                  {paginatedMembers.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                        No members found. Try adjusting your filters.
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Pagination Controls */}
-          {filteredMembers.length > 0 && (
-            <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-sm text-gray-500">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredMembers.length)} of {filteredMembers.length} members
-              </div>
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </Button>
-                <div className="text-sm font-medium px-2">
-                  Page {currentPage} of {Math.max(1, totalPages)}
-                </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  disabled={currentPage >= totalPages || totalPages === 0}
-                >
-                  Next
-                </Button>
-              </div>
+                  ) : (
+                    paginatedMembers.map((member) => (
+                      <TableRow key={member.id}>
+                        <TableCell className="font-medium">
+                          <div>
+                            {member.name}
+                            <div className="mt-1 text-sm text-gray-500 sm:hidden">
+                              {member.email || 'N/A'}
+                            </div>
+                            <div className="text-sm text-gray-500 sm:hidden">
+                              Cell Group: {member.cellGroup?.name || 'No Cell Group'}
+                            </div>
+                            <div className="text-sm text-gray-500 sm:hidden">
+                              Invited by: {member.invitedBy?.name || 'Not invited by anyone'}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            getCommitmentStatus(member) === 'COMMITTED'   ? 'bg-green-100 text-green-800' :
+                            getCommitmentStatus(member) === 'AT_RISK'     ? 'bg-yellow-100 text-yellow-800' :
+                            getCommitmentStatus(member) === 'NEW_MEMBER'  ? 'bg-blue-100 text-blue-800' :
+                            getCommitmentStatus(member) === 'UNCOMMITTED' ? 'bg-red-100 text-red-800' :
+                                                                            'bg-green-100 text-green-800'
+                          }`}>
+                            {getCommitmentStatus(member) === 'LEGACY' ? 'COMMITTED' : getCommitmentStatus(member).replace('_', ' ')}
+                          </span>
+                        </TableCell>
+                        <TableCell>{member.phone}</TableCell>
+                        <TableCell className="hidden sm:table-cell">{member.email || 'N/A'}</TableCell>
+                        <TableCell className="hidden sm:table-cell">{member.cellGroup?.name || '-'}</TableCell>
+                        <TableCell className="text-right">
+                          <Link href={`/members/${member.id}`}>
+                            <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                              <Eye className="mr-2 h-4 w-4" />
+                              <span className="hidden sm:inline">View Details</span>
+                              <span className="sm:hidden">View</span>
+                            </Button>
+                          </Link>
+                          {isAdmin && (
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="ml-2"
+                              onClick={() => setMemberToDelete(member.id)}
+                            >
+                              Delete
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
             </div>
-          )}
-        </CardContent>
-      </Card>
 
-      <div className="w-full">
+            {filteredMembers.length > 0 && (
+              <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-sm text-gray-500">
+                  Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredMembers.length)} of {filteredMembers.length} members
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  <div className="text-sm font-medium px-2">
+                    Page {currentPage} of {Math.max(1, totalPages)}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage >= totalPages || totalPages === 0}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         <UpcomingBirthdays />
       </div>
-    </div>
+
+      <AlertDialog open={memberToDelete !== null} onOpenChange={(open) => { if (!open) setMemberToDelete(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete member?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove the member and all their attendance records. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }

@@ -7,19 +7,61 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { format } from "date-fns"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
+
+const MONTHS = [
+  { value: 1, label: "January" }, { value: 2, label: "February" },
+  { value: 3, label: "March" }, { value: 4, label: "April" },
+  { value: 5, label: "May" }, { value: 6, label: "June" },
+  { value: 7, label: "July" }, { value: 8, label: "August" },
+  { value: 9, label: "September" }, { value: 10, label: "October" },
+  { value: 11, label: "November" }, { value: 12, label: "December" },
+]
+
+const currentYear = new Date().getFullYear()
+const YEARS = Array.from({ length: currentYear - 2009 }, (_, i) => currentYear - i)
+
+function formatMonthYear(date: string | null) {
+  if (!date) return "—"
+  const d = new Date(date)
+  return d.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+}
 
 interface Semester {
   id: string
   name: string
-  startDate: string
-  endDate: string
+  startDate: string | null
+  endDate: string | null
   academicYear: string
   status: "ACTIVE" | "CLOSED"
   isArchive: boolean
+  isOldMemberBucket: boolean
 }
+
+interface FormState {
+  name: string
+  academicYear: string
+  startMonth: number
+  startYear: number
+  endMonth: number
+  endYear: number
+  status: string
+  isArchive: boolean
+  isOldMemberBucket: boolean
+}
+
+const emptyForm = (): FormState => ({
+  name: "",
+  academicYear: "",
+  startMonth: new Date().getMonth() + 1,
+  startYear: currentYear,
+  endMonth: new Date().getMonth() + 1,
+  endYear: currentYear,
+  status: "ACTIVE",
+  isArchive: false,
+  isOldMemberBucket: false,
+})
 
 export default function SemestersPage() {
   const { data: session } = useSession()
@@ -28,40 +70,31 @@ export default function SemestersPage() {
   const [showModal, setShowModal] = useState(false)
   const [migrating, setMigrating] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [form, setForm] = useState({
-    name: "",
-    startDate: "",
-    endDate: "",
-    academicYear: "",
-    status: "ACTIVE",
-    isArchive: false,
-  })
+  const [form, setForm] = useState<FormState>(emptyForm())
 
   useEffect(() => {
-    // Fetch semesters from API
     async function fetchSemesters() {
       setLoading(true)
       const res = await fetch("/api/semesters")
-      if (res.ok) {
-        setSemesters(await res.json())
-      }
+      if (res.ok) setSemesters(await res.json())
       setLoading(false)
     }
     fetchSemesters()
   }, [])
 
-  function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
-
   function handleEditClick(semester: Semester) {
+    const startD = semester.startDate ? new Date(semester.startDate) : null
+    const endD = semester.endDate ? new Date(semester.endDate) : null
     setForm({
       name: semester.name,
-      startDate: format(new Date(semester.startDate), "yyyy-MM-dd"),
-      endDate: format(new Date(semester.endDate), "yyyy-MM-dd"),
       academicYear: semester.academicYear,
+      startMonth: startD ? startD.getMonth() + 1 : 1,
+      startYear: startD ? startD.getFullYear() : currentYear,
+      endMonth: endD ? endD.getMonth() + 1 : 12,
+      endYear: endD ? endD.getFullYear() : currentYear,
       status: semester.status,
       isArchive: semester.isArchive,
+      isOldMemberBucket: semester.isOldMemberBucket,
     })
     setEditingId(semester.id)
     setShowModal(true)
@@ -83,11 +116,8 @@ export default function SemestersPage() {
     try {
       const res = await fetch("/api/admin/migrate-legacy", { method: "POST" })
       const data = await res.json()
-      if (res.ok) {
-        toast.success(data.message)
-      } else {
-        toast.error(data.error || "Migration failed")
-      }
+      if (res.ok) toast.success(data.message)
+      else toast.error(data.error || "Migration failed")
     } catch {
       toast.error("Failed to run migration")
     } finally {
@@ -99,34 +129,38 @@ export default function SemestersPage() {
     e.preventDefault()
     const url = editingId ? `/api/semesters/${editingId}` : "/api/semesters"
     const method = editingId ? "PATCH" : "POST"
-    
+
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form)
+      body: JSON.stringify(form),
     })
-    
+
     if (res.ok) {
       setShowModal(false)
-      const savedSemester = await res.json()
+      const saved: Semester = await res.json()
       if (editingId) {
-        if (savedSemester.status === "ACTIVE") {
-           setSemesters(prev => prev.map(s => s.id === editingId ? savedSemester : { ...s, status: "CLOSED" }))
-        } else {
-           setSemesters(prev => prev.map(s => s.id === editingId ? savedSemester : s))
-        }
+        setSemesters(prev =>
+          saved.status === "ACTIVE"
+            ? prev.map(s => s.id === editingId ? saved : { ...s, status: "CLOSED" as const })
+            : prev.map(s => s.id === editingId ? saved : s)
+        )
       } else {
-        if (savedSemester.status === "ACTIVE") {
-           setSemesters(prev => [savedSemester, ...prev.map(s => ({ ...s, status: "CLOSED" as const }))])
-        } else {
-           setSemesters(prev => [savedSemester, ...prev])
-        }
+        setSemesters(prev =>
+          saved.status === "ACTIVE"
+            ? [saved, ...prev.map(s => ({ ...s, status: "CLOSED" as const }))]
+            : [saved, ...prev]
+        )
       }
-      toast.success(editingId ? "Semester updated successfully" : "Semester created successfully")
+      toast.success(editingId ? "Semester updated" : "Semester created")
       setEditingId(null)
     } else {
       toast.error(await res.text())
     }
+  }
+
+  function setF(patch: Partial<FormState>) {
+    setForm(f => ({ ...f, ...patch }))
   }
 
   return (
@@ -137,53 +171,121 @@ export default function SemestersPage() {
         </CardHeader>
         <CardContent>
           <div className="mb-4 flex justify-end">
-            <Dialog open={showModal} onOpenChange={setShowModal}>
+            <Dialog open={showModal} onOpenChange={open => { setShowModal(open); if (!open) setEditingId(null) }}>
               <DialogTrigger asChild>
-                <Button variant="default" onClick={() => {
-                  setEditingId(null)
-                  setForm({ name: "", startDate: "", endDate: "", academicYear: "", status: "ACTIVE", isArchive: false })
-                }}>Create Semester</Button>
+                <Button variant="default" onClick={() => { setEditingId(null); setForm(emptyForm()) }}>
+                  Create Semester
+                </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>{editingId ? "Edit Semester" : "Create Semester"}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <Input name="name" value={form.name} onChange={handleInputChange} placeholder="Semester Name" required />
-                  <Input name="academicYear" value={form.academicYear} onChange={handleInputChange} placeholder="Academic Year" required />
-                  <Input name="startDate" type="date" value={form.startDate} onChange={handleInputChange} placeholder="Start Date" required />
-                  <Input name="endDate" type="date" value={form.endDate} onChange={handleInputChange} placeholder="End Date" required />
-                  <Select name="status" value={form.status} onValueChange={v => setForm(f => ({ ...f, status: v }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
+                  <Input
+                    value={form.name}
+                    onChange={e => setF({ name: e.target.value })}
+                    placeholder="Semester Name"
+                    required
+                  />
+                  <Input
+                    value={form.academicYear}
+                    onChange={e => setF({ academicYear: e.target.value })}
+                    placeholder="Academic Year (e.g. 2025/2026)"
+                    required
+                  />
+
+                  {/* Old Member Bucket toggle */}
+                  <label className="flex items-center gap-2 text-sm font-medium">
+                    <input
+                      type="checkbox"
+                      checked={form.isOldMemberBucket}
+                      onChange={e => setF({ isOldMemberBucket: e.target.checked })}
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    Old Members bucket (catch-all for members with no matching semester)
+                  </label>
+
+                  {/* Date range — hidden for bucket semesters */}
+                  {!form.isOldMemberBucket && (
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-medium mb-1">Start month</p>
+                        <div className="flex gap-2">
+                          <Select value={String(form.startMonth)} onValueChange={v => setF({ startMonth: Number(v) })}>
+                            <SelectTrigger className="flex-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {MONTHS.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <Select value={String(form.startYear)} onValueChange={v => setF({ startYear: Number(v) })}>
+                            <SelectTrigger className="w-28">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium mb-1">End month</p>
+                        <div className="flex gap-2">
+                          <Select value={String(form.endMonth)} onValueChange={v => setF({ endMonth: Number(v) })}>
+                            <SelectTrigger className="flex-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {MONTHS.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <Select value={String(form.endYear)} onValueChange={v => setF({ endYear: Number(v) })}>
+                            <SelectTrigger className="w-28">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <Select value={form.status} onValueChange={v => setF({ status: v })}>
+                    <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="ACTIVE">Active</SelectItem>
                       <SelectItem value="CLOSED">Closed</SelectItem>
                     </SelectContent>
                   </Select>
+
                   <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
                       checked={form.isArchive}
-                      onChange={e => setForm(f => ({ ...f, isArchive: e.target.checked }))}
+                      onChange={e => setF({ isArchive: e.target.checked })}
                       className="h-4 w-4 rounded border-gray-300"
                     />
-                    Archive semester (for historical members before recorded semesters)
+                    Archive semester (historical members before recorded semesters)
                   </label>
-                  <Button type="submit" variant="default">{editingId ? "Save Changes" : "Create"}</Button>
+
+                  <Button type="submit">{editingId ? "Save Changes" : "Create"}</Button>
                 </form>
               </DialogContent>
             </Dialog>
           </div>
+
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Academic Year</TableHead>
-                  <TableHead>Start Date</TableHead>
-                  <TableHead>End Date</TableHead>
+                  <TableHead>Start</TableHead>
+                  <TableHead>End</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Actions</TableHead>
@@ -191,36 +293,41 @@ export default function SemestersPage() {
               </TableHeader>
               <TableBody>
                 {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center">Loading...</TableCell>
-                  </TableRow>
+                  <TableRow><TableCell colSpan={7} className="text-center">Loading...</TableCell></TableRow>
                 ) : semesters.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center">No semesters found</TableCell>
+                  <TableRow><TableCell colSpan={7} className="text-center">No semesters found</TableCell></TableRow>
+                ) : semesters.map(semester => (
+                  <TableRow key={semester.id}>
+                    <TableCell>{semester.name}</TableCell>
+                    <TableCell>{semester.academicYear}</TableCell>
+                    <TableCell>{formatMonthYear(semester.startDate)}</TableCell>
+                    <TableCell>{formatMonthYear(semester.endDate)}</TableCell>
+                    <TableCell>
+                      {semester.status === "ACTIVE"
+                        ? <span className="font-medium text-green-600">Active</span>
+                        : <span className="font-medium text-gray-400">Closed</span>}
+                    </TableCell>
+                    <TableCell>
+                      {semester.isOldMemberBucket
+                        ? <span className="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-800">Old Members</span>
+                        : semester.isArchive
+                          ? <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">Archive</span>
+                          : <span className="text-gray-400 text-xs">Regular</span>}
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="outline" size="sm" onClick={() => handleEditClick(semester)}>Edit</Button>
+                      {session?.user?.email === "urfzone4@gmail.com" && (
+                        <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDelete(semester.id)}>Delete</Button>
+                      )}
+                    </TableCell>
                   </TableRow>
-                ) : (
-                  semesters.map(semester => (
-                    <TableRow key={semester.id}>
-                      <TableCell>{semester.name}</TableCell>
-                      <TableCell>{semester.academicYear}</TableCell>
-                      <TableCell>{format(new Date(semester.startDate), "yyyy-MM-dd")}</TableCell>
-                      <TableCell>{format(new Date(semester.endDate), "yyyy-MM-dd")}</TableCell>
-                      <TableCell>{semester.status === "ACTIVE" ? <span className="font-medium text-green-600">Active</span> : <span className="font-medium text-gray-400">Closed</span>}</TableCell>
-                      <TableCell>{semester.isArchive ? <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">Archive</span> : <span className="text-gray-400 text-xs">Regular</span>}</TableCell>
-                      <TableCell>
-                        <Button variant="outline" size="sm" onClick={() => handleEditClick(semester)}>Edit</Button>
-                        {session?.user?.email === "urfzone4@gmail.com" && (
-                           <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDelete(semester.id)}>Delete</Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
+                ))}
               </TableBody>
             </Table>
           </div>
         </CardContent>
       </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Maintenance</CardTitle>
@@ -236,13 +343,7 @@ export default function SemestersPage() {
                 semester, or if you notice historical members showing incorrect statuses.
               </p>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleMigrateLegacy}
-              disabled={migrating}
-              className="shrink-0"
-            >
+            <Button variant="outline" size="sm" onClick={handleMigrateLegacy} disabled={migrating} className="shrink-0">
               {migrating ? "Running..." : "Run Migration"}
             </Button>
           </div>

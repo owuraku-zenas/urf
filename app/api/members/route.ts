@@ -88,7 +88,8 @@ export async function POST(request: Request) {
       ...restData
     } = data
 
-    const joinDateObj = data.joinDate ? new Date(data.joinDate) : new Date();
+    const raw = data.joinDate ? new Date(data.joinDate) : new Date();
+    const joinDateObj = new Date(raw.getFullYear(), raw.getMonth(), 1, 0, 0, 0, 0);
 
     // Auto-calculate joinedSemester based on joinDate
     let finalJoinedSemesterId = null;
@@ -96,6 +97,7 @@ export async function POST(request: Request) {
 
     const matchingSemester = await prisma.semester.findFirst({
       where: {
+        isOldMemberBucket: false,
         startDate: { lte: joinDateObj },
         endDate: { gte: joinDateObj }
       }
@@ -103,13 +105,14 @@ export async function POST(request: Request) {
 
     if (matchingSemester) {
       finalJoinedSemesterId = matchingSemester.id;
-      // Archive semester = historical member; start them at COMMITTED
       if (matchingSemester.isArchive) {
         initialCommitmentStatus = 'COMMITTED';
       }
     } else {
-      // No semester covers this joinDate — historical member, fall back and start at COMMITTED
+      // No semester covers this joinDate — assign to old-member bucket if one exists
       const fallbackSemester = await prisma.semester.findFirst({
+        where: { isOldMemberBucket: true },
+      }) || await prisma.semester.findFirst({
         where: { status: 'ACTIVE' },
       }) || await prisma.semester.findFirst({
         orderBy: { startDate: 'desc' }

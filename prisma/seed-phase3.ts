@@ -106,8 +106,7 @@ async function main() {
           birthDay,
           cellGroupId: randomElement(cellGroups).id,
           joinedSemesterId: joinedSem.id,
-          joinDate: new Date(joinedSem.startDate.getTime() + randomInt(1000, 10000000)),
-          isActive: Math.random() > 0.1 // 90% active
+          joinDate: new Date((joinedSem.startDate ?? new Date()).getTime() + randomInt(1000, 10000000)),
         }
       })
     }
@@ -120,7 +119,7 @@ async function main() {
   const events = [];
   for (const sem of semesters) {
     for (let i = 1; i <= 15; i++) { // 15 events per semester
-      const eventDate = new Date(sem.startDate.getTime() + (i * 4 * 24 * 60 * 60 * 1000))
+      const eventDate = new Date((sem.startDate ?? new Date()).getTime() + (i * 4 * 24 * 60 * 60 * 1000))
       events.push(await prisma.event.create({
         data: {
           name: `Week ${i} Service`,
@@ -144,7 +143,9 @@ async function main() {
     if (semEvents.length === 0) continue;
 
     for (const member of members) {
-      if (sem.startDate < randomElement(semesters).startDate && Math.random() > 0.5) continue;
+      const semStart = sem.startDate ?? new Date(0);
+      const randStart = randomElement(semesters).startDate ?? new Date(0);
+      if (semStart < randStart && Math.random() > 0.5) continue;
 
       let attendances = 0;
       for (const ev of semEvents) {

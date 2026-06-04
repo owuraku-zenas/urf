@@ -2,16 +2,13 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { auth } from "@/auth";
 
-/**
- * GET /api/semesters
- * Fetches all semesters.
- */
 export async function GET() {
   try {
     const semesters = await db.semester.findMany({
-      orderBy: {
-        startDate: "desc",
-      },
+      orderBy: [
+        { isOldMemberBucket: "asc" },
+        { startDate: "desc" },
+      ],
     });
     return NextResponse.json(semesters);
   } catch (error) {
@@ -20,10 +17,6 @@ export async function GET() {
   }
 }
 
-/**
- * POST /api/semesters
- * Creates a new semester. Admin only.
- */
 export async function POST(req: Request) {
   try {
     const session = await auth();
@@ -33,43 +26,48 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, academicYear, startDate, endDate, status, isArchive } = body;
+    const { name, academicYear, startMonth, startYear, endMonth, endYear, status, isArchive, isOldMemberBucket } = body;
 
-    if (!name || !academicYear || !startDate || !endDate || !status) {
+    if (!name || !academicYear || !status) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
-    const startDateObj = new Date(startDate);
-    const endDateObj = new Date(endDate);
+    let startDateObj: Date | null = null;
+    let endDateObj: Date | null = null;
 
-    if (startDateObj >= endDateObj) {
-      return new NextResponse("End date must be after start date", { status: 400 });
-    }
+    if (!isOldMemberBucket) {
+      if (!startMonth || !startYear || !endMonth || !endYear) {
+        return new NextResponse("Start and end month/year are required for regular semesters", { status: 400 });
+      }
+      startDateObj = new Date(Number(startYear), Number(startMonth) - 1, 1, 0, 0, 0, 0);
+      endDateObj = new Date(Number(endYear), Number(endMonth), 0, 23, 59, 59, 999);
 
-    // Enforce only one active semester by auto-closing others
-    if (status === "ACTIVE") {
-      await db.semester.updateMany({
-        where: { status: "ACTIVE" },
-        data: { status: "CLOSED" }
+      if (startDateObj >= endDateObj) {
+        return new NextResponse("End month must be after start month", { status: 400 });
+      }
+
+      if (status === "ACTIVE") {
+        await db.semester.updateMany({ where: { status: "ACTIVE" }, data: { status: "CLOSED" } });
+      }
+
+      const overlapping = await db.semester.findFirst({
+        where: {
+          isOldMemberBucket: false,
+          OR: [
+            { startDate: { lte: startDateObj }, endDate: { gt: startDateObj } },
+            { startDate: { lt: endDateObj }, endDate: { gte: endDateObj } },
+            { startDate: { gte: startDateObj }, endDate: { lte: endDateObj } },
+          ],
+        },
       });
-    }
-
-    // Prevent overlapping dates
-    const overlappingSemester = await db.semester.findFirst({
-      where: {
-        OR: [
-          // New semester starts during an existing one
-          { startDate: { lte: startDateObj }, endDate: { gt: startDateObj } },
-          // New semester ends during an existing one
-          { startDate: { lt: endDateObj }, endDate: { gte: endDateObj } },
-          // New semester engulfs an existing one
-          { startDate: { gte: startDateObj }, endDate: { lte: endDateObj } },
-        ],
-      },
-    });
-
-    if (overlappingSemester) {
-      return new NextResponse(`Date range overlaps with existing semester: "${overlappingSemester.name}"`, { status: 409 });
+      if (overlapping) {
+        return new NextResponse(`Date range overlaps with existing semester: "${overlapping.name}"`, { status: 409 });
+      }
+    } else {
+      const existingBucket = await db.semester.findFirst({ where: { isOldMemberBucket: true } });
+      if (existingBucket) {
+        return new NextResponse(`An "Old Members" bucket already exists: "${existingBucket.name}"`, { status: 409 });
+      }
     }
 
     const semester = await db.semester.create({
@@ -80,6 +78,7 @@ export async function POST(req: Request) {
         endDate: endDateObj,
         status,
         isArchive: isArchive === true,
+        isOldMemberBucket: isOldMemberBucket === true,
       },
     });
 
@@ -88,7 +87,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("[SEMESTERS_POST]", error);
     if (error instanceof Error && error.message.includes("Unique constraint failed")) {
-        return new NextResponse("A semester with this name already exists.", { status: 409 });
+      return new NextResponse("A semester with this name already exists.", { status: 409 });
     }
     return new NextResponse("Internal Error", { status: 500 });
   }

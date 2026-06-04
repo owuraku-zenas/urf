@@ -138,15 +138,16 @@ model Attendance {
 }
 
 model Semester {
-  id           String   @id @default(cuid())
-  name         String   @unique
-  startDate    DateTime
-  endDate      DateTime
-  academicYear String
-  status       SemesterStatus @default(ACTIVE)
-  isArchive    Boolean        @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                String         @id @default(cuid())
+  name              String         @unique
+  startDate         DateTime?
+  endDate           DateTime?
+  academicYear      String
+  status            SemesterStatus @default(ACTIVE)
+  isArchive         Boolean        @default(false)
+  isOldMemberBucket Boolean        @default(false)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 
   events       Event[]
   joinedMembers Member[] @relation("MemberJoinedSemester")

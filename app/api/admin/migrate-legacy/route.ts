@@ -17,11 +17,14 @@ export async function POST() {
     return NextResponse.json({ error: "Admins only" }, { status: 403 })
   }
 
-  // 1. Fetch all regular (non-archive) semesters and their date ranges
-  const regularSemesters = await prisma.semester.findMany({
-    where: { isArchive: false },
+  // 1. Fetch all regular (non-archive, non-bucket) semesters with defined date ranges
+  const allRegular = await prisma.semester.findMany({
+    where: { isArchive: false, isOldMemberBucket: false },
     select: { id: true, startDate: true, endDate: true },
   })
+  const regularSemesters = allRegular.filter(
+    (s): s is typeof s & { startDate: Date; endDate: Date } => s.startDate !== null && s.endDate !== null
+  )
 
   // 2. Find all members with at least one NEW_MEMBER commitment
   const candidates = await prisma.semesterCommitment.findMany({
