@@ -158,10 +158,10 @@ export default function MembersPage() {
     ? filteredMembers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
     : filteredMembers
 
-  // KPI Calculations — read directly from API data to avoid selectedSemester timing issues
-  const committedCount   = members.filter(m => m.commitments?.[0]?.status === 'COMMITTED').length
-  const atRiskCount      = members.filter(m => m.commitments?.[0]?.status === 'AT_RISK').length
-  const uncommittedCount = members.filter(m => m.commitments?.[0]?.status === 'UNCOMMITTED').length
+  // KPI Calculations
+  const committedCount = members.filter(m => getCommitmentStatus(m) === 'COMMITTED').length
+  const atRiskCount = members.filter(m => getCommitmentStatus(m) === 'AT_RISK').length
+  const uncommittedCount = members.filter(m => getCommitmentStatus(m) === 'UNCOMMITTED').length
 
   const handleExportPDF = () => {
     generateMemberListPDF(
