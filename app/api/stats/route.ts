@@ -24,8 +24,6 @@ export async function GET(request: Request) {
       cellGroupCount,
       totalAttendance,
       totalEvents,
-      activeMemberCount,
-      inactiveMemberCount,
       committedCount,
       uncommittedCount,
       atRiskCount,
@@ -37,16 +35,8 @@ export async function GET(request: Request) {
       prisma.event.count({
         where: {
           ...eventWhere,
-          attendance: {
-            some: {},
-          },
+          attendance: { some: {} },
         },
-      }),
-      prisma.member.count({
-        where: { isActive: true }
-      }),
-      prisma.member.count({
-        where: { isActive: false }
       }),
       semesterId ? prisma.semesterCommitment.count({ where: { semesterId, status: 'COMMITTED' } }) : prisma.semesterCommitment.count({ where: { status: 'COMMITTED' } }),
       semesterId ? prisma.semesterCommitment.count({ where: { semesterId, status: 'UNCOMMITTED' } }) : prisma.semesterCommitment.count({ where: { status: 'UNCOMMITTED' } }),
@@ -62,8 +52,6 @@ export async function GET(request: Request) {
       eventCount,
       cellGroupCount,
       attendanceRate,
-      activeMemberCount,
-      inactiveMemberCount,
       committedCount,
       uncommittedCount,
       atRiskCount,

@@ -27,7 +27,6 @@ interface Member {
     name: string
   }
   invitees?: Array<{ id: string }>
-  isActive?: boolean
 }
 
 interface Event {
@@ -100,8 +99,6 @@ export default function Dashboard() {
 
   // Calculate statistics
   const totalMembers = members?.length || 0
-  const totalActiveMembers = members.filter(m => m.isActive).length;
-  const totalInactiveMembers = members.filter(m => m.isActive === false).length;
   const totalCellGroups = cellGroups?.length || 0
   const totalEvents = events?.length || 0
   const totalInvitations = members?.reduce((acc, member) => acc + (member.invitees?.length || 0), 0) || 0
@@ -135,7 +132,7 @@ export default function Dashboard() {
     return (
       <div className="space-y-6">
         <div className="grid gap-4 md:grid-cols-4">
-          {Array.from({ length: 6 }).map((_, i) => (
+          {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
               <div className="h-3 w-24 animate-pulse rounded bg-gray-100 mb-3" />
               <div className="h-7 w-16 animate-pulse rounded bg-gray-100" />
@@ -163,27 +160,7 @@ export default function Dashboard() {
             <CardTitle className="text-sm font-medium">Total Members</CardTitle>
           </CardHeader>
           <CardContent>
-  <div className="text-2xl font-bold">{totalMembers}</div>
-  <div className="flex gap-4 mt-2 text-sm">
-    <span className="text-green-600 font-medium">{totalActiveMembers} Active</span>
-    <span className="text-gray-400 font-medium">{totalInactiveMembers} Inactive</span>
-  </div>
-</CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Members</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{totalActiveMembers}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Inactive Members</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-400">{totalInactiveMembers}</div>
+            <div className="text-2xl font-bold">{totalMembers}</div>
           </CardContent>
         </Card>
         <Card>

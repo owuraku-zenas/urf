@@ -14,8 +14,6 @@ interface Stats {
   eventCount: number
   cellGroupCount: number
   attendanceRate: number
-  activeMemberCount: number
-  inactiveMemberCount: number
   committedCount: number
   uncommittedCount: number
   atRiskCount: number
@@ -37,8 +35,6 @@ export default function Home() {
     eventCount: 0,
     cellGroupCount: 0,
     attendanceRate: 0,
-    activeMemberCount: 0,
-    inactiveMemberCount: 0,
     committedCount: 0,
     uncommittedCount: 0,
     atRiskCount: 0,
@@ -66,7 +62,7 @@ export default function Home() {
   const uncommittedPct = evaluated > 0 ? Math.round((stats.uncommittedCount / evaluated) * 100) : 0
 
   const topStats = [
-    { label: "Members",        value: stats.memberCount,       sub: `${stats.activeMemberCount} active`, icon: Users },
+    { label: "Members",        value: stats.memberCount,       sub: "registered",  icon: Users },
     { label: "Events",         value: stats.eventCount,        sub: "this period",                       icon: CalendarDays },
     { label: "Attendance avg", value: `${stats.attendanceRate}%`, sub: "per event",                     icon: ClipboardList },
     { label: "Cell groups",    value: stats.cellGroupCount,    sub: "active",                            icon: LayoutGrid },

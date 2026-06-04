@@ -133,7 +133,6 @@ export async function PUT(
         roomNumber: body.roomNumber,
         cellGroupId: body.cellGroupId,
         invitedById: body.invitedById === "" ? null : body.invitedById,
-        isActive: body.isActive !== undefined ? body.isActive : false,
         admissionYear: body.admissionYear === "" ? null : body.admissionYear,
         admissionMonth: body.admissionMonth ? parseInt(body.admissionMonth.toString()) : 8,
         programDuration: body.programDuration ? parseInt(body.programDuration.toString()) : 4,

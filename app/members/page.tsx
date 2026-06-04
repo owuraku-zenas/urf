@@ -39,7 +39,6 @@ interface Member {
   updatedAt: string
   cellGroupId: string | null
   invitedById: string | null
-  isActive: boolean
 }
 
 interface CellGroup {
@@ -61,7 +60,6 @@ export default function MembersPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCellGroup, setSelectedCellGroup] = useState("all")
-  const [selectedStatus, setSelectedStatus] = useState("all")
   const [selectedCommitment, setSelectedCommitment] = useState("all")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
@@ -70,7 +68,7 @@ export default function MembersPage() {
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchQuery, selectedCellGroup, selectedStatus, selectedCommitment, startDate, endDate, itemsPerPage])
+  }, [searchQuery, selectedCellGroup, selectedCommitment, startDate, endDate, itemsPerPage])
 
   const handleDeleteMember = async (memberId: string) => {
     if (!window.confirm("Are you sure you want to delete this member?")) return;
@@ -131,9 +129,7 @@ export default function MembersPage() {
       member.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.email.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCellGroup = selectedCellGroup === 'all' || member.cellGroupId === selectedCellGroup
-    const matchesStatus = selectedStatus === 'all' || 
-      (selectedStatus === 'active' && member.isActive) ||
-      (selectedStatus === 'inactive' && !member.isActive)
+    const matchesStatus = true
     const matchesCommitment = selectedCommitment === 'all' || getCommitmentStatus(member) === selectedCommitment.toUpperCase()
     
     // Date range filtering
@@ -161,7 +157,7 @@ export default function MembersPage() {
         ...member,
         cellGroup: member.cellGroup || null,
         joinDate: member.createdAt,
-        status: member.isActive ? "Active" : "Inactive", // Add status here
+        status: getCommitmentStatus(member).replace('_', ' '),
       })),
       {
         title: 'Member List',
@@ -184,7 +180,7 @@ export default function MembersPage() {
       ],
       ...filteredMembers.map(member => [
         member.name,
-        member.isActive ? "Active" : "Inactive",
+        getCommitmentStatus(member).replace('_', ' '),
         member.phone,
         member.email,
         member.cellGroup?.name || "No Cell Group",
@@ -295,19 +291,6 @@ export default function MembersPage() {
                       {group.name}
                     </SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={selectedStatus}
-                onValueChange={setSelectedStatus}
-              >
-                <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
                 </SelectContent>
               </Select>
               <Select
@@ -427,11 +410,6 @@ export default function MembersPage() {
                             Invited by: {member.invitedBy?.name || 'Not invited by anyone'}
                           </div>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className={member.isActive ? 'text-green-600 font-medium' : 'text-gray-400 font-medium'}>
-                          {member.isActive ? 'Active' : 'Offline'}
-                        </span>
                       </TableCell>
                       <TableCell>
                         <span className={`px-2 py-1 text-xs rounded-full ${

@@ -99,8 +99,7 @@ export async function POST(request: Request) {
 // Helpers
 function buildDynamicFilter(filters: any) {
   const query: any = {}
-  if (filters.isActive !== undefined) query.isActive = filters.isActive
-  // Additional logic here, e.g filtering by cellGroup or currentAcademicLevel
+  // Additional filters (cellGroup, currentAcademicLevel, etc.) can be added here
   return query
 }
 

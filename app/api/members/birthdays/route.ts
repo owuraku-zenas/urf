@@ -11,8 +11,7 @@ export async function GET(request: Request) {
     const members = await prisma.member.findMany({
       where: {
         birthMonth: { not: null },
-        birthDay: { not: null },
-        isActive: true
+        birthDay: { not: null }
       },
       select: {
         id: true,

@@ -56,16 +56,6 @@ export async function POST(request: Request) {
       },
     })
 
-    // Update member isActive if 5 or more PRESENT attendances
-    const count = await prisma.attendance.count({
-      where: { memberId, status: 'PRESENT' }
-    })
-    if (count >= 5) {
-      await prisma.member.update({ where: { id: memberId }, data: { isActive: true } })
-    } else {
-      await prisma.member.update({ where: { id: memberId }, data: { isActive: false } })
-    }
-
     if (event.semesterId) {
       // Run asynchronously so we don't block the request response
       calculateMemberCommitment(memberId, event.semesterId).catch(err => {
@@ -119,16 +109,6 @@ export async function PUT(request: Request) {
         member: true,
       },
     })
-
-    // Update member isActive if 5 or more PRESENT attendances
-    const count = await prisma.attendance.count({
-      where: { memberId, status: 'PRESENT' }
-    })
-    if (count >= 5) {
-      await prisma.member.update({ where: { id: memberId }, data: { isActive: true } })
-    } else {
-      await prisma.member.update({ where: { id: memberId }, data: { isActive: false } })
-    }
 
     if (event.semesterId) {
       // Run asynchronously so we don't block the request response

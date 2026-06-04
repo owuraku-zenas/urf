@@ -23,7 +23,6 @@ export default async function SmsAdminPage() {
       id: true,
       name: true,
       phone: true,
-      isActive: true,
       currentAcademicLevel: true,
       cellGroup: {
         select: { name: true }

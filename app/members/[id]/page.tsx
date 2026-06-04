@@ -17,7 +17,6 @@ import { useSemester } from "@/context/semester-context"
 import { SemesterSelector } from "@/components/semester-selector"
 
 interface MemberWithRelations extends Member {
-  isActive: boolean;
   cellGroup: {
     id: string
     name: string
@@ -212,23 +211,6 @@ interface Attendance {
             <div>
               <div className="flex items-center gap-3">
                 <CardTitle className="text-2xl">{member.name}</CardTitle>
-                <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium ${
-                  member.isActive 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-gray-100 text-gray-600'
-                }`}>
-                  {member.isActive ? (
-                    <>
-                      <CheckCircle className="h-4 w-4" />
-                      Active
-                    </>
-                  ) : (
-                    <>
-                      <XCircle className="h-4 w-4" />
-                      Inactive
-                    </>
-                  )}
-                </span>
               </div>
               <CardDescription>Member Details</CardDescription>
             </div>

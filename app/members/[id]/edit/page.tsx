@@ -44,7 +44,6 @@ const MemberFormSchema = z.object({
   roomNumber: z.string().max(20, "Room number is too long").nullable().optional(),
   cellGroupId: z.string().min(1, "Cell group is required"),
   invitedById: z.string().nullable().optional(),
-  isActive: z.boolean().optional(),
   admissionYear: z.string().refine(val => !val || /^\d{4}$/.test(val), "Must be a 4-digit number").nullable().optional(),
   admissionMonth: z.string().optional(),
   programDuration: z.string().optional(),
@@ -91,7 +90,6 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
     roomNumber: "",
     cellGroupId: "",
     invitedById: "",
-    isActive: false,
     admissionYear: "",
     admissionMonth: "8",
     programDuration: "4",
@@ -113,7 +111,6 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
           birthMonth: memberData.birthMonth ? String(memberData.birthMonth) : "",
           birthDay: memberData.birthDay ? String(memberData.birthDay) : "",
           joinDate: memberData.joinDate ? new Date(memberData.joinDate).toISOString().split('T')[0] : "",
-          isActive: memberData.isActive ?? false,
           admissionYear: memberData.admissionYear ?? "",
           admissionMonth: memberData.admissionMonth ? String(memberData.admissionMonth) : "8",
           programDuration: memberData.programDuration ? String(memberData.programDuration) : "4",
@@ -553,24 +550,6 @@ export default function EditMemberPage({ params }: { params: Promise<{ id: strin
                 </select>
               </div>
 
-              <div className="space-y-2 md:col-span-2">
-                <div className="flex items-center space-x-2">
-                  <input
-                    id="isActive"
-                    name="isActive"
-                    type="checkbox"
-                    checked={formData.isActive ?? false}
-                    onChange={handleChange}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <label htmlFor="isActive" className="block text-sm font-medium">
-                    Active Member
-                  </label>
-                </div>
-                <p className="text-xs text-gray-500 ml-6">
-                  Check this box if the member is active (has 5 or more attendances)
-                </p>
-              </div>
             </div>
 
             <div className="mt-6 flex justify-end space-x-4">
