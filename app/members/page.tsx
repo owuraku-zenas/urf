@@ -39,12 +39,18 @@ interface Member {
   updatedAt: string
   cellGroupId: string | null
   invitedById: string | null
+  commitments?: Array<{ status: string; semesterId: string }>
 }
 
 interface CellGroup {
   id: string
   name: string
   description: string | null
+}
+
+interface Semester {
+  id: string
+  name: string
 }
 
 export default function MembersPage() {
@@ -63,12 +69,14 @@ export default function MembersPage() {
   const [selectedCommitment, setSelectedCommitment] = useState("all")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
+  const [semesters, setSemesters] = useState<Semester[]>([])
+  const [selectedJoinedSemester, setSelectedJoinedSemester] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchQuery, selectedCellGroup, selectedCommitment, startDate, endDate, itemsPerPage])
+  }, [searchQuery, selectedCellGroup, selectedCommitment, startDate, endDate, itemsPerPage, selectedJoinedSemester])
 
   const handleDeleteMember = async (memberId: string) => {
     if (!window.confirm("Are you sure you want to delete this member?")) return;
@@ -87,22 +95,26 @@ export default function MembersPage() {
         const commitmentParam = selectedSemester && selectedSemester !== 'all'
           ? `&commitmentSemesterId=${selectedSemester}`
           : ''
-        const [membersRes, cellGroupsRes] = await Promise.all([
-          fetch(`/api/members?semesterId=all${commitmentParam}`),
-          fetch('/api/cell-groups')
+        const joinedParam = selectedJoinedSemester !== 'all' ? selectedJoinedSemester : 'all'
+        const [membersRes, cellGroupsRes, semestersRes] = await Promise.all([
+          fetch(`/api/members?semesterId=${joinedParam}${commitmentParam}`),
+          fetch('/api/cell-groups'),
+          fetch('/api/semesters')
         ])
 
-        if (!membersRes.ok || !cellGroupsRes.ok) {
+        if (!membersRes.ok || !cellGroupsRes.ok || !semestersRes.ok) {
           throw new Error('Failed to fetch data')
         }
 
-        const [membersData, cellGroupsData] = await Promise.all([
+        const [membersData, cellGroupsData, semestersData] = await Promise.all([
           membersRes.json(),
-          cellGroupsRes.json()
+          cellGroupsRes.json(),
+          semestersRes.json()
         ])
 
         setMembers(membersData)
         setCellGroups(cellGroupsData)
+        setSemesters(semestersData)
       } catch (error) {
         console.error('Error fetching data:', error)
       } finally {
@@ -111,7 +123,7 @@ export default function MembersPage() {
     }
 
     fetchData()
-  }, [selectedSemester])
+  }, [selectedSemester, selectedJoinedSemester])
 
   const getCommitmentStatus = (member: any) => {
     if (!member.commitments || member.commitments.length === 0) return 'NEW_MEMBER'
@@ -127,7 +139,7 @@ export default function MembersPage() {
   const filteredMembers = members.filter(member => {
     const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      member.email.toLowerCase().includes(searchQuery.toLowerCase())
+      (member.email || '').toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCellGroup = selectedCellGroup === 'all' || member.cellGroupId === selectedCellGroup
     const matchesStatus = true
     const matchesCommitment = selectedCommitment === 'all' || getCommitmentStatus(member) === selectedCommitment.toUpperCase()
@@ -146,10 +158,10 @@ export default function MembersPage() {
     ? filteredMembers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
     : filteredMembers
 
-  // KPI Calculations
-  const committedCount = members.filter(m => getCommitmentStatus(m) === 'COMMITTED').length
-  const atRiskCount = members.filter(m => getCommitmentStatus(m) === 'AT_RISK').length
-  const uncommittedCount = members.filter(m => getCommitmentStatus(m) === 'UNCOMMITTED').length
+  // KPI Calculations — read directly from API data to avoid selectedSemester timing issues
+  const committedCount   = members.filter(m => m.commitments?.[0]?.status === 'COMMITTED').length
+  const atRiskCount      = members.filter(m => m.commitments?.[0]?.status === 'AT_RISK').length
+  const uncommittedCount = members.filter(m => m.commitments?.[0]?.status === 'UNCOMMITTED').length
 
   const handleExportPDF = () => {
     generateMemberListPDF(
@@ -308,6 +320,22 @@ export default function MembersPage() {
                 </SelectContent>
               </Select>
               <Select
+                value={selectedJoinedSemester}
+                onValueChange={setSelectedJoinedSemester}
+              >
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Joined in semester" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Semesters</SelectItem>
+                  {semesters.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
                 value={itemsPerPage.toString()}
                 onValueChange={(val) => setItemsPerPage(Number(val))}
               >
@@ -379,7 +407,6 @@ export default function MembersPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
-                  <TableHead>System State</TableHead>
                   <TableHead>Commitment</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead className="hidden sm:table-cell">Email</TableHead>
