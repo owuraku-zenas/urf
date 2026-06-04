@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Menu, X, ChevronDown } from "lucide-react"
+import { Menu, ChevronDown } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 export function MainNav({ isAdmin = false }: { isAdmin?: boolean }) {
@@ -38,7 +38,6 @@ export function MainNav({ isAdmin = false }: { isAdmin?: boolean }) {
         { href: "/reports/semester-comparison", label: "Semester Comparison" }
       ]
     },
-    { href: "/whats-new", label: "What's New" },
   ]
   if (isAdmin) {
     navItems.push({ href: "/semesters", label: "Semesters" })

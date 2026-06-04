@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { User, LogOut, Users } from "lucide-react"
+import { User, LogOut, Users, Sparkles } from "lucide-react"
 import Link from "next/link"
 
 export function Header() {
@@ -58,6 +58,15 @@ export function Header() {
                     </p>
                   </div>
                 </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <Link href="/whats-new" passHref legacyBehavior>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <a>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      <span>What's New</span>
+                    </a>
+                  </DropdownMenuItem>
+                </Link>
                 <DropdownMenuSeparator />
                 <Link href="/users/profile" passHref legacyBehavior>
                   <DropdownMenuItem asChild className="cursor-pointer">

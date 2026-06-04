@@ -28,6 +28,67 @@ const TYPE_STYLES: Record<ChangeType, { label: string; bg: string; text: string 
 
 const releases: Release[] = [
   {
+    date: "2026-06-04",
+    displayDate: "June 4, 2026",
+    changes: [
+      {
+        type: "IMPROVEMENT",
+        title: "Semester filter now controls both which members appear and their commitment score",
+        body: "Previously, the 'Score by semester' selector only changed the commitment badge shown per member — it did not affect which members appeared in the list. There was a separate 'Joined in semester' dropdown for that. These are now unified: selecting a semester shows only members who joined within that semester's date range, and scores their commitment for the same semester. Selecting 'All' shows everyone.",
+      },
+      {
+        type: "FIX",
+        title: "New Member status now correct when a semester is selected",
+        body: "If a member had no commitment record for the selected semester, the page was silently showing their status from a completely different semester — a member who was Committed in semester 1 could appear Committed in semester 2 even with no data there. They now correctly show as New Member when no record exists for the selected semester.",
+      },
+      {
+        type: "NEW",
+        title: "New Member added to the commitment filter dropdown",
+        body: "The commitment level filter on the Members page now includes a New Member option, letting you quickly see all members currently in the grace period for the selected semester.",
+      },
+      {
+        type: "FIX",
+        title: "Member filtering by semester now uses actual join dates, not a pre-stored field",
+        body: "Semester membership was previously determined by a field stored on the member record at creation time, which could go stale if semester dates changed. Filtering now compares the member's join date directly against the semester's start and end dates, so it is always accurate.",
+      },
+      {
+        type: "NEW",
+        title: "Recalculate Commitment Scores button in Semesters maintenance",
+        body: "A new Recalculate button appears in the Maintenance section of the Semesters page. It recalculates commitment status for every member across all semesters based on their attendance records. Run this after adding historical attendance data or if scores look incorrect. Bulk attendance saves now also trigger recalculation automatically.",
+      },
+      {
+        type: "FIX",
+        title: "Member Growth report now groups by actual join date",
+        body: "The chart was grouping members by when their record was created in the system, not when they actually joined. Members added retroactively (e.g. historical data entry) were appearing in today's month instead of their real join month. Fixed. Also added Year and Semester filters, a latest-first table, and a corrected 'New This Month' figure that returns 0 when nobody joined this calendar month rather than showing last month's count.",
+      },
+      {
+        type: "FIX",
+        title: "Attendance percentages now calculated against the right membership count",
+        body: "Attendance trend percentages were divided by total all-time membership regardless of which semester was selected. If a semester had 20 members but there are 74 total, an event with 18 attendees showed as 24% instead of 90%. The denominator is now the number of members who had joined by the end of the selected semester.",
+      },
+      {
+        type: "FIX",
+        title: "Semester comparison report now shows New Member count and correct column labels",
+        body: "The New Member commitment status was silently excluded from the semester breakdown table and chart. It now appears as its own column and bar. The average attendance column was also relabelled to 'Avg Attendees / Event' to make clear it is an absolute count, not a percentage.",
+      },
+      {
+        type: "FIX",
+        title: "SMS phone number format corrected for Hubtel",
+        body: "Phone numbers stored as +233XXXXXXXXX were being sent to Hubtel with the leading + intact, which Hubtel does not accept. The dispatcher now strips the + before sending (233XXXXXXXXX format). All query parameters are also now properly URL-encoded.",
+      },
+      {
+        type: "IMPROVEMENT",
+        title: "Phone number field enforces no spaces and shows format guidance",
+        body: "The phone field on both the Add Member and Edit Member pages now strips spaces in real time as you type, so accidental spaces can never reach the database. A placeholder and hint text below the field remind you of the accepted format: 024XXXXXXX or +233XXXXXXXX.",
+      },
+      {
+        type: "IMPROVEMENT",
+        title: "What's New moved to the profile dropdown",
+        body: "The What's New link has been moved from the main navigation bar into the profile dropdown menu (click your avatar in the top right). This keeps the main nav uncluttered.",
+      },
+    ],
+  },
+  {
     date: "2026-06-03",
     displayDate: "June 3, 2026",
     changes: [
