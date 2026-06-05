@@ -1,21 +1,25 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { CommitmentStatus } from "@prisma/client"
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const rawSemesterId = searchParams.get("semesterId")
-    const semesterId = rawSemesterId === 'all' ? null : rawSemesterId;
+    const semesterId = rawSemesterId === 'all' ? null : rawSemesterId
 
-    const eventWhere = semesterId ? { semesterId } : undefined;
-    const attendanceWhere = semesterId ? { event: { semesterId } } : undefined;
+    const eventWhere = semesterId ? { semesterId } : undefined
+    const attendanceWhere = semesterId ? { event: { semesterId } } : undefined
 
-    let activeSemesterName = null;
+    const commitmentWhere = (status: CommitmentStatus) =>
+      semesterId ? { semesterId, status } : { status }
+
+    let activeSemesterName = null
     if (semesterId) {
-      const activeSemester = await prisma.semester.findUnique({ where: { id: semesterId } });
-      activeSemesterName = activeSemester?.name || null;
+      const sem = await prisma.semester.findUnique({ where: { id: semesterId } })
+      activeSemesterName = sem?.name || null
     } else if (rawSemesterId === 'all') {
-      activeSemesterName = "All Semesters";
+      activeSemesterName = "All Semesters"
     }
 
     const [
@@ -27,21 +31,34 @@ export async function GET(request: Request) {
       committedCount,
       uncommittedCount,
       atRiskCount,
+      newMemberCount,
     ] = await Promise.all([
       prisma.member.count(),
       prisma.event.count({ where: eventWhere }),
       prisma.cellGroup.count(),
       prisma.attendance.count({ where: attendanceWhere }),
-      prisma.event.count({
-        where: {
-          ...eventWhere,
-          attendance: { some: {} },
-        },
-      }),
-      semesterId ? prisma.semesterCommitment.count({ where: { semesterId, status: 'COMMITTED' } }) : prisma.semesterCommitment.count({ where: { status: 'COMMITTED' } }),
-      semesterId ? prisma.semesterCommitment.count({ where: { semesterId, status: 'UNCOMMITTED' } }) : prisma.semesterCommitment.count({ where: { status: 'UNCOMMITTED' } }),
-      semesterId ? prisma.semesterCommitment.count({ where: { semesterId, status: 'AT_RISK' } }) : prisma.semesterCommitment.count({ where: { status: 'AT_RISK' } }),
+      prisma.event.count({ where: { ...eventWhere, attendance: { some: {} } } }),
+      prisma.semesterCommitment.count({ where: commitmentWhere(CommitmentStatus.COMMITTED) }),
+      prisma.semesterCommitment.count({ where: commitmentWhere(CommitmentStatus.UNCOMMITTED) }),
+      prisma.semesterCommitment.count({ where: commitmentWhere(CommitmentStatus.AT_RISK) }),
+      prisma.semesterCommitment.count({ where: commitmentWhere(CommitmentStatus.NEW_MEMBER) }),
     ])
+
+    // Separate query so TypeScript resolves the include type correctly
+    const atRiskRows = await prisma.semesterCommitment.findMany({
+      where: commitmentWhere(CommitmentStatus.AT_RISK),
+      take: 8,
+      orderBy: { updatedAt: 'desc' },
+      include: {
+        member: {
+          select: {
+            id: true,
+            name: true,
+            cellGroup: { select: { name: true } },
+          },
+        },
+      },
+    })
 
     const attendanceRate = totalEvents > 0
       ? Math.round((totalAttendance / (totalEvents * memberCount)) * 100)
@@ -55,10 +72,16 @@ export async function GET(request: Request) {
       committedCount,
       uncommittedCount,
       atRiskCount,
+      newMemberCount,
+      atRiskMembers: atRiskRows.map(r => ({
+        id: r.member.id,
+        name: r.member.name,
+        cellGroup: r.member.cellGroup?.name ?? null,
+      })),
       activeSemesterName,
     })
   } catch (error) {
     console.error("Error fetching stats:", error)
     return NextResponse.json({ error: "Failed to fetch stats" }, { status: 500 })
   }
-} 
+}

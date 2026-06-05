@@ -6,8 +6,14 @@ import { useSemester } from "@/context/semester-context"
 import { SemesterSelector } from "@/components/semester-selector"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, CalendarDays, ClipboardList, LayoutGrid, ChevronRight, MessageSquare } from "lucide-react"
+import { Users, CalendarDays, ClipboardList, LayoutGrid, ChevronRight, MessageSquare, AlertTriangle } from "lucide-react"
 import { useSession } from "next-auth/react"
+
+interface AtRiskMember {
+  id: string
+  name: string
+  cellGroup: string | null
+}
 
 interface Stats {
   memberCount: number
@@ -17,6 +23,8 @@ interface Stats {
   committedCount: number
   uncommittedCount: number
   atRiskCount: number
+  newMemberCount: number
+  atRiskMembers: AtRiskMember[]
   activeSemesterName?: string | null
 }
 
@@ -38,6 +46,8 @@ export default function Home() {
     committedCount: 0,
     uncommittedCount: 0,
     atRiskCount: 0,
+    newMemberCount: 0,
+    atRiskMembers: [],
   })
 
   useEffect(() => {
@@ -237,6 +247,72 @@ export default function Home() {
           </Card>
 
         </div>
+
+        {/* Needs Attention */}
+        {(loading || stats.atRiskCount > 0) && (
+          <div className="mt-6">
+            <Card>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                    <CardTitle className="text-base font-semibold">Needs Attention</CardTitle>
+                    {!loading && (
+                      <span className="rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                        {stats.atRiskCount} at risk
+                      </span>
+                    )}
+                  </div>
+                  <Link
+                    href={`/members?commitment=at_risk`}
+                    className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700"
+                  >
+                    View all <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="space-y-2">
+                    {[...Array(3)].map((_, i) => <SkeletonBlock key={i} className="h-9" />)}
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-100">
+                    {stats.atRiskMembers.map(member => (
+                      <div key={member.id} className="flex items-center justify-between py-2.5">
+                        <div>
+                          <Link
+                            href={`/members/${member.id}`}
+                            className="text-sm font-medium text-gray-900 hover:text-blue-600"
+                          >
+                            {member.name}
+                          </Link>
+                          {member.cellGroup && (
+                            <p className="text-xs text-gray-400">{member.cellGroup}</p>
+                          )}
+                        </div>
+                        <span className="rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                          At Risk
+                        </span>
+                      </div>
+                    ))}
+                    {stats.atRiskCount > 8 && (
+                      <div className="pt-3 text-center">
+                        <Link
+                          href="/members?commitment=at_risk"
+                          className="text-xs font-medium text-blue-600 hover:text-blue-700"
+                        >
+                          + {stats.atRiskCount - 8} more — view all
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
       </div>
     </main>
   )

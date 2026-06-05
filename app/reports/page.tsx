@@ -3,7 +3,8 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Download } from "lucide-react"
+import { Download, ChevronRight, TrendingUp, Users, BarChart2, UserCheck, GraduationCap } from "lucide-react"
+import Link from "next/link"
 import { useToast } from "@/components/ui/use-toast"
 import Dashboard from "../components/dashboard"
 import CellGroupAttendanceChart from "../components/cell-group-attendance-chart"
@@ -240,6 +241,32 @@ export default function ReportsPage() {
             <Download className="mr-2 h-4 w-4" />
             {isExporting ? 'Exporting...' : 'Export Report'}
           </Button>
+        </div>
+
+        {/* Detailed report pages */}
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5 mb-6">
+          {[
+            { href: "/reports/member-growth",      label: "Member Growth",       desc: "Monthly joins, year & semester filters",    icon: TrendingUp    },
+            { href: "/reports/semester-comparison", label: "Semester Comparison", desc: "Attendance & commitment per semester",      icon: BarChart2     },
+            { href: "/reports/retention",           label: "Retention",           desc: "Committed members semester-over-semester",  icon: UserCheck     },
+            { href: "/reports/invitations",         label: "Invitations",         desc: "Top inviters and retention quality",        icon: Users         },
+            { href: "/reports/demographics",        label: "Demographics",        desc: "Academic levels, universities, programmes", icon: GraduationCap },
+          ].map(({ href, label, desc, icon: Icon }) => (
+            <Link key={href} href={href}>
+              <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <Icon className="h-4 w-4 text-muted-foreground" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <CardTitle className="text-sm font-semibold mt-2">{label}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-xs">{desc}</CardDescription>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
         </div>
 
         <div className="grid gap-4 sm:gap-6">

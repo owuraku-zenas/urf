@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -64,11 +65,12 @@ interface Semester {
   name: string
 }
 
-export default function MembersPage() {
+function MembersPageContent() {
   const { user } = useUser()
   const { selectedSemester } = useSemester()
   const router = useRouter()
   const { toast } = useToast()
+  const searchParams = useSearchParams()
   const isAdmin = user?.role === "admin" || !user
 
   const [members, setMembers] = useState<Member[]>([])
@@ -77,7 +79,7 @@ export default function MembersPage() {
   const [refetching, setRefetching] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCellGroup, setSelectedCellGroup] = useState("all")
-  const [selectedCommitment, setSelectedCommitment] = useState("all")
+  const [selectedCommitment, setSelectedCommitment] = useState(() => searchParams.get("commitment") || "all")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
   const [semesters, setSemesters] = useState<Semester[]>([])
@@ -515,5 +517,13 @@ export default function MembersPage() {
         </AlertDialogContent>
       </AlertDialog>
     </>
+  )
+}
+
+export default function MembersPage() {
+  return (
+    <Suspense>
+      <MembersPageContent />
+    </Suspense>
   )
 }
