@@ -28,6 +28,38 @@ const TYPE_STYLES: Record<ChangeType, { label: string; bg: string; text: string 
 
 const releases: Release[] = [
   {
+    date: "2026-06-05",
+    displayDate: "June 5, 2026",
+    changes: [
+      {
+        type: "NEW",
+        title: "Three new reports: Retention, Invitations, and Demographics",
+        body: "Retention shows how many members who were Committed in one semester stayed Committed in the next — and how many dropped to At Risk, Uncommitted, or went dark. Invitations ranks every member who has brought someone in by the quality of their invites (how many stayed Committed), not just the count. Demographics breaks down membership by academic level (100–Alumni), top universities, and top programmes.",
+        note: "All three are in the Reports menu in the navigation bar.",
+      },
+      {
+        type: "NEW",
+        title: "Cell Groups page now shows commitment breakdown per group",
+        body: "Each cell group card now shows a mini bar and counts for Committed, At Risk, and Uncommitted members in the active semester. Lets leaders see at a glance which groups are thriving and which need attention without opening a separate report.",
+      },
+      {
+        type: "NEW",
+        title: "Needs Attention card on the dashboard",
+        body: "When members are At Risk in the selected semester, a new card appears on the dashboard listing up to 8 of them by name and cell group. Each name links directly to their member profile. The card is hidden when nobody is at risk.",
+      },
+      {
+        type: "IMPROVEMENT",
+        title: "Commitment score explanation on the Members page",
+        body: "A collapsible panel below the KPI cards explains exactly how each status is calculated: Committed (≥70% attendance), At Risk (40–69%), Uncommitted (<40%), and New Member (no data yet). Also shows the formula and notes that scores update automatically after every attendance save.",
+      },
+      {
+        type: "FIX",
+        title: "Cell Groups page no longer crashes on a temporary database blip",
+        body: "The page was calling the database directly with no error handling, so a momentary Neon connection timeout would show a full crash page. It now displays a friendly message and invites you to refresh rather than crashing.",
+      },
+    ],
+  },
+  {
     date: "2026-06-04",
     displayDate: "June 4, 2026",
     changes: [
