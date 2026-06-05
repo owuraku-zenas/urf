@@ -299,6 +299,47 @@ function MembersPageContent() {
           </Card>
         </div>
 
+        {/* How scores are calculated */}
+        <details className="mb-6 rounded-lg border border-gray-200 bg-gray-50 text-sm">
+          <summary className="cursor-pointer select-none px-4 py-3 font-medium text-gray-600 hover:text-gray-900">
+            How are these scores calculated?
+          </summary>
+          <div className="border-t border-gray-200 px-4 py-4 grid gap-3 sm:grid-cols-2">
+            <div className="flex gap-3">
+              <span className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full bg-green-500" />
+              <div>
+                <p className="font-medium text-gray-800">Committed — ≥70% attendance</p>
+                <p className="text-gray-500 text-xs mt-0.5">The member attended at least 70% of all events in the selected semester that occurred on or after their join date. Shows consistent, reliable engagement.</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <span className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full bg-yellow-400" />
+              <div>
+                <p className="font-medium text-gray-800">At Risk — 40–69% attendance</p>
+                <p className="text-gray-500 text-xs mt-0.5">The member attended between 40% and 69% of events. Present but inconsistent — a good candidate for a follow-up conversation before they disengage further.</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <span className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full bg-red-400" />
+              <div>
+                <p className="font-medium text-gray-800">Uncommitted — &lt;40% attendance</p>
+                <p className="text-gray-500 text-xs mt-0.5">The member attended fewer than 40% of events. Low engagement warrants pastoral attention. The score updates automatically after each attendance entry.</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <span className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full bg-blue-400" />
+              <div>
+                <p className="font-medium text-gray-800">New Member — no data yet</p>
+                <p className="text-gray-500 text-xs mt-0.5">No attendance has been recorded for this member in the selected semester. Once events are marked, their score calculates automatically. Historical members with no events default to Committed.</p>
+              </div>
+            </div>
+            <div className="sm:col-span-2 mt-1 rounded-md bg-white border border-gray-100 px-3 py-2 text-xs text-gray-500">
+              <span className="font-medium text-gray-700">Formula: </span>
+              attendance % = events attended ÷ total events in semester (from join date onwards). Updated live after every attendance save.
+            </div>
+          </div>
+        </details>
+
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>Member List</CardTitle>

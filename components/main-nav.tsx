@@ -33,9 +33,12 @@ export function MainNav({ isAdmin = false }: { isAdmin?: boolean }) {
       href: "/reports",
       label: "Reports",
       subItems: [
-        { href: "/reports/attendance-trends", label: "Attendance Trends" },
-        { href: "/reports/member-growth", label: "Member Growth" },
-        { href: "/reports/semester-comparison", label: "Semester Comparison" }
+        { href: "/reports/attendance-trends",   label: "Attendance Trends"    },
+        { href: "/reports/member-growth",       label: "Member Growth"        },
+        { href: "/reports/semester-comparison", label: "Semester Comparison"  },
+        { href: "/reports/retention",           label: "Retention"            },
+        { href: "/reports/invitations",         label: "Invitations"          },
+        { href: "/reports/demographics",        label: "Demographics"         },
       ]
     },
   ]
