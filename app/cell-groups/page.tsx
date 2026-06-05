@@ -11,33 +11,53 @@ export default async function CellGroupsPage() {
 
   const isAdmin = session.user.role === 'ADMIN'
 
-  const [cellGroups, activeSemester] = await Promise.all([
-    prisma.cellGroup.findMany({
-      include: { _count: { select: { members: true } } },
-      orderBy: { name: 'asc' },
-    }),
-    prisma.semester.findFirst({ where: { status: 'ACTIVE' } }),
-  ])
+  let cellGroups: Awaited<ReturnType<typeof prisma.cellGroup.findMany<{ include: { _count: { select: { members: true } } } }>>> = []
+  let activeSemester: Awaited<ReturnType<typeof prisma.semester.findFirst>> = null
+  let commitmentMap: Record<string, Record<string, number>> = {}
+  let dbError = false
 
-  // Build commitment breakdown per cell group for the active semester
-  const commitmentMap: Record<string, Record<string, number>> = {}
-  if (activeSemester) {
-    const commitments = await prisma.semesterCommitment.findMany({
-      where: { semesterId: activeSemester.id },
-      include: { member: { select: { cellGroupId: true } } },
-    })
-    for (const c of commitments) {
-      const cgId = c.member.cellGroupId
-      if (!cgId) continue
-      if (!commitmentMap[cgId]) commitmentMap[cgId] = {}
-      commitmentMap[cgId][c.status] = (commitmentMap[cgId][c.status] || 0) + 1
+  try {
+    ;[cellGroups, activeSemester] = await Promise.all([
+      prisma.cellGroup.findMany({
+        include: { _count: { select: { members: true } } },
+        orderBy: { name: 'asc' },
+      }),
+      prisma.semester.findFirst({ where: { status: 'ACTIVE' } }),
+    ])
+
+    if (activeSemester) {
+      const commitments = await prisma.semesterCommitment.findMany({
+        where: { semesterId: activeSemester.id },
+        include: { member: { select: { cellGroupId: true } } },
+      })
+      for (const c of commitments) {
+        const cgId = c.member.cellGroupId
+        if (!cgId) continue
+        if (!commitmentMap[cgId]) commitmentMap[cgId] = {}
+        commitmentMap[cgId][c.status] = (commitmentMap[cgId][c.status] || 0) + 1
+      }
     }
+  } catch (err) {
+    console.error("Cell groups page DB error:", err)
+    dbError = true
   }
 
   const committed   = (cgId: string) => commitmentMap[cgId]?.COMMITTED   || 0
   const atRisk      = (cgId: string) => commitmentMap[cgId]?.AT_RISK      || 0
   const uncommitted = (cgId: string) => commitmentMap[cgId]?.UNCOMMITTED  || 0
   const newMember   = (cgId: string) => commitmentMap[cgId]?.NEW_MEMBER   || 0
+
+  if (dbError) {
+    return (
+      <div className="container mx-auto py-8">
+        <h1 className="text-3xl font-bold mb-6">Cell Groups</h1>
+        <div className="rounded-lg border border-red-200 bg-red-50 px-6 py-8 text-center">
+          <p className="text-sm font-medium text-red-800">Unable to load cell groups</p>
+          <p className="mt-1 text-xs text-red-600">The database is temporarily unreachable. Please refresh the page in a moment.</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto py-8">
