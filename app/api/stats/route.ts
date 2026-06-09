@@ -14,13 +14,20 @@ export async function GET(request: Request) {
     const commitmentWhere = (status: CommitmentStatus) =>
       semesterId ? { semesterId, status } : { status }
 
+    const sem = semesterId
+      ? await prisma.semester.findUnique({ where: { id: semesterId } })
+      : null
+
     let activeSemesterName = null
     if (semesterId) {
-      const sem = await prisma.semester.findUnique({ where: { id: semesterId } })
       activeSemesterName = sem?.name || null
     } else if (rawSemesterId === 'all') {
       activeSemesterName = "All Semesters"
     }
+
+    const memberCountWhere = sem
+      ? { where: { joinDate: { lte: sem.endDate! } } }
+      : undefined
 
     const [
       memberCount,
@@ -33,7 +40,7 @@ export async function GET(request: Request) {
       atRiskCount,
       newMemberCount,
     ] = await Promise.all([
-      prisma.member.count(),
+      prisma.member.count(memberCountWhere),
       prisma.event.count({ where: eventWhere }),
       prisma.cellGroup.count(),
       prisma.attendance.count({ where: attendanceWhere }),
