@@ -306,7 +306,7 @@ export default function WhatsNewPage() {
   const totalChanges = releases.reduce((sum, r) => sum + r.changes.length, 0)
 
   return (
-    <main className="mx-auto max-w-3xl px-5 py-10">
+    <main className="mx-auto max-w-3xl px-3 sm:px-5 py-6 sm:py-10">
       {/* Page header */}
       <div className="mb-12 border-b border-slate-200 pb-8">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-[1.75rem]">

@@ -228,7 +228,7 @@ export default function ReportsPage() {
 
   return (
     <main className="flex-1">
-      <div className="w-full max-w-7xl mx-auto px-5 py-10">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-5 py-6 sm:py-10">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-4 flex-wrap">
             <h1 className="text-2xl sm:text-3xl font-bold">Reports & Analytics</h1>
@@ -244,7 +244,7 @@ export default function ReportsPage() {
         </div>
 
         {/* Detailed report pages */}
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5 mb-6">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 mb-6">
           {[
             { href: "/reports/member-growth",      label: "Member Growth",       desc: "Monthly joins, year & semester filters",    icon: TrendingUp    },
             { href: "/reports/semester-comparison", label: "Semester Comparison", desc: "Attendance & commitment per semester",      icon: BarChart2     },

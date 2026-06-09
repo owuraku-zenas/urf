@@ -126,11 +126,11 @@ export default function RetentionReportPage() {
                 <tr>
                   <th className="text-left font-medium p-3">From</th>
                   <th className="text-left font-medium p-3">To</th>
-                  <th className="text-right font-medium p-3">Committed in From</th>
-                  <th className="text-right font-medium p-3 text-green-700">Retained</th>
-                  <th className="text-right font-medium p-3 text-yellow-700">→ At Risk</th>
-                  <th className="text-right font-medium p-3 text-red-700">→ Uncommitted</th>
-                  <th className="text-right font-medium p-3 text-gray-500">No Data</th>
+                  <th className="text-right font-medium p-3 hidden sm:table-cell">Committed in From</th>
+                  <th className="text-right font-medium p-3 text-green-700 hidden sm:table-cell">Retained</th>
+                  <th className="text-right font-medium p-3 text-yellow-700 hidden md:table-cell">→ At Risk</th>
+                  <th className="text-right font-medium p-3 text-red-700 hidden md:table-cell">→ Uncommitted</th>
+                  <th className="text-right font-medium p-3 text-gray-500 hidden md:table-cell">No Data</th>
                   <th className="text-right font-medium p-3">Rate</th>
                 </tr>
               </thead>
@@ -143,11 +143,11 @@ export default function RetentionReportPage() {
                   <tr key={i} className="border-b hover:bg-muted/30 transition-colors">
                     <td className="p-3 font-medium">{row.fromSemester}</td>
                     <td className="p-3 text-muted-foreground">{row.toSemester}</td>
-                    <td className="p-3 text-right">{row.committedInA}</td>
-                    <td className="p-3 text-right text-green-700 font-medium">{row.retainedCommitted}</td>
-                    <td className="p-3 text-right text-yellow-700">{row.droppedToAtRisk}</td>
-                    <td className="p-3 text-right text-red-700">{row.droppedToUncommitted}</td>
-                    <td className="p-3 text-right text-gray-400">{row.noData}</td>
+                    <td className="p-3 text-right hidden sm:table-cell">{row.committedInA}</td>
+                    <td className="p-3 text-right text-green-700 font-medium hidden sm:table-cell">{row.retainedCommitted}</td>
+                    <td className="p-3 text-right text-yellow-700 hidden md:table-cell">{row.droppedToAtRisk}</td>
+                    <td className="p-3 text-right text-red-700 hidden md:table-cell">{row.droppedToUncommitted}</td>
+                    <td className="p-3 text-right text-gray-400 hidden md:table-cell">{row.noData}</td>
                     <td className="p-3 text-right">
                       <span className={`font-bold ${
                         row.retentionRate >= 70 ? 'text-green-600'

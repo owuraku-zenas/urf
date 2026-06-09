@@ -25,11 +25,11 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="w-full max-w-7xl mx-auto px-5 flex h-16 items-center justify-between gap-4">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-5 flex h-14 sm:h-16 items-center justify-between gap-2 sm:gap-4">
         {/* Logo - left */}
         <div className="flex items-center min-w-fit">
           <Link href="/">
-            <img src="/church-logo.png" alt="Church Logo" className="h-12 w-auto object-contain" />
+            <img src="/church-logo.png" alt="Church Logo" className="h-9 sm:h-12 w-auto object-contain" />
           </Link>
         </div>
         

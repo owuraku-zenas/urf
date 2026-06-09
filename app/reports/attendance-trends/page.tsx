@@ -245,9 +245,9 @@ export default function AttendanceTrendsReportPage() {
                 <tr className="border-b">
                   <th className="text-left py-3 px-4">Date</th>
                   <th className="text-left py-3 px-4">Event</th>
-                  <th className="text-left py-3 px-4">Type</th>
+                  <th className="text-left py-3 px-4 hidden sm:table-cell">Type</th>
                   <th className="text-left py-3 px-4">Attendance</th>
-                  <th className="text-left py-3 px-4">Percentage</th>
+                  <th className="text-left py-3 px-4">%</th>
                 </tr>
               </thead>
               <tbody>
@@ -268,10 +268,8 @@ export default function AttendanceTrendsReportPage() {
                     <tr key={event.id} className="border-b">
                       <td className="py-3 px-4">{new Date(event.date).toLocaleDateString()}</td>
                       <td className="py-3 px-4">{event.name}</td>
-                      <td className="py-3 px-4">{formatEventType(event.type)}</td>
-                      <td className="py-3 px-4">
-                        {event.attendanceCount} / {reportData?.totalMembers}
-                      </td>
+                      <td className="py-3 px-4 hidden sm:table-cell">{formatEventType(event.type)}</td>
+                      <td className="py-3 px-4">{event.attendanceCount} / {reportData?.totalMembers}</td>
                       <td className="py-3 px-4">{event.attendancePercentage}%</td>
                     </tr>
                   ))
@@ -281,7 +279,7 @@ export default function AttendanceTrendsReportPage() {
           </div>
           
           {filteredEvents.length > 0 && (
-            <div className="flex items-center justify-between px-2 py-4 mt-2">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-2 py-4 mt-2">
               <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-2">
                   <p>Rows per page</p>

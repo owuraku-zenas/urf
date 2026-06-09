@@ -142,7 +142,7 @@ export default function AttendancePage() {
   if (error) {
     return (
       <main className="flex-1">
-        <div className="w-full max-w-7xl mx-auto px-5 py-10">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-5 py-6 sm:py-10">
           <Card className="border-red-200 bg-red-50">
             <CardHeader>
               <CardTitle className="text-red-800">Error</CardTitle>
@@ -156,7 +156,7 @@ export default function AttendancePage() {
 
   return (
     <main className="flex-1">
-      <div className="w-full max-w-7xl mx-auto px-5 py-10">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-5 py-6 sm:py-10">
         <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
           <h1 className="text-2xl sm:text-3xl font-bold">Attendance Tracking</h1>
           <SemesterSelector />
@@ -168,9 +168,9 @@ export default function AttendancePage() {
             <CardDescription>Choose an event to view attendance records</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <Select value={selectedEventId} onValueChange={handleSelectEvent}>
-                <SelectTrigger className="w-full md:w-[300px]">
+                <SelectTrigger className="w-full sm:w-[300px]">
                   <SelectValue placeholder="Select an event" />
                 </SelectTrigger>
                 <SelectContent>
@@ -191,7 +191,7 @@ export default function AttendancePage() {
                   )}
                 </SelectContent>
               </Select>
-              <Button disabled={!selectedEventId} asChild className="w-full md:w-auto">
+              <Button disabled={!selectedEventId} asChild className="w-full sm:w-auto">
                 <Link href={selectedEventId ? `/attendance/${selectedEventId}` : "#"}>
                   <ClipboardList className="mr-2 h-4 w-4" />
                   Mark Attendance
@@ -210,15 +210,15 @@ export default function AttendancePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0 mb-4">
+              <div className="flex flex-col gap-3 sm:flex-row mb-4">
                 <Input
                   placeholder="Search by name or phone..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full md:max-w-sm"
+                  className="w-full sm:max-w-sm"
                 />
                 <Select value={selectedCellGroup} onValueChange={setSelectedCellGroup}>
-                  <SelectTrigger className="w-full md:w-[180px]">
+                  <SelectTrigger className="w-full sm:w-[180px]">
                     <SelectValue placeholder="Filter by cell group" />
                   </SelectTrigger>
                   <SelectContent>
@@ -237,7 +237,7 @@ export default function AttendancePage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
-                      <TableHead>Phone</TableHead>
+                      <TableHead className="hidden sm:table-cell">Phone</TableHead>
                       <TableHead className="hidden sm:table-cell">Cell Group</TableHead>
                       <TableHead className="hidden sm:table-cell">Time Marked</TableHead>
                     </TableRow>
@@ -258,8 +258,12 @@ export default function AttendancePage() {
                     ) : (
                       filteredRecords.map((record) => (
                         <TableRow key={record.id}>
-                          <TableCell className="font-medium">{record.member.name}</TableCell>
-                          <TableCell>{record.member.phone}</TableCell>
+                          <TableCell className="font-medium">
+                            <div>{record.member.name}</div>
+                            <div className="text-xs text-gray-500 sm:hidden">{record.member.phone}</div>
+                            <div className="text-xs text-gray-500 sm:hidden">{record.member.cellGroup?.name || 'No Cell Group'}</div>
+                          </TableCell>
+                          <TableCell className="hidden sm:table-cell">{record.member.phone}</TableCell>
                           <TableCell className="hidden sm:table-cell">{record.member.cellGroup?.name || 'No Cell Group'}</TableCell>
                           <TableCell className="hidden sm:table-cell">{new Date(record.createdAt).toLocaleTimeString()}</TableCell>
                         </TableRow>
