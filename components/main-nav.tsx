@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 export function MainNav({ isAdmin = false }: { isAdmin?: boolean }) {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
 
   const isActive = (path: string) => {
     if (path === "/" && pathname === "/") return true
@@ -33,13 +34,13 @@ export function MainNav({ isAdmin = false }: { isAdmin?: boolean }) {
       href: "/reports",
       label: "Reports",
       subItems: [
-        { href: "/reports/attendance-trends",   label: "Attendance Trends"    },
-        { href: "/reports/member-growth",       label: "Member Growth"        },
-        { href: "/reports/semester-comparison", label: "Semester Comparison"  },
-        { href: "/reports/retention",           label: "Retention"            },
-        { href: "/reports/invitations",         label: "Invitations"          },
-        { href: "/reports/demographics",        label: "Demographics"         },
-      ]
+        { href: "/reports/attendance-trends",   label: "Attendance Trends"   },
+        { href: "/reports/member-growth",       label: "Member Growth"       },
+        { href: "/reports/semester-comparison", label: "Semester Comparison" },
+        { href: "/reports/retention",           label: "Retention"           },
+        { href: "/reports/invitations",         label: "Invitations"         },
+        { href: "/reports/demographics",        label: "Demographics"        },
+      ],
     },
   ]
   if (isAdmin) {
@@ -58,22 +59,22 @@ export function MainNav({ isAdmin = false }: { isAdmin?: boolean }) {
               className={`text-sm font-medium flex items-center gap-1 transition-colors hover:text-primary ${
                 isActive(item.href) ? "text-primary" : "text-muted-foreground"
               }`}
-              onClick={() => setIsOpen(false)}
             >
               {item.label}
-              {item.subItems && <ChevronDown className="h-3.5 w-3.5 opacity-70 transition-transform group-hover:rotate-180" />}
+              {item.subItems && (
+                <ChevronDown className="h-3.5 w-3.5 opacity-70 transition-transform group-hover:rotate-180" />
+              )}
             </Link>
             {item.subItems && (
               <div className="absolute left-0 top-full hidden group-hover:block z-50 pt-2 min-w-[200px]">
                 <div className="bg-popover text-popover-foreground border rounded-md shadow-md p-1 flex flex-col gap-1">
-                  {item.subItems.map(subItem => (
+                  {item.subItems.map((subItem) => (
                     <Link
                       key={subItem.href}
                       href={subItem.href}
                       className={`text-sm px-2 py-1.5 hover:bg-accent hover:text-accent-foreground rounded-sm transition-colors ${
                         isActive(subItem.href) ? "bg-accent/50 text-accent-foreground" : ""
                       }`}
-                      onClick={() => setIsOpen(false)}
                     >
                       {subItem.label}
                     </Link>
@@ -93,35 +94,58 @@ export function MainNav({ isAdmin = false }: { isAdmin?: boolean }) {
             <span className="sr-only">Toggle menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-[240px] sm:w-[300px]">
-          <nav className="flex flex-col space-y-4 mt-4">
+        <SheetContent side="left" className="w-72 px-0">
+          <nav className="flex flex-col mt-6">
             {navItems.map((item) => (
-              <div key={item.href} className="flex flex-col">
-                <Link
-                  href={item.href}
-                  className={`text-sm font-medium flex items-center justify-between transition-colors hover:text-primary py-2 ${
-                    isActive(item.href) ? "text-primary" : "text-muted-foreground"
-                  }`}
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.label}
-                  {item.subItems && <ChevronDown className="h-4 w-4 opacity-70" />}
-                </Link>
-                {item.subItems && (
-                  <div className="flex flex-col pl-4 border-l border-border ml-2 mt-1 space-y-2">
-                    {item.subItems.map(subItem => (
-                      <Link
-                        key={subItem.href}
-                        href={subItem.href}
-                        className={`text-sm font-medium transition-colors hover:text-primary py-1 ${
-                          isActive(subItem.href) ? "text-primary" : "text-muted-foreground"
+              <div key={item.href}>
+                {item.subItems ? (
+                  <>
+                    <button
+                      className={`w-full flex items-center justify-between px-5 py-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground ${
+                        isActive(item.href) ? "text-primary" : "text-muted-foreground"
+                      }`}
+                      onClick={() =>
+                        setOpenSubmenu(openSubmenu === item.href ? null : item.href)
+                      }
+                    >
+                      {item.label}
+                      <ChevronDown
+                        className={`h-4 w-4 opacity-70 transition-transform ${
+                          openSubmenu === item.href ? "rotate-180" : ""
                         }`}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {subItem.label}
-                      </Link>
-                    ))}
-                  </div>
+                      />
+                    </button>
+                    {openSubmenu === item.href && (
+                      <div className="flex flex-col border-l border-border ml-5">
+                        {item.subItems.map((subItem) => (
+                          <Link
+                            key={subItem.href}
+                            href={subItem.href}
+                            className={`px-4 py-2.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground ${
+                              isActive(subItem.href)
+                                ? "text-primary font-medium"
+                                : "text-muted-foreground"
+                            }`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {subItem.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className={`flex items-center px-5 py-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground ${
+                      isActive(item.href)
+                        ? "text-primary bg-accent/50"
+                        : "text-muted-foreground"
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
                 )}
               </div>
             ))}

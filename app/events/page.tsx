@@ -71,7 +71,7 @@ export default function EventsPage() {
   if (error) {
     return (
       <main className="flex-1">
-        <div className="w-full max-w-7xl mx-auto px-5 py-10">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-5 py-6 sm:py-10">
           <Card className="border-red-200 bg-red-50">
             <CardHeader>
               <CardTitle className="text-red-800">Error</CardTitle>
@@ -85,7 +85,7 @@ export default function EventsPage() {
 
   return (
     <main className="flex-1">
-      <div className="w-full max-w-7xl mx-auto px-5 py-10">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-5 py-6 sm:py-10">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-4 flex-wrap">
             <h1 className="text-2xl sm:text-3xl font-bold">Church Events</h1>

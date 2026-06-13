@@ -30,7 +30,7 @@ export default function RootLayout({
             <div className="flex min-h-screen flex-col">
               <Header />
               <main className="flex-1 relative">
-                <div className="w-full max-w-7xl mx-auto px-5 py-5">
+                <div className="w-full max-w-7xl mx-auto px-3 sm:px-5 py-4 sm:py-5">
                   {children}
                 </div>
               </main>

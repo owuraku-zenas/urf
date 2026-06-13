@@ -260,7 +260,7 @@ function MembersPageContent() {
         </div>
 
         {/* KPI cards — 4 columns now includes New Members */}
-        <div className="grid gap-4 md:grid-cols-4 mb-6">
+        <div className="grid gap-3 grid-cols-2 md:grid-cols-4 mb-6">
           <Card className="bg-green-50/50 border-green-200">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-green-800">Committed</CardTitle>
@@ -434,7 +434,7 @@ function MembersPageContent() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Commitment</TableHead>
-                    <TableHead>Phone</TableHead>
+                    <TableHead className="hidden sm:table-cell">Phone</TableHead>
                     <TableHead className="hidden sm:table-cell">Email</TableHead>
                     <TableHead className="hidden sm:table-cell">Cell Group</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -453,15 +453,9 @@ function MembersPageContent() {
                         <TableCell className="font-medium">
                           <div>
                             {member.name}
-                            <div className="mt-1 text-sm text-gray-500 sm:hidden">
-                              {member.email || 'N/A'}
-                            </div>
-                            <div className="text-sm text-gray-500 sm:hidden">
-                              Cell Group: {member.cellGroup?.name || 'No Cell Group'}
-                            </div>
-                            <div className="text-sm text-gray-500 sm:hidden">
-                              Invited by: {member.invitedBy?.name || 'Not invited by anyone'}
-                            </div>
+                            <div className="mt-1 text-xs text-gray-500 sm:hidden">{member.phone}</div>
+                            <div className="text-xs text-gray-500 sm:hidden">{member.email || 'N/A'}</div>
+                            <div className="text-xs text-gray-500 sm:hidden">{member.cellGroup?.name || 'No Cell Group'}</div>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -475,7 +469,7 @@ function MembersPageContent() {
                             {getCommitmentStatus(member) === 'LEGACY' ? 'COMMITTED' : getCommitmentStatus(member).replace('_', ' ')}
                           </span>
                         </TableCell>
-                        <TableCell>{member.phone}</TableCell>
+                        <TableCell className="hidden sm:table-cell">{member.phone}</TableCell>
                         <TableCell className="hidden sm:table-cell">{member.email || 'N/A'}</TableCell>
                         <TableCell className="hidden sm:table-cell">{member.cellGroup?.name || '-'}</TableCell>
                         <TableCell className="text-right">

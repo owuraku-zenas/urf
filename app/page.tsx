@@ -80,7 +80,7 @@ export default function Home() {
 
   return (
     <main className="flex-1">
-      <div className="w-full max-w-7xl mx-auto px-5 py-10">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-5 py-6 sm:py-10">
 
         {/* Header */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
